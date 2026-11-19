@@ -91,8 +91,9 @@ home=function(){
  const carShort=Math.max(0,(Number(db.monthly)||0)-savedFor(ym()));
  const s1Need=fixedUnpaid('s1')+unpaidCredit('s1')+carShort;
  const unknowns=unknown();
+ const explanation='<div class="card"><h3>配分額の計算内訳</h3><p>選択 '+db.intervalDays+'日 ／ 給料日まで残り '+remaining+'日 ／ 計算対象 '+duration+'日</p><p>'+fmt(free)+' × '+duration+' ÷ '+remaining+' = <b>'+fmt(allowance)+'</b></p>'+(remaining<=db.intervalDays?'<div class="notice">給料日までの残り日数が短いため、5日と7日が同じ金額になることがあるで。</div>':'')+(free<=0?'<div class="notice">配分可能額が0円以下のため、すべての期間が0円になるで。</div>':'')+'</div>';
  const header='<div class="hero"><small>次の'+duration+'日間に使える目安</small><div class="big">'+fmt(allowance)+'</div><div class="seg">'+[3,5,7].map(n=>'<button class="'+(db.intervalDays===n?'active':'')+'" onclick="changeInterval('+n+')">'+n+'日</button>').join('')+'</div><p class="caption">りそな残高 '+fmt(a.r)+' − りそな未払固定費 '+fmt(fixedUnpaid('r'))+' − りそな後払い '+fmt(unpaidCredit('r'))+' − 予備枠 '+fmt(db.weeklyBuffer)+'。次の給料日まで'+remaining+'日で日割り計算。支出記録で自動更新するで。</p><p class="caption">三井住友①の確保予定 '+fmt(s1Need)+'（未払固定費・後払い・今月の未積立目標）。りそなの生活費からは二重に引かへん。</p>'+(unknowns?'<div class="notice">固定費の金額未入力が'+unknowns+'件。金額は暫定やで。</div>':'')+(free<0?'<div class="notice">りそなの資金が不足しているで。</div>':'')+(a.s1<s1Need?'<div class="notice">三井住友①の確保予定額が残高を上回っているで。</div>':'')+'</div>';
- return '<div class="notice">v0.9 テスト版｜通常版のデータとは完全に別保存</div>'+header+original.slice(original.indexOf('</div><div class="card"><h3>口座・財布の残高</h3>')+6);
+ return '<div class="notice">v0.9 テスト版｜通常版のデータとは完全に別保存</div>'+header+explanation+original.slice(original.indexOf('</div><div class="card"><h3>口座・財布の残高</h3>')+6);
 };
 savingView=function(){
  const original=originalSavingView();
