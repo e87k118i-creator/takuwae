@@ -73,4 +73,5 @@ savingView=function(){
 };
 record=function(t){if(t.kind==='saving'&&t.purpose==='car')delete db.savingMonths[String(t.date||today()).slice(0,7)];originalRecord(t)};
 settingsView=function(){return originalSettingsView().replace('<h2>設定・口座管理</h2>','<h2>設定・口座管理</h2><div class="notice">テスト専用データ。通常版の記録には影響せえへん。実データは入力しないでな。</div>')};
+render();
 </script></body></html>
