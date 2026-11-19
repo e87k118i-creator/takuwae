@@ -105,13 +105,24 @@ settingsView=function(){return originalSettingsView().replace('<h2>設定・口�
 
 /* v0.9 salary-period closing: test data only */
 if(!db.rollovers||typeof db.rollovers!=='object')db.rollovers={};
+
+if(!db.closingSnapshots)db.closingSnapshots={};
+function snapshotOn24(){
+ const d=new Date(),pay=Math.max(2,Math.min(28,Number(db.payday)||25));
+ if(d.getDate()!==pay-1)return;
+ const period=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+ const a=balances(),reserve=fixedUnpaid('r')+unpaidCredit('r')+(Number(db.weeklyBuffer)||0);
+ db.closingSnapshots[period]={amount:Math.max(0,a.r-reserve),bankBalance:a.r,reserve,capturedAt:new Date().toISOString(),provisional:true};
+ save();
+}
 const rolloverPeriod=()=>{const d=new Date(),pay=Math.max(1,Math.min(28,Number(db.payday)||25));let y=d.getFullYear(),m=d.getMonth();if(d.getDate()<pay){m--;if(m<0){m=11;y--}}return y+'-'+String(m+1).padStart(2,'0')};
 let closeOpen=false;
 function toggleClose(){closeOpen=!closeOpen;render()}
 function rolloverForm(){
- const period=rolloverPeriod(),closed=db.rollovers[period],a=balances();
+ const period=rolloverPeriod(),closed=db.rollovers[period],a=balances(),snapshot=db.closingSnapshots[period];
  if(closed)return '<div class="card"><h3>給与期間の精算：'+period+'</h3><p>精算済み：'+fmt(closed.total)+'（積立 '+fmt(closed.saving)+'／現金 '+fmt(closed.cash)+'／翌月繰越 '+fmt(closed.carry)+'）</p><small>処理日時：'+esc(closed.recordedAt)+'</small></div>';
  return '<div class="card"><div class="row"><h3>25日｜前給与期間の余剰金精算</h3><button class="secondary" type="button" onclick="toggleClose()">'+(closeOpen?'閉じる':'精算を開く')+'</button></div><p class="caption">対象期間：'+period+'の給与日を迎えた時点。新しい給与が入金済みなら、前期間の最終余剰金を明細で確認して入力してな。金額は自動確定せえへん。</p>'+
+ (snapshot?'<p class="caption">24日記録（暫定）：'+fmt(snapshot.amount)+'。確定額は明細と照合して入力してな。</p>':'<p class="caption">24日記録なし。後からの自動復元はできへんので明細を確認してな。</p>')+
  (closeOpen?'<form class="stack" onsubmit="commitRollover(event)"><div class="field"><label>前給与期間の最終余剰金（円）</label><input name="total" type="number" min="0" step="1" required placeholder="確認した金額"></div><div class="field"><label>積立に回す金額</label><input name="saving" type="number" min="0" step="1" required value="0"></div><div class="field"><label>積立先</label><select name="purpose">'+db.fundCategories.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.name)+'</option>').join('')+'</select></div><div class="field"><label>現金で引き出す金額</label><input name="cash" type="number" min="0" step="1" required value="0"></div><p class="caption">残額は翌月の生活費へ繰り越す。積立と現金引き出しは、実際に資金を移動した後に記録してな。</p><p class="caption">りそな帳簿残高：'+fmt(a.r)+'。振替は支出として数えへん。</p><div class="actions"><button class="secondary" type="button" onclick="toggleClose()">キャンセル</button><button type="submit">実行済みの内容を記録</button></div></form>':'')+'</div>';
 }
 function commitRollover(event){
@@ -131,6 +142,7 @@ function commitRollover(event){
  if(saving&&data.purpose==='car')delete db.savingMonths[stamp.slice(0,7)];
  save();closeOpen=false;render();
 }
+snapshotOn24();
 const homeBeforeRollover=home;
 home=function(){return rolloverForm()+homeBeforeRollover()};
 render();
