@@ -124,7 +124,7 @@ function confirmClosingAmount(amount){
  if(!Number.isSafeInteger(n)||n<0)return alert('金額を確認してな');
  if(db.rollovers[period])return alert('精算済みやで');
  if(!confirm('締め額 '+fmt(n)+' を確定する？'))return;
- db.closingSnapshots[period]={...(db.closingSnapshots[period]||{}),amount:n,confirmed:true,provisional:false,confirmedAt:new Date().toISOString()};
+ db.closingSnapshots[period]={...(db.closingSnapshots[period]||{}),amount:n,confirmed:true,provisional:false,confirmedAt:new Date().toISOString(),txSignature:closingTxSignature(period)};
  save();render();
 }
 const rolloverPeriod=()=>{const d=new Date(),pay=Math.max(1,Math.min(28,Number(db.payday)||25));let y=d.getFullYear(),m=d.getMonth();if(d.getDate()<pay){m--;if(m<0){m=11;y--}}return y+'-'+String(m+1).padStart(2,'0')};
@@ -147,7 +147,7 @@ function commitRollover(event){
  const period=rolloverPeriod();if(new Date().getDate()<Math.max(2,Math.min(28,Number(db.payday)||25)))return alert('給料日以降に精算してな');if(db.rollovers[period])return alert('この給与期間は精算済みやで');
  if(saving+cash>balances().r)return alert('実際に移動する積立・現金の合計が、りそなの帳簿残高を超えてるで');
  if(saving&&!db.fundCategories.some(x=>x.id===data.purpose))return alert('積立先を選び直してな');
- const snap=db.closingSnapshots[period];if(snap?.confirmed&&total!==snap.amount)return alert('24日に確定した締め額と一致せえへん。確認してな');
+ const snap=db.closingSnapshots[period];if(snap?.confirmed&&total!==snap.amount)return alert('24日に確定した締め額と一致せえへん。確認してな');if(snap?.confirmed&&snap.txSignature&&snap.txSignature!==closingTxSignature(period))return alert('24日の締め確定後に過去の取引が変わっているで。締め額を再確認してな');
  const carry=total-saving-cash;
  if(!confirm('前期間の余剰金 '+fmt(total)+' を精算するで。\n積立 '+fmt(saving)+'、現金 '+fmt(cash)+'、翌月繰越 '+fmt(carry)+'。\n積立と現金引き出しは実行済みで間違いない？'))return;
  const stamp=today();
@@ -159,8 +159,8 @@ function commitRollover(event){
 }
 snapshotOn24();
 
-function cancelRollover(){
- const period=rolloverPeriod(),r=db.rollovers[period];
+function cancelRollover(period=rolloverPeriod()){
+ const r=db.rollovers[period];
  if(!r)return alert('精算記録がないで');
  const linked=db.tx.filter(t=>t.rolloverPeriod===period);
  // Older test records lack linkage; do not guess which transactions belong to them.
@@ -185,7 +185,18 @@ function reviseClosingAmount(){
  snap.confirmed=false;snap.provisional=true;
  save();snapshotOn24();render();
 }
+
+function historyRolloverView(){
+ const keys=Object.keys(db.rollovers).sort().reverse();
+ if(!keys.length)return '';
+ return '<div class="card"><h3>過去の給与期間精算</h3>'+keys.map(k=>{const r=db.rollovers[k];return '<div class="entry"><div class="row"><b>'+esc(k)+'</b><b>'+fmt(r.total)+'</b></div><p class="caption">積立 '+fmt(r.saving)+'／現金 '+fmt(r.cash)+'／繰越 '+fmt(r.carry)+'</p><button class="secondary" onclick="cancelRollover(\''+esc(k)+'\')">この期間の精算全体を取り消す</button></div>'}).join('')+'</div>';
+}
+function closingTxSignature(period){
+ const [year,month]=period.split('-').map(Number),pay=Math.max(2,Math.min(28,Number(db.payday)||25));
+ const end=new Date(year,month-1,pay-1,23,59,59);
+ return JSON.stringify(db.tx.filter(t=>t.date&&new Date(t.date+'T12:00:00')<=end&&!t.rolloverPeriod).map(t=>[t.id,t.kind,t.amount,t.date,t.from,t.to,t.settled]).sort((a,b)=>String(a[0]).localeCompare(String(b[0]))));
+}
 const homeBeforeRollover=home;
-home=function(){return rolloverForm()+homeBeforeRollover()};
+home=function(){return rolloverForm()+historyRolloverView()+homeBeforeRollover()};
 render();
 </script></body></html>
