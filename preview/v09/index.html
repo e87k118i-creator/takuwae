@@ -112,14 +112,28 @@ function snapshotOn24(){
  if(d.getDate()!==pay-1)return;
  const period=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
  const a=balances(),reserve=fixedUnpaid('r')+unpaidCredit('r')+(Number(db.weeklyBuffer)||0);
- db.closingSnapshots[period]={amount:Math.max(0,a.r-reserve),bankBalance:a.r,reserve,capturedAt:new Date().toISOString(),provisional:true};
+ if(db.closingSnapshots[period]?.confirmed)return;
+ db.closingSnapshots[period]={amount:Math.max(0,a.r-reserve),bankBalance:a.r,reserve,capturedAt:new Date().toISOString(),provisional:true,confirmed:false};
  save();
+}
+
+function confirmClosingAmount(amount){
+ const d=new Date(),pay=Math.max(2,Math.min(28,Number(db.payday)||25));
+ if(d.getDate()!==pay-1)return alert('締め額は給料日前日に確定してな');
+ const period=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),n=Number(amount);
+ if(!Number.isSafeInteger(n)||n<0)return alert('金額を確認してな');
+ if(db.rollovers[period])return alert('精算済みやで');
+ if(!confirm('締め額 '+fmt(n)+' を確定する？'))return;
+ db.closingSnapshots[period]={...(db.closingSnapshots[period]||{}),amount:n,confirmed:true,provisional:false,confirmedAt:new Date().toISOString()};
+ save();render();
 }
 const rolloverPeriod=()=>{const d=new Date(),pay=Math.max(1,Math.min(28,Number(db.payday)||25));let y=d.getFullYear(),m=d.getMonth();if(d.getDate()<pay){m--;if(m<0){m=11;y--}}return y+'-'+String(m+1).padStart(2,'0')};
 let closeOpen=false;
 function toggleClose(){closeOpen=!closeOpen;render()}
 function rolloverForm(){
- const period=rolloverPeriod(),closed=db.rollovers[period],a=balances(),snapshot=db.closingSnapshots[period];
+ const period=rolloverPeriod(),closed=db.rollovers[period],a=balances(),snapshot=db.closingSnapshots[period],d=new Date(),pay=Math.max(2,Math.min(28,Number(db.payday)||25));
+ if(d.getDate()===pay-1&&!closed)return '<div class="card"><h3>24日｜余剰金の締め額確定</h3><p class="caption">最後の支出を記録してから確定してな。確定後は自動更新せえへん。</p><div class="field"><label>締め額</label><input id="close-amount" type="number" min="0" step="1" value="'+(snapshot?.amount??0)+'" '+(snapshot?.confirmed?'disabled':'')+'></div>'+(snapshot?.confirmed?'<p>確定済み：'+fmt(snapshot.amount)+'</p>':'<button style="margin-top:10px" onclick="confirmClosingAmount(document.getElementById(\'close-amount\').value)">締め額を確定</button>')+'</div>';
+ if(d.getDate()<pay&&!closed)return '';
  if(closed)return '<div class="card"><h3>給与期間の精算：'+period+'</h3><p>精算済み：'+fmt(closed.total)+'（積立 '+fmt(closed.saving)+'／現金 '+fmt(closed.cash)+'／翌月繰越 '+fmt(closed.carry)+'）</p><small>処理日時：'+esc(closed.recordedAt)+'</small></div>';
  return '<div class="card"><div class="row"><h3>25日｜前給与期間の余剰金精算</h3><button class="secondary" type="button" onclick="toggleClose()">'+(closeOpen?'閉じる':'精算を開く')+'</button></div><p class="caption">対象期間：'+period+'の給与日を迎えた時点。新しい給与が入金済みなら、前期間の最終余剰金を明細で確認して入力してな。金額は自動確定せえへん。</p>'+
  (snapshot?'<p class="caption">24日記録（暫定）：'+fmt(snapshot.amount)+'。確定額は明細と照合して入力してな。</p>':'<p class="caption">24日記録なし。後からの自動復元はできへんので明細を確認してな。</p>')+
@@ -130,7 +144,7 @@ function commitRollover(event){
  const data=Object.fromEntries(new FormData(event.currentTarget)),total=Number(data.total),saving=Number(data.saving),cash=Number(data.cash);
  if(![total,saving,cash].every(n=>Number.isSafeInteger(n)&&n>=0))return alert('金額は0以上の整数で入力してな');
  if(saving+cash>total)return alert('積立と現金の合計が余剰金を超えてるで');
- const period=rolloverPeriod();if(db.rollovers[period])return alert('この給与期間は精算済みやで');
+ const period=rolloverPeriod();if(new Date().getDate()<Math.max(2,Math.min(28,Number(db.payday)||25)))return alert('給料日以降に精算してな');if(db.rollovers[period])return alert('この給与期間は精算済みやで');
  if(saving+cash>balances().r)return alert('実際に移動する積立・現金の合計が、りそなの帳簿残高を超えてるで');
  if(saving&&!db.fundCategories.some(x=>x.id===data.purpose))return alert('積立先を選び直してな');
  const carry=total-saving-cash;
