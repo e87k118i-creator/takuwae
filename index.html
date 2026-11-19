@@ -129,7 +129,7 @@ function rolloverForm(){
  if(d.getDate()<pay&&!closed)return '';
  if(closed)return '<div class="card"><h3>給与期間の精算：'+period+'</h3><p>精算済み：'+fmt(closed.total)+'（積立 '+fmt(closed.saving)+'／現金 '+fmt(closed.cash)+'／翌月繰越 '+fmt(closed.carry)+'）</p><small>処理日時：'+esc(closed.recordedAt)+'</small><p class="caption">精算に紐づく取引は個別編集できへん。訂正が必要なら、精算全体を取り消してやり直してな。</p><button class="danger" onclick="cancelRollover()">精算全体を取り消す</button></div>';
  return '<div class="card"><div class="row"><h3>25日｜前給与期間の余剰金精算</h3><button class="secondary" type="button" onclick="toggleClose()">'+(closeOpen?'閉じる':'精算を開く')+'</button></div><p class="caption">対象期間：'+period+'の給与日を迎えた時点。新しい給与が入金済みなら、前期間の最終余剰金を明細で確認して入力してな。金額は自動確定せえへん。</p>'+
- (snapshot?'<p class="caption">24日記録（'+(snapshot.confirmed?'確定':'暫定')+'）：'+fmt(snapshot.amount)+'。明細と照合してな。</p>':'<p class="caption">24日記録なし。後からの自動復元はできへんので明細を確認してな。</p>')+
+ (snapshot?'<p class="caption">24日記録（'+(snapshot.confirmed?'確定':'暫定')+'）：'+fmt(snapshot.amount)+'。明細と照合してな。</p>'+(snapshot.confirmed?'<button class="secondary" onclick="reopenClosingForReview(\''+period+'\')">締め額の確定を解除</button>':''):'<p class="caption">24日記録なし。後からの自動復元はできへんので明細を確認してな。</p>')+
  (closeOpen?'<form class="stack" onsubmit="commitRollover(event)"><div class="field"><label>前給与期間の最終余剰金（円）</label><input name="total" type="number" min="0" step="1" required value="'+(snapshot?.confirmed?snapshot.amount:'')+'" placeholder="確認した金額"></div><div class="field"><label>積立に回す金額</label><input name="saving" type="number" min="0" step="1" required value="0"></div><div class="field"><label>積立先</label><select name="purpose">'+db.fundCategories.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.name)+'</option>').join('')+'</select></div><div class="field"><label>現金で引き出す金額</label><input name="cash" type="number" min="0" step="1" required value="0"></div><p class="caption">残額は翌月の生活費へ繰り越す。積立と現金引き出しは、実際に資金を移動した後に記録してな。</p><p class="caption">りそな帳簿残高：'+fmt(a.r)+'。振替は支出として数えへん。</p><div class="actions"><button class="secondary" type="button" onclick="toggleClose()">キャンセル</button><button type="submit">実行済みの内容を記録</button></div></form>':'')+'</div>';
 }
 function commitRollover(event){
@@ -179,6 +179,14 @@ function reviseClosingAmount(){
  save();snapshotOn24();render();
 }
 
+function reopenClosingForReview(period){
+ if(db.rollovers[period])return alert('精算済みの期間やで。先に精算を取り消してな');
+ const snap=db.closingSnapshots[period];
+ if(!snap?.confirmed)return alert('確定済みの締め額がないで');
+ if(!confirm('締め額の確定を解除する？ 前期間の余剰金は明細と照合して手入力してな。'))return;
+ snap.confirmed=false;snap.provisional=true;snap.reopenedAt=new Date().toISOString();
+ save();render();
+}
 function historyRolloverView(){
  const keys=Object.keys(db.rollovers).sort().reverse();
  if(!keys.length)return '';
