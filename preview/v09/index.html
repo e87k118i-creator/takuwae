@@ -120,7 +120,7 @@ function commitRollover(event){
  if(![total,saving,cash].every(n=>Number.isSafeInteger(n)&&n>=0))return alert('金額は0以上の整数で入力してな');
  if(saving+cash>total)return alert('積立と現金の合計が余剰金を超えてるで');
  const period=rolloverPeriod();if(db.rollovers[period])return alert('この給与期間は精算済みやで');
- if(total>balances().r||saving+cash>balances().r)return alert('りそなの帳簿残高を超えてるで');
+ if(saving+cash>balances().r)return alert('実際に移動する積立・現金の合計が、りそなの帳簿残高を超えてるで');
  if(saving&&!db.fundCategories.some(x=>x.id===data.purpose))return alert('積立先を選び直してな');
  const carry=total-saving-cash;
  if(!confirm('前期間の余剰金 '+fmt(total)+' を精算するで。\n積立 '+fmt(saving)+'、現金 '+fmt(cash)+'、翌月繰越 '+fmt(carry)+'。\n積立と現金引き出しは実行済みで間違いない？'))return;
