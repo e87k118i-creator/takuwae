@@ -24,6 +24,12 @@ body:has(.quick-tabs) #view{flex:1;display:flex;flex-direction:column;min-height
 body:has(.quick-tabs) .quick-panel{flex:1;display:flex;flex-direction:column;justify-content:space-between;margin-bottom:10px}
 body:has(.quick-tabs) .foot{margin-top:0}
 @media(max-height:700px){body:has(.quick-tabs) .quick-panel{flex:0 0 auto}}
+/* Installed iPhone PWA: fit content exactly above the measured bottom navigation. */
+@media (display-mode: standalone){
+  body:has(.quick-tabs) main{padding-bottom:var(--installed-nav-height,calc(64px + env(safe-area-inset-bottom)))}
+  body:has(.quick-tabs) .quick-panel{margin-bottom:6px}
+}
+
 .quick-choice.chosen{background:#e2f1eb;border:2px solid #448372;color:#24604f}
 </style></head><body><main><header><div><small>PERSONAL FINANCE</small><h1>たくわえ</h1></div><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
 const KEY='takuwae-v1';const names={s1:'三井住友①',r:'りそな',s2:'三井住友②',cash:'現金財布',em:'電子マネー'};const seedBills=[['rent','家賃','r'],['parking','駐車場','s1'],['insurance','傷害保険','s1'],['phone','携帯電話','s1'],['chat','ChatGPT','s1'],['adobe','Adobe','s1'],['youtube','YouTube',''],['weather','ウェザーニュース',''],['prime','Amazonプライム','']].map(([id,name,bank])=>({id,name,bank,active:true}));
@@ -247,4 +253,14 @@ home=function(){
 };
 
 render();
+(function(){
+ const isInstalled=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+ if(!isInstalled)return;
+ const nav=document.querySelector('.nav');
+ if(!nav)return;
+ const sync=()=>document.documentElement.style.setProperty('--installed-nav-height',Math.ceil(nav.getBoundingClientRect().height+6)+'px');
+ sync();
+ window.addEventListener('resize',sync);
+ if(typeof ResizeObserver==='function')new ResizeObserver(sync).observe(nav);
+})();
 </script><script>if("serviceWorker" in navigator && location.protocol==="https:"){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}</script></body></html>
