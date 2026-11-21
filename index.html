@@ -217,9 +217,9 @@ const homeBeforeRollover=home;
 home=function(){return rolloverForm()+historyRolloverView()+homeBeforeRollover()};
 
 /* v1.0 quick entry: existing storage key and ledger are preserved. */
-let quickMode='quick',quickCategory='買い物',quickSource='r',quickAmount='',quickNotice='';
-const quickSources=[['r','りそな'],['s1','三井住友'],['cash','現金'],['em','電子マネー']];
-const quickCategories=['買い物','食事','支払い','その他'];
+let quickMode='quick',quickCategory='買い物',quickSource='cash',quickAmount='',quickNotice='';
+const quickSources=[['cash','現金'],['em','電子マネー'],['s1','三井住友'],['r','りそな']];
+const quickCategories=['買い物','食事','支払い','雑費'];
 const homeV09=home;
 function quickSetCategory(v){if(!quickCategories.includes(v))return;quickCategory=v;render()}
 function quickSetSource(v){if(!quickSources.some(x=>x[0]===v))return;quickSource=v;render()}
@@ -232,7 +232,7 @@ function quickRecord(){
  if(!quickCategories.includes(quickCategory)||!quickSources.some(x=>x[0]===quickSource))return;
  quickBusy=true;
  try{
-   record({kind:'expense',amount:n,from:quickSource,category:quickCategory,method:'instant',settled:true,note:''});
+   record({kind:'expense',amount:n,from:quickSource,category:quickCategory,method:'instant',settled:true,note:'',recordedAt:new Date().toISOString()});
    quickAmount='';quickNotice=fmt(n)+' を記録したで';
  }finally{quickBusy=false}
  render();
