@@ -326,17 +326,18 @@ body:has(.home-switch:not([hidden])) main{padding-bottom:calc(var(--installed-na
 .nav-inner .sprite-settings{background-position:100% 0}
 @media(max-width:390px){.nav-inner .sprite-icon{width:37px;height:37px}}
 
-/* v37 notebook-inspired masthead and subtle Japanese washi paper texture */
-html{background:#f6f1e7}
+/* v38: softer washi grain matching the approved subtle paper concept.
+   Keep header rings, typography, cards, data and bottom navigation unchanged. */
+html{background:#f8f4eb}
 body{
- background-color:#f6f1e7;
+ background-color:#f8f4eb;
  background-image:
-  radial-gradient(ellipse 1px 13px at 16% 22%,rgba(129,112,87,.075) 1%,transparent 76%),
-  radial-gradient(ellipse 13px 1px at 72% 61%,rgba(142,118,80,.065) 1%,transparent 80%),
-  radial-gradient(ellipse 1px 9px at 88% 11%,rgba(162,138,99,.055) 1%,transparent 80%),
-  repeating-linear-gradient(12deg,rgba(151,130,99,.022) 0px,rgba(151,130,99,.022) .5px,transparent .5px,transparent 7px),
-  repeating-linear-gradient(104deg,rgba(255,255,255,.14) 0px,rgba(255,255,255,.14) .6px,transparent .6px,transparent 13px),
-  linear-gradient(180deg,#f9f5ec 0%,#f4eddf 100%);
+  radial-gradient(ellipse 1px 13px at 16% 22%,rgba(129,112,87,.033) 1%,transparent 76%),
+  radial-gradient(ellipse 13px 1px at 72% 61%,rgba(142,118,80,.028) 1%,transparent 80%),
+  radial-gradient(ellipse 1px 9px at 88% 11%,rgba(162,138,99,.025) 1%,transparent 80%),
+  repeating-linear-gradient(12deg,rgba(151,130,99,.009) 0px,rgba(151,130,99,.009) .5px,transparent .5px,transparent 7px),
+  repeating-linear-gradient(104deg,rgba(255,255,255,.08) 0px,rgba(255,255,255,.08) .6px,transparent .6px,transparent 13px),
+  linear-gradient(180deg,#fcf9f2 0%,#f7f2e9 100%);
  background-size:97px 83px,113px 107px,71px 99px,auto,auto,auto;
  min-height:100dvh;
 }
