@@ -1,23 +1,23 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#e9eef3"><title>たくわえ｜資金管理</title><meta name="takuwae-version" content="69"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" sizes="512x512" href="./icon-wallet-b.png?v=20261120b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="たくわえ"><style>
-:root{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',sans-serif;color:#263a50;background:#e9eef3}*{box-sizing:border-box}body{margin:0}main{max-width:620px;margin:auto;padding:18px 14px 95px}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}h1{font-size:24px;margin:0}h2{font-size:18px;margin:4px 0 14px}h3{font-size:15px;margin:0 0 10px}small,.muted{color:#69788a;font-size:12px}.card{background:white;border-radius:17px;padding:17px;margin-bottom:12px;box-shadow:0 1px 4px #2030400b}.hero{background:#fff;padding:22px;border-radius:20px;margin-bottom:12px}.hero .big{font-size:34px;font-weight:750;letter-spacing:-1px;margin:9px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{padding:13px;background:#f2f5f8;border-radius:12px}.stat strong{display:block;font-size:20px;margin-top:5px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:grid;gap:10px}.field{display:grid;gap:5px;min-width:0}label{font-size:12px;color:#607085;font-weight:650}input,select,textarea{width:100%;min-width:0;padding:12px;border:1px solid #cbd5df;border-radius:10px;background:#fff;color:#263a50;font:inherit;font-size:16px}input[type=checkbox]{width:27px;height:27px;accent-color:#32815c;cursor:pointer}button{border:0;background:#3f627e;color:white;padding:12px 15px;border-radius:11px;font-weight:650;font-size:14px;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.secondary{background:#e9eef3;color:#34516a}.danger{background:#bb3f4b}.outline{background:white;border:1px solid #cbd5df;color:#34516a}.seg{display:flex;gap:5px}.seg button{flex:1;padding:11px 5px;background:#eef2f6;color:#52657a}.seg .active{color:white;background:#3f627e}.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #d5dde5;display:flex;justify-content:center;padding:8px 3px max(10px,env(safe-area-inset-bottom));z-index:2}.nav-inner{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:min(620px,100%);gap:2px}.nav button{background:transparent;color:#66788b;padding:11px 1px;font-size:16px;font-weight:650;letter-spacing:-.35px;min-height:48px;white-space:nowrap}.nav button.active{background:#e9eef3;color:#243f65;font-weight:800;border-radius:10px}.bill{padding:13px 0;border-bottom:1px solid #e4e9ee}.bill:last-child{border:0}.bill-fields{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:7px;align-items:center;margin-top:8px}.tick{display:grid;place-items:center;height:44px;width:48px;cursor:pointer}.tick input{width:30px;height:30px}.green{color:#32815c}.navy{color:#243f65}.blue{color:#3478d4}.amber{color:#9b681e}.progress{height:9px;background:#e4e9ef;border-radius:10px;overflow:hidden}.progress div{height:100%;background:#6d9c8c}.notice{font-size:13px;background:#fff6e7;padding:11px;border-radius:10px;color:#785521;margin-bottom:12px}.pill{font-size:11px;border-radius:20px;padding:4px 8px;background:#edf1f5;color:#536579}.entry{padding:10px 0;border-bottom:1px solid #e7ebef}.entry:last-child{border:0}.entry strong{font-size:16px}.foot{font-size:11px;color:#758498;margin-top:14px;line-height:1.6}.bar{height:12px;border-radius:8px;background:#e8edf3;overflow:hidden;display:flex}.bar span{background:#3478d4}canvas{width:100%;height:220px;display:block;touch-action:pan-y;cursor:crosshair}.chart-detail{min-height:54px;margin-top:8px;padding:10px 12px;border-radius:10px;background:#f2f5f8;font-size:13px;line-height:1.65}.chart-detail strong{font-size:16px}.chart-tip{color:#64748b;font-size:12px;margin-top:5px}.hidden{display:none}.checkselect{width:20px;height:20px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}.caption{font-size:12px;color:#66778a;line-height:1.5}hr{border:0;border-top:1px solid #e5eaf0;margin:15px 0}
-.bill-hint{font-size:12px;color:#9b5b20;margin-top:7px;line-height:1.5}
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#e9eef3"><title>たくわえ｜資金管理</title><meta name="takuwae-version" content="70"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" sizes="512x512" href="./icon-wallet-b.png?v=20261120b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="たくわえ"><style>
+:root{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',sans-serif;color:#263a50;background:#e9eef3}*{box-sizing:border-box}body{margin:0}main{max-width:620px;margin:auto;padding:18px 14px 95px}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}h1{font-size:26px;margin:0}h2{font-size:20px;margin:4px 0 14px}h3{font-size:17px;margin:0 0 10px}small,.muted{color:#69788a;font-size:14px}.card{background:white;border-radius:17px;padding:17px;margin-bottom:12px;box-shadow:0 1px 4px #2030400b}.hero{background:#fff;padding:22px;border-radius:20px;margin-bottom:12px}.hero .big{font-size:36px;font-weight:750;letter-spacing:-1px;margin:9px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{padding:13px;background:#f2f5f8;border-radius:12px}.stat strong{display:block;font-size:22px;margin-top:5px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:grid;gap:10px}.field{display:grid;gap:5px;min-width:0}label{font-size:14px;color:#607085;font-weight:650}input,select,textarea{width:100%;min-width:0;padding:12px;border:1px solid #cbd5df;border-radius:10px;background:#fff;color:#263a50;font:inherit;font-size:18px}input[type=checkbox]{width:27px;height:27px;accent-color:#32815c;cursor:pointer}button{border:0;background:#3f627e;color:white;padding:12px 15px;border-radius:11px;font-weight:650;font-size:16px;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.secondary{background:#e9eef3;color:#34516a}.danger{background:#bb3f4b}.outline{background:white;border:1px solid #cbd5df;color:#34516a}.seg{display:flex;gap:5px}.seg button{flex:1;padding:11px 5px;background:#eef2f6;color:#52657a}.seg .active{color:white;background:#3f627e}.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #d5dde5;display:flex;justify-content:center;padding:8px 3px max(10px,env(safe-area-inset-bottom));z-index:2}.nav-inner{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:min(620px,100%);gap:2px}.nav button{background:transparent;color:#66788b;padding:11px 1px;font-size:18px;font-weight:650;letter-spacing:-.35px;min-height:48px;white-space:nowrap}.nav button.active{background:#e9eef3;color:#243f65;font-weight:800;border-radius:10px}.bill{padding:13px 0;border-bottom:1px solid #e4e9ee}.bill:last-child{border:0}.bill-fields{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:7px;align-items:center;margin-top:8px}.tick{display:grid;place-items:center;height:44px;width:48px;cursor:pointer}.tick input{width:30px;height:30px}.green{color:#32815c}.navy{color:#243f65}.blue{color:#3478d4}.amber{color:#9b681e}.progress{height:9px;background:#e4e9ef;border-radius:10px;overflow:hidden}.progress div{height:100%;background:#6d9c8c}.notice{font-size:15px;background:#fff6e7;padding:11px;border-radius:10px;color:#785521;margin-bottom:12px}.pill{font-size:13px;border-radius:20px;padding:4px 8px;background:#edf1f5;color:#536579}.entry{padding:10px 0;border-bottom:1px solid #e7ebef}.entry:last-child{border:0}.entry strong{font-size:18px}.foot{font-size:13px;color:#758498;margin-top:14px;line-height:1.6}.bar{height:12px;border-radius:8px;background:#e8edf3;overflow:hidden;display:flex}.bar span{background:#3478d4}canvas{width:100%;height:220px;display:block;touch-action:pan-y;cursor:crosshair}.chart-detail{min-height:54px;margin-top:8px;padding:10px 12px;border-radius:10px;background:#f2f5f8;font-size:15px;line-height:1.65}.chart-detail strong{font-size:18px}.chart-tip{color:#64748b;font-size:14px;margin-top:5px}.hidden{display:none}.checkselect{width:20px;height:20px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}.caption{font-size:14px;color:#66778a;line-height:1.5}hr{border:0;border-top:1px solid #e5eaf0;margin:15px 0}
+.bill-hint{font-size:14px;color:#9b5b20;margin-top:7px;line-height:1.5}
 /* v0.9 入出金：手描きレイアウトをもとにした2カラム */
 .tx-layout{display:grid;grid-template-columns:minmax(0,1fr) 75px;gap:13px;align-items:start}
 .tx-fields{display:grid;gap:13px;min-width:0}
 .tx-actions{display:grid;gap:10px;align-content:start}
-.tx-kind{min-height:58px;padding:9px 6px;border:2px solid transparent;border-radius:13px;font-size:17px;font-weight:800;box-shadow:inset 0 0 0 1px #ffffff70}
+.tx-kind{min-height:58px;padding:9px 6px;border:2px solid transparent;border-radius:13px;font-size:19px;font-weight:800;box-shadow:inset 0 0 0 1px #ffffff70}
 .tx-kind.tx-expense{background:#f9e7e5;color:#a43e45}
 .tx-kind.tx-income{background:#e4f1e9;color:#28744b}
 .tx-kind.tx-saving{background:#e5edfc;color:#315ea6}
 .tx-kind.tx-transfer{background:#f7eedc;color:#95691d}
 .tx-kind.selected{border-color:currentColor;box-shadow:0 2px 7px #243f651a}
-.tx-submit{min-height:92px;background:#355c77;font-size:17px;padding:10px 5px}
-.tx-submit small{display:block;font-size:11px;color:#e6eff7;margin-top:5px;font-weight:500}
+.tx-submit{min-height:92px;background:#355c77;font-size:19px;padding:10px 5px}
+.tx-submit small{display:block;font-size:13px;color:#e6eff7;margin-top:5px;font-weight:500}
 .tx-date{margin-top:14px}
 .tx-date input{width:100%}
-@media(max-width:390px){.tx-layout{grid-template-columns:minmax(0,1fr) 64px;gap:9px}.tx-kind{font-size:16px}.tx-submit{font-size:15px}.card{padding:13px}}
+@media(max-width:390px){.tx-layout{grid-template-columns:minmax(0,1fr) 64px;gap:9px}.tx-kind{font-size:18px}.tx-submit{font-size:17px}.card{padding:13px}}
 \n
-.quick-tabs{margin-top:12px;margin-bottom:12px}.quick-panel h3{margin:16px 0 9px}.quick-heading{justify-content:flex-start;gap:12px;margin-bottom:9px}.quick-clear{padding:5px 9px;font-size:12px}.quick-amount-row{display:grid;grid-template-columns:minmax(0,1fr) 90px;gap:8px}.quick-amount{height:56px;display:flex;align-items:center;gap:5px;border:1px solid #cbd5df;border-radius:11px;padding:0 9px;min-width:0}.quick-amount input{border:0;padding:5px 0;min-width:0;font-size:20px}.quick-record{height:56px;padding:0 5px;background:#397e6c}.quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.quick-choice{height:64px;background:#f2f5f8;color:#263a50;border:1px solid #cbd5df;padding:5px}
+.quick-tabs{margin-top:12px;margin-bottom:12px}.quick-panel h3{margin:16px 0 9px}.quick-heading{justify-content:flex-start;gap:12px;margin-bottom:9px}.quick-clear{padding:5px 9px;font-size:14px}.quick-amount-row{display:grid;grid-template-columns:minmax(0,1fr) 90px;gap:8px}.quick-amount{height:56px;display:flex;align-items:center;gap:5px;border:1px solid #cbd5df;border-radius:11px;padding:0 9px;min-width:0}.quick-amount input{border:0;padding:5px 0;min-width:0;font-size:22px}.quick-record{height:56px;padding:0 5px;background:#397e6c}.quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.quick-choice{height:64px;background:#f2f5f8;color:#263a50;border:1px solid #cbd5df;padding:5px}
 /* Keep the note closer to the fixed navigation without altering other tabs. */
 body:has(.quick-tabs) main{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
 body:has(.quick-tabs) #view{flex:1;display:flex;flex-direction:column;min-height:0}
@@ -25,12 +25,12 @@ body:has(.quick-tabs) .quick-panel{flex:1;display:flex;flex-direction:column;jus
 body:has(.quick-tabs) .foot{margin-top:0}
 @media(max-height:700px){body:has(.quick-tabs) .quick-panel{flex:0 0 auto}}
 /* Original capture time is larger than the date in transaction history. */
-.original-time{font-weight:750;font-size:19px;line-height:1.25;color:#2c5472;margin-top:3px;font-variant-numeric:tabular-nums}
+.original-time{font-weight:750;font-size:21px;line-height:1.25;color:#2c5472;margin-top:3px;font-variant-numeric:tabular-nums}
 /* Two totals remain baseline-aligned even when the labels wrap. */
 .fund-summary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:end;margin-bottom:12px}
 .fund-metric{min-width:0;display:flex;flex-direction:column;justify-content:flex-end}
 .fund-metric small{min-height:35px;display:flex;align-items:flex-end;line-height:1.35}
-.fund-metric .big{font-size:clamp(20px,5vw,31px);line-height:1.2;margin:6px 0 0;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fund-metric .big{font-size:clamp(22px,calc(5vw + 2px),33px);line-height:1.2;margin:6px 0 0;white-space:nowrap;font-variant-numeric:tabular-nums}
 .fund-metric .fund-total{color:#17836e}
 /* Installed iPhone PWA: fit content exactly above the measured bottom navigation. */
 @media (display-mode: standalone){
@@ -44,7 +44,7 @@ body:has(.quick-tabs) .foot{margin-top:0}
 .nav{flex-direction:column;align-items:center}
 .home-switch{width:min(620px,100%);padding:0 8px 7px;flex-shrink:0}
 .home-switch[hidden]{display:none}
-.home-switch button{min-height:46px;font-size:14px;padding:11px 8px}
+.home-switch button{min-height:46px;font-size:16px;padding:11px 8px}
 /* Clearly distinguish the active home sections. */
 .home-switch button:first-child.active{background:#326fa5;color:#fff}
 .home-switch button:nth-child(2).active{background:#f2d77b;color:#493b18}
@@ -120,17 +120,17 @@ main{background:transparent;padding-top:15px}
 header{position:relative;justify-content:center;text-align:center;padding:10px 12px 17px;margin-bottom:16px;border-bottom:1px solid #ded4c5}
 header:before{content:"❧";position:absolute;left:7px;top:19px;color:#6a943f;font-size:29px;line-height:1}
 header:after{content:"✒";position:absolute;right:8px;top:18px;color:#a67a3b;font-size:26px;transform:rotate(-20deg)}
-header h1{font-size:clamp(25px,7vw,34px);letter-spacing:.12em;color:#102e4e;text-shadow:0 1px #fff}
+header h1{font-size:clamp(27px,calc(7vw + 2px),36px);letter-spacing:.12em;color:#102e4e;text-shadow:0 1px #fff}
 header h1:before{content:"🌱";font-size:.63em;vertical-align:middle;margin-right:9px;letter-spacing:0}
-header small{display:block;letter-spacing:.09em;font-size:10px;color:#62717b}
-header .pill{position:absolute;right:0;bottom:-13px;font-size:10px;padding:3px 7px;opacity:.85;background:#f4efe5}
+header small{display:block;letter-spacing:.09em;font-size:12px;color:#62717b}
+header .pill{position:absolute;right:0;bottom:-13px;font-size:12px;padding:3px 7px;opacity:.85;background:#f4efe5}
 .hero,.card{background:linear-gradient(145deg,#fffdf8,#faf5eb);border:1px solid #e0d6c7;border-radius:20px;box-shadow:var(--notebook-shadow)}
 .hero{position:relative;padding:21px;margin-bottom:17px}
 .hero:before{content:"";position:absolute;top:10px;left:12px;right:12px;height:1px;background:#eae1d5}
 .hero small,.card>small{color:#496176;font-weight:650}
-.hero .big{color:#123854;font-size:clamp(27px,8vw,38px);font-weight:800;letter-spacing:-.045em}
+.hero .big{color:#123854;font-size:clamp(29px,calc(8vw + 2px),40px);font-weight:800;letter-spacing:-.045em}
 .card{margin-bottom:16px;padding:18px}
-.card h3{border-bottom:1px dashed #d6cabb;padding-bottom:11px;font-size:16px}
+.card h3{border-bottom:1px dashed #d6cabb;padding-bottom:11px;font-size:18px}
 .grid>.card{min-width:0;box-shadow:0 3px 0 #ded5c8,0 6px 12px #453d2c10}
 .grid>.card strong{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .progress{height:12px;background:#dbe1df;border:1px solid #cbd4d0;box-shadow:inset 0 1px 2px #41546920}
@@ -147,7 +147,7 @@ input,select,textarea{background:#fffdf9;border-color:#cfc6b8;border-radius:11px
 .home-switch button:nth-child(2).active{background:linear-gradient(#f0c95e,#dba93d);color:#533b0d;box-shadow:0 2px 3px #79601e22}
 .nav{background:linear-gradient(180deg,rgba(16,38,60,0) 0%,rgba(29,62,83,.38) 21%,rgba(24,55,81,.88) 48%,#10263c 100%);border-top:0;box-shadow:none;padding-top:18px}
 .nav-inner{gap:1px}
-.nav button{color:#f5f3e9;font-size:11px;font-weight:650;letter-spacing:-.02em;min-height:57px;padding:8px 0 6px;line-height:1.5;border-radius:11px;white-space:normal}
+.nav button{color:#f5f3e9;font-size:13px;font-weight:650;letter-spacing:-.02em;min-height:57px;padding:8px 0 6px;line-height:1.5;border-radius:11px;white-space:normal}
 .nav button:before{display:block;margin:0 auto 1px;font-size:23px;line-height:1.2;font-weight:400;color:#e8f3f5}
 .nav button:nth-child(1):before{content:"⌂"}
 .nav button:nth-child(2):before{content:"⇄"}
@@ -166,7 +166,7 @@ input,select,textarea{background:#fffdf9;border-color:#cfc6b8;border-radius:11px
 .chart-detail,.stat{background:#f5eee3;border-radius:13px}
 .notice{background:#fff0d4;border:1px solid #efddbc}
 .foot{color:#7f796f}
-@media(max-width:390px){header:after{right:2px}.nav button{font-size:10px}.nav button:before{font-size:21px}.hero,.card{padding:14px}}
+@media(max-width:390px){header:after{right:2px}.nav button{font-size:12px}.nav button:before{font-size:21px}.hero,.card{padding:14px}}
 
 /* Home switch: transparent strip, active icon and pill only. */
 .home-switch.seg{background:transparent;border:0;border-radius:0;box-shadow:none;padding:7px 9px 10px;gap:8px}
@@ -195,7 +195,7 @@ body:has(.home-switch:not([hidden])) main{padding-bottom:calc(var(--installed-na
 .home-switch.seg button{
  flex:1 1 0;min-width:0;height:72px;min-height:72px;
  display:flex;align-items:center;justify-content:center;gap:7px;
- padding:12px 10px;font-size:15px;font-weight:750;line-height:1.2;
+ padding:12px 10px;font-size:17px;font-weight:750;line-height:1.2;
  border:2px solid transparent;border-radius:13px;
  text-shadow:none;white-space:nowrap;transform:none;
 }
@@ -213,7 +213,7 @@ body:has(.home-switch:not([hidden])) main{padding-bottom:calc(var(--installed-na
 .home-switch.seg button:not(.active){opacity:.82;filter:saturate(.85)}
 .home-switch.seg button.active{opacity:1;filter:none;border-color:#fff8e9;box-shadow:0 2px 5px #173c5336,0 0 0 1px #577685}
 .nav{z-index:4}
-@media(max-width:390px){.home-switch.seg{gap:8px;padding:8px 10px 10px}.home-switch.seg button{font-size:13px;padding:8px 4px;gap:4px}}
+@media(max-width:390px){.home-switch.seg{gap:8px;padding:8px 10px 10px}.home-switch.seg button{font-size:15px;padding:8px 4px;gap:4px}}
 
 /* Rounded hand-drawn tab pictograms; preserve six-tab layout. */
 .nav-inner button::before{content:none!important;display:none!important}
@@ -307,14 +307,14 @@ body:has(.home-switch:not([hidden])) main{padding-bottom:calc(var(--installed-na
 .nav-inner button{gap:1px;padding-top:5px;padding-bottom:6px;min-height:65px}
 .nav-inner button:not(.active) .nav-illustration{filter:saturate(.68) brightness(.88) drop-shadow(0 1px 1px rgba(0,10,25,.18));opacity:.88}
 .nav-inner button.active .nav-illustration{filter:drop-shadow(0 3px 2px rgba(0,10,25,.3));opacity:1}
-.nav-inner button .nav-label{font-size:11px}
-@media(max-width:390px){.nav-inner .nav-illustration{width:37px;height:37px}.nav-inner button .nav-label{font-size:10px}}
+.nav-inner button .nav-label{font-size:13px}
+@media(max-width:390px){.nav-inner .nav-illustration{width:37px;height:37px}.nav-inner button .nav-label{font-size:12px}}
 @media(prefers-reduced-motion:reduce){.nav-inner .nav-illustration{transition:none}}
 
 /* v35: slightly larger, lighter labels; preserve selected state and icon layout. */
-.nav-inner button .nav-label{font-size:12px;font-weight:550;letter-spacing:0;line-height:1.2}
+.nav-inner button .nav-label{font-size:14px;font-weight:550;letter-spacing:0;line-height:1.2}
 .nav-inner button.active .nav-label{font-weight:650}
-@media(max-width:390px){.nav-inner button .nav-label{font-size:11px}}
+@media(max-width:390px){.nav-inner button .nav-label{font-size:13px}}
 
 /* v31: actual transparent illustrated sprite, no decorative backing panel */
 .nav-inner .sprite-icon{display:block;flex:none;width:42px;height:42px;max-width:none;background-image:url("./assets/takuwae-tabs-3d-hq.webp?v=34");background-repeat:no-repeat;background-size:600% 100%;background-color:transparent;border:0;overflow:visible}
@@ -361,14 +361,14 @@ header.washi-header:after{
  opacity:.92;
 }
 header.washi-header h1{
- font-size:clamp(27px,7.3vw,37px);
+ font-size:clamp(29px,calc(7.3vw + 2px),39px);
  letter-spacing:.12em;font-weight:750;
  color:#142d49;text-shadow:0 1px 0 #fff9;
  white-space:nowrap;
 }
 header.washi-header h1:before{content:"🌱";font-size:.66em;vertical-align:3px;margin-right:8px;letter-spacing:0}
 header.washi-header small{
- display:block;margin-top:7px;font-size:clamp(11px,3vw,14px);
+ display:block;margin-top:7px;font-size:clamp(13px,calc(3vw + 2px),16px);
  font-weight:500;letter-spacing:.055em;color:#334151;
 }
 header.washi-header .pill{position:absolute;right:0;bottom:-12px;z-index:1}
@@ -433,7 +433,7 @@ header.washi-header .pill{position:absolute;right:0;bottom:-12px;z-index:1}
  display:block;min-width:0;
  text-align:center;white-space:nowrap;
  overflow:hidden;text-overflow:ellipsis;
- font-weight:750;font-size:clamp(14px,4vw,17px);color:#29435b;
+ font-weight:750;font-size:clamp(16px,calc(4vw + 2px),19px);color:#29435b;
 }
 
 /* v49: whisper-light pale aqua tint on existing milk-glass cards; preserve transparency and shadows. */
@@ -456,7 +456,7 @@ header.washi-header .pill{position:absolute;right:0;bottom:-12px;z-index:1}
 
 /* v50: bounded date input and three-column spinning wheel; no financial-logic changes */
 #view .tx-date{min-width:0;max-width:100%;width:100%;overflow:visible}
-#view .tx-date-open{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;background:rgba(250,253,255,.77);border:1px solid #cfc6b8;border-radius:11px;color:#263f50;text-align:center;font-size:17px;font-weight:650;min-height:50px;padding:10px 12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#view .tx-date-open{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;background:rgba(250,253,255,.77);border:1px solid #cfc6b8;border-radius:11px;color:#263f50;text-align:center;font-size:19px;font-weight:650;min-height:50px;padding:10px 12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .tx-wheel-overlay{position:fixed;inset:0;z-index:2000;background:rgba(15,31,45,.40);display:flex;align-items:flex-end;justify-content:center;padding:16px 12px calc(16px + env(safe-area-inset-bottom));}
 .tx-wheel-dialog{width:min(100%,460px);background:#f8f5f0;color:#263f50;border:1px solid #fff;border-radius:22px;padding:15px 14px 18px;box-shadow:0 12px 38px rgba(15,31,45,.23)}
 .tx-wheel-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;font-weight:700}
@@ -464,13 +464,13 @@ header.washi-header .pill{position:absolute;right:0;bottom:-12px;z-index:1}
 .tx-wheel-columns{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:5px;min-width:0}
 .tx-wheel-col{position:relative;min-width:0;height:220px;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 .tx-wheel-col::-webkit-scrollbar{display:none}
-.tx-wheel-item{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-size:19px;color:#617083;user-select:none}
+.tx-wheel-item{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-size:21px;color:#617083;user-select:none}
 .tx-wheel-item[aria-selected="true"]{color:#1e4960;font-weight:800}
 .tx-wheel-spacer{height:88px;pointer-events:none}
 .tx-wheel-picker{position:relative}
 .tx-wheel-picker:before{content:"";position:absolute;z-index:0;top:88px;left:0;right:0;height:44px;border-top:1px solid #d7dce0;border-bottom:1px solid #d7dce0;border-radius:8px;background:rgba(210,231,239,.33);pointer-events:none}
 .tx-wheel-confirm{display:block;width:100%;margin-top:12px;min-height:48px;background:#2b7189;font-weight:700}
-@media(max-width:350px){.tx-wheel-dialog{padding:12px 9px}.tx-wheel-item{font-size:17px}}
+@media(max-width:350px){.tx-wheel-dialog{padding:12px 9px}.tx-wheel-item{font-size:19px}}
 
 
 /* v51: soft inset fields and tactile pastel action buttons — entry form only. */
@@ -834,7 +834,7 @@ header.washi-header .pill{position:absolute;right:0;bottom:-12px;z-index:1}
 #view .fund-add-button{
   display:inline-flex;align-items:center;justify-content:center;gap:7px;
   flex:none;min-height:42px;padding:7px 12px;
-  white-space:nowrap;font-size:13px;font-weight:650;line-height:1.25;
+  white-space:nowrap;font-size:15px;font-weight:650;line-height:1.25;
   color:#213f57;
   background:linear-gradient(160deg,#f1f5f6 0%,#e4ecef 54%,#d4e2e8 100%);
   border:1px solid #a9bec9;border-radius:18px;
@@ -852,14 +852,20 @@ header.washi-header .pill{position:absolute;right:0;bottom:-12px;z-index:1}
   box-shadow:0 2px 6px rgba(49,72,87,.14),inset 0 2px 4px rgba(35,65,80,.09);
 }
 #view .fund-add-button:focus-visible{outline:2px solid #4b839e;outline-offset:3px}
-@media(max-width:390px){#view .fund-add-button{padding:7px 9px;gap:5px;font-size:12px}}
+@media(max-width:390px){#view .fund-add-button{padding:7px 9px;gap:5px;font-size:14px}}
 @media(prefers-reduced-motion:reduce){#view .fund-add-button{transition:none}}
 
 /* v69: reuse the approved muted-blue button for history, fixed costs, and zero confirmation. */
-#view .fund-zero-button{min-height:38px;padding:6px 11px;font-size:12px;border-radius:16px}
+#view .fund-zero-button{min-height:38px;padding:6px 11px;font-size:14px;border-radius:16px}
 @media(max-width:390px){#view .fund-zero-button{padding:6px 9px}}
 /* v46 history month selector uses bounded controls on iPhone too. */
 #view .history-month-nav{margin:6px 0 8px;max-width:100%;box-sizing:border-box}
+
+/* v70: raise app text about 2px while preserving decorative icon sizes. */
+:root{font-size:18px}
+#view .fund-add-button{min-height:44px}
+#view .fund-zero-button{min-height:40px}
+@media(max-width:390px){#view .fund-add-button{min-height:44px}}
 </style></head><body><main><header class="washi-header"><div class="washi-heading"><h1>たくわえ</h1><small>パーソナルファイナンス</small></div><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
 const KEY='takuwae-v1';const names={s1:'三井住友①',r:'りそな',s2:'三井住友②',cash:'現金財布',em:'電子マネー'};const seedBills=[['rent','家賃','r'],['parking','駐車場','s1'],['insurance','傷害保険','s1'],['phone','携帯電話','s1'],['chat','ChatGPT','s1'],['adobe','Adobe','s1'],['youtube','YouTube',''],['weather','ウェザーニュース',''],['prime','Amazonプライム','']].map(([id,name,bank])=>({id,name,bank,active:true}));
 const today=()=>new Date().toLocaleDateString('sv-SE');const ym=()=>new Date().toLocaleDateString('sv-SE').slice(0,7);const fresh=()=>({initial:{s1:0,r:0,s2:0,cash:0,em:0},fundInitial:{repair:0,car:0},fundCategories:[{id:'repair',name:'修理予備費',goal:300000},{id:'car',name:'車両購入資金',goal:0}],bills:seedBills,months:{},tx:[],monthly:30000,bonus:150000,payday:25,weeklyBuffer:0});let db;try{db=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){db=fresh()}if(!Array.isArray(db.fundCategories))db.fundCategories=fresh().fundCategories;const ui={tab:'home',type:'expense',edit:false,selected:[],add:false,withdrawStep:0,wd:{fund:'repair',amount:'',reason:'フレアの修理',to:'s1'},filter:'all',month:ym(),addFund:false,deleteFund:null,editTx:null,billNotice:null};const fmt=n=>'¥'+Math.round(Number(n)||0).toLocaleString('ja-JP');const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);let save=()=>localStorage.setItem(KEY,JSON.stringify(db));const month=()=>db.months[ui.month]??(db.months[ui.month]={});const billState=b=>month()[b.id]??(month()[b.id]={amount:'',paid:false,bank:b.bank});const activeBills=()=>db.bills.filter(b=>b.active!==false&&(!b.end||ui.month<b.end)&&(!b.start||ui.month>=b.start));const balances=()=>{const a={...db.initial};for(const t of db.tx){if(t.kind==='income')a[t.to]=(a[t.to]||0)+t.amount;else if(t.kind==='expense') {if(t.settled)a[t.from]=(a[t.from]||0)-t.amount;}else {a[t.from]=(a[t.from]||0)-t.amount;a[t.to]=(a[t.to]||0)+t.amount;}}return a};const fundName=k=>db.fundCategories.find(f=>f.id===k)?.name||k;const funds=()=>{const a={...db.fundInitial};for(const t of db.tx){if(t.kind==='saving')a[t.purpose]=(a[t.purpose]||0)+t.amount;if(t.kind==='withdraw')a[t.purpose]=(a[t.purpose]||0)-t.amount;}return a};const options=(selected,includeEmpty=false,subset=Object.keys(names))=>(includeEmpty?'<option value="">支払元</option>':'')+subset.map(k=>`<option value="${k}" ${selected===k?'selected':''}>${names[k]}</option>`).join('');const totalBill=()=>activeBills().reduce((s,b)=>s+(billState(b).paid?Number(billState(b).amount)||0:0),0);const pending=()=>activeBills().filter(b=>!billState(b).paid).reduce((s,b)=>s+(Number(billState(b).amount)||0),0);const unknown=()=>activeBills().filter(b=>!billState(b).amount).length;const moneyColor=k=>({expense:'navy',income:'green',saving:'blue',withdraw:'amber',transfer:'muted'}[k]||'muted');const titleKind=k=>({expense:'出金',income:'入金',saving:'積立',withdraw:'取り崩し',transfer:'振替'}[k]);function record(t){db.tx.unshift({id:id(),date:today(),...t});save();render()};function setTab(t){ui.tab=t;ui.withdrawStep=0;render()};function navIcon(k){return '<span class="nav-illustration sprite-icon sprite-'+k+'" aria-hidden="true"></span>';
@@ -886,7 +892,7 @@ for(const [solid,gradient] of [[cream,'cream'],[red,'red'],[blue,'blue'],[gold,'
 return '<svg class="nav-illustration" viewBox="0 0 48 48" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" stroke="'+outline+'" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">'+gradients+shapes+'</svg>';
 }
 function nav(){document.getElementById('nav').innerHTML=['home:ホーム','entry:入出金','bills:固定費','saving:積立','history:履歴','settings:設定'].map(s=>{const [k,n]=s.split(':');return `<button class="${ui.tab===k?'active':''}" onclick="setTab('${k}')">${navIcon(k)}<span class="nav-label">${n}</span></button>`}).join('')};
-function home(){const a=balances(),f=funds(),unknowns=unknown();const unpaid=pending();const reserveNeeded=Math.max(0,300000-f.repair);const all=Object.values(a).reduce((x,y)=>x+y,0);const pendingCards=db.tx.filter(t=>t.kind==='expense'&&!t.settled).reduce((x,t)=>x+t.amount,0);const monthSaved=db.tx.filter(t=>t.kind==='saving'&&t.purpose==='car'&&String(t.date||'').slice(0,7)===ym()).reduce((sum,t)=>sum+Number(t.amount||0),0);const savingToProtect=Math.max(0,Number(db.monthly||0)-monthSaved);const free=Math.max(0,a.r-unpaid-pendingCards-db.weeklyBuffer-savingToProtect);const weekly=Math.floor(free/4);return `<div class="hero"><small>今週あと使えるお金 · 暫定目安</small><div class="big">${fmt(weekly)}</div><div class="progress"><div style="width:${Math.min(100,Math.max(0,weekly/30000*100))}%"></div></div><p class="caption">りそなの帳簿残高から、未払いの入力済み固定費・後払い予定・生活費確保額・今月の未積立予定額 ${fmt(savingToProtect)} を差し引き、4等分した簡易試算。積立が三井住友①から行われる場合も安全側に控除する暫定方式。</p>${unknowns?`<div class="notice">金額未入力の固定費が${unknowns}件あるため、使える額は確定してへんで。</div>`:''}</div><div class="card"><h3>口座・財布の残高</h3>${Object.keys(names).map(k=>`<div class="row entry"><span>${names[k]}</span><strong>${fmt(a[k])}</strong></div>`).join('')}<div class="row" style="margin-top:12px"><b>帳簿上の資産合計</b><b>${fmt(all)}</b></div></div><div class="grid"><div class="card"><small>修理予備費</small><strong class="blue" style="display:block;font-size:21px">${fmt(f.repair)}</strong><small>目標まであと${fmt(reserveNeeded)}</small></div><div class="card"><small>車両購入資金</small><strong class="blue" style="display:block;font-size:21px">${fmt(f.car)}</strong><small>毎月${fmt(db.monthly)}目標</small></div></div><button style="width:100%" onclick="setTab('entry')">＋ 入出金を記録</button><p class="caption">※三井住友②の用途別合計 ${fmt(f.repair+f.car)} ／ 実残高 ${fmt(a.s2)}。差額 ${fmt(a.s2-f.repair-f.car)} は未分類資金として扱う。</p>`}
+function home(){const a=balances(),f=funds(),unknowns=unknown();const unpaid=pending();const reserveNeeded=Math.max(0,300000-f.repair);const all=Object.values(a).reduce((x,y)=>x+y,0);const pendingCards=db.tx.filter(t=>t.kind==='expense'&&!t.settled).reduce((x,t)=>x+t.amount,0);const monthSaved=db.tx.filter(t=>t.kind==='saving'&&t.purpose==='car'&&String(t.date||'').slice(0,7)===ym()).reduce((sum,t)=>sum+Number(t.amount||0),0);const savingToProtect=Math.max(0,Number(db.monthly||0)-monthSaved);const free=Math.max(0,a.r-unpaid-pendingCards-db.weeklyBuffer-savingToProtect);const weekly=Math.floor(free/4);return `<div class="hero"><small>今週あと使えるお金 · 暫定目安</small><div class="big">${fmt(weekly)}</div><div class="progress"><div style="width:${Math.min(100,Math.max(0,weekly/30000*100))}%"></div></div><p class="caption">りそなの帳簿残高から、未払いの入力済み固定費・後払い予定・生活費確保額・今月の未積立予定額 ${fmt(savingToProtect)} を差し引き、4等分した簡易試算。積立が三井住友①から行われる場合も安全側に控除する暫定方式。</p>${unknowns?`<div class="notice">金額未入力の固定費が${unknowns}件あるため、使える額は確定してへんで。</div>`:''}</div><div class="card"><h3>口座・財布の残高</h3>${Object.keys(names).map(k=>`<div class="row entry"><span>${names[k]}</span><strong>${fmt(a[k])}</strong></div>`).join('')}<div class="row" style="margin-top:12px"><b>帳簿上の資産合計</b><b>${fmt(all)}</b></div></div><div class="grid"><div class="card"><small>修理予備費</small><strong class="blue" style="display:block;font-size:23px">${fmt(f.repair)}</strong><small>目標まであと${fmt(reserveNeeded)}</small></div><div class="card"><small>車両購入資金</small><strong class="blue" style="display:block;font-size:23px">${fmt(f.car)}</strong><small>毎月${fmt(db.monthly)}目標</small></div></div><button style="width:100%" onclick="setTab('entry')">＋ 入出金を記録</button><p class="caption">※三井住友②の用途別合計 ${fmt(f.repair+f.car)} ／ 実残高 ${fmt(a.s2)}。差額 ${fmt(a.s2-f.repair-f.car)} は未分類資金として扱う。</p>`}
 function entry(){
 const types=[['expense','出金'],['income','入金'],['saving','積立'],['transfer','振替']];
 const current=types.find(x=>x[0]===ui.type)?.[1]||'出金';
@@ -902,7 +908,7 @@ function billMonthLabel(){const [y,m]=ui.month.split('-').map(Number);const d=ne
 function shiftBillMonth(step){const [y,m]=ui.month.split('-').map(Number);const d=new Date(y,m-1+step,1);ui.month=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');ui.edit=false;ui.selected=[];render()}
 function billsView(){const bs=activeBills();return `<div class="row" style="margin-bottom:10px"><h2>固定費管理</h2><button class="secondary" onclick="ui.edit=!ui.edit;ui.selected=[];render()">${ui.edit?'完了':'編集'}</button></div><div class="hero"><small>今月の引き落とし確認済み合計</small><div class="big navy">−${fmt(totalBill())}</div><small>${bs.filter(b=>billState(b).paid).length}/${bs.length}件確認済み · ${ui.month}</small></div><div class="card"><div class="field bill-month-field" style="margin-bottom:12px"><label>表示月</label><div class="bill-month-nav"><button type="button" class="secondary" aria-label="前の月" onclick="shiftBillMonth(-1)">‹</button><span class="bill-month-value" aria-live="polite">${billMonthLabel()}</span><button type="button" class="secondary" aria-label="次の月" onclick="shiftBillMonth(1)">›</button></div></div>${bs.map(b=>{const s=billState(b);return `<div class="bill"><div class="row">${ui.edit?`<input class="checkselect" type="checkbox" onchange="toggleSelect('${b.id}',this.checked)">`:''}<b style="flex:1">${esc(b.name)}</b><small>${s.paid?'確認済み':'未確認'}</small></div>${!ui.edit?`<div class="bill-fields"><select aria-label="支払元" onchange="changeBill('${b.id}','bank',this.value)">${options(s.bank,true,['s1','r','s2'])}</select><label class="tick"><input type="checkbox" data-bill-id="${b.id}" aria-label="${esc(b.name)}の引落確認" ${s.paid?'checked':''} onchange="confirmBill('${b.id}',this.checked)"></label><input aria-label="金額" type="number" min="0" placeholder="金額" value="${esc(s.amount)}" oninput="changeBillAmount('${b.id}',this.value)"></div>${ui.billNotice===b.id?`<div class="bill-hint" role="alert">支払元口座と金額を入力してから確認してな。</div>`:''}`:''}</div>`}).join('')}${ui.edit?`<button class="danger" style="width:100%;margin-top:12px" onclick="scheduleDelete()">選択項目を翌月から削除</button>`:''}</div><div class="card"><button type="button" class="secondary fund-add-button" style="width:100%" onclick="ui.add=!ui.add;render()"><span class="fund-add-plus" aria-hidden="true">＋</span><span>固定費を追加</span></button>${ui.add?`<form class="stack" style="margin-top:14px" onsubmit="addBill(event)"><div class="field"><label>名称</label><input name="name" required></div><div class="field"><label>支払元</label><select name="bank">${options('s1',false,['s1','r','s2'])}</select></div><div class="actions"><button class="secondary" type="button" onclick="ui.add=false;render()">キャンセル</button><button>当月から追加</button></div></form>`:''}</div><p class="caption">追加は当月から、削除は翌月から反映。月ごとの金額は空欄で始まるで。固定費の確認取消や金額訂正は帳簿の記録と連動する。</p>`}
 function changeBillAmount(bid,val){const b=db.bills.find(x=>x.id===bid),st=billState(b);if(st.paid)return;st.amount=val;save();const tick=document.querySelector('input[data-bill-id="'+bid+'"]');if(tick)tick.disabled=false};function changeBill(bid,field,val){const b=db.bills.find(x=>x.id===bid),s=billState(b);if(s.paid){if(!confirm('確認済みの記録を取り消して編集する？'))return;unconfirm(bid)}s[field]=val;ui.billNotice=null;save();render()};function unconfirm(bid){const s=month()[bid];if(s)s.paid=false;db.tx=db.tx.filter(t=>t.billKey!==ui.month+':'+bid)};function confirmBill(bid,checked){const b=db.bills.find(x=>x.id===bid),s=billState(b);if(checked){if(!(Number(s.amount)>0)||!s.bank){ui.billNotice=bid;render();return;}ui.billNotice=null;db.tx=db.tx.filter(t=>t.billKey!==ui.month+':'+bid);db.tx.unshift({id:id(),kind:'expense',from:s.bank,amount:Number(s.amount),date:today(),category:b.name,settled:true,billKey:ui.month+':'+bid});s.paid=true}else{unconfirm(bid)}ui.billNotice=null;save();render()};function toggleSelect(id,on){ui.selected=on?[...ui.selected,id]:ui.selected.filter(x=>x!==id)};function scheduleDelete(){if(!ui.selected.length)return alert('削除する項目を選んでな');if(!confirm('選択した固定費を翌月から一覧から外す？ 過去の履歴は残るで。'))return;const [y,m]=ui.month.split('-').map(Number),next=`${m===12?y+1:y}-${String(m===12?1:m+1).padStart(2,'0')}`;for(const b of db.bills)if(ui.selected.includes(b.id))b.end=next;ui.edit=false;ui.selected=[];save();render()};function addBill(e){e.preventDefault();const d=Object.fromEntries(new FormData(e.target));db.bills.push({id:id(),name:d.name.trim(),bank:d.bank,start:ui.month,active:true});ui.add=false;save();render()}
-function savingView(){const f=funds();return `<h2>積立・将来の見通し</h2><div class="grid">${db.fundCategories.map(x=>`<div class="card"><small>${esc(x.name)}</small><strong class="blue" style="display:block;font-size:20px">${fmt(f[x.id]||0)}</strong><small>${x.goal?'目標 '+fmt(x.goal):'用途別積立'}</small></div>`).join('')}</div><div class="card"><div class="row"><h3>積立項目の管理</h3><button type="button" class="secondary fund-add-button" onclick="ui.addFund=!ui.addFund;render()"><span class="fund-add-plus" aria-hidden="true">＋</span><span>項目を追加</span></button></div>${ui.addFund?`<form class="stack" onsubmit="addFund(event)" style="padding:12px 0"><div class="field"><label>積立項目名</label><input name="fundName" placeholder="例：旅行資金" maxlength="40" required></div><div class="field"><label>目標金額（円・任意）</label><input name="fundGoal" type="number" min="0" step="1" placeholder="未設定なら0"></div><div class="actions"><button type="button" class="secondary" onclick="ui.addFund=false;render()">キャンセル</button><button type="submit">追加する</button></div></form>`:''}${db.fundCategories.map(x=>`<div class="row entry"><span>${esc(x.name)}</span><span>${!['repair','car'].includes(x.id)?`<button class="outline" style="padding:6px 9px" onclick="ui.deleteFund='${x.id}';render()">削除</button>`:''}</span></div>`).join('')}${ui.deleteFund?`<div class="notice"><b>${esc(fundName(ui.deleteFund))}を削除する？</b><p>残高0円の項目だけ削除できるで。取引履歴は残す。</p><div class="actions"><button class="secondary" onclick="ui.deleteFund=null;render()">キャンセル</button><button class="danger" onclick="removeFund(ui.deleteFund)">削除を確定</button></div></div>`:""}<p class="caption">追加した項目は「入出金 → 積立」から選べるで。残高が0円なら削除できるで。過去の履歴は保持する。</p></div><div class="card"><h3>資金推移グラフ</h3><canvas id="chart" width="700" height="320" aria-label="積立資金の推移グラフ。点をタップすると日付と金額を表示"></canvas><div id="chart-detail" class="chart-detail" aria-live="polite">グラフの点をタップすると、年月日と金額が表示されるで。</div><p class="chart-tip">青：車両購入資金 ／ 緑：修理予備費 ／ その他：追加項目</p><p class="caption">追加項目は将来の積立額が未設定のため、現状維持で表示するで。</p></div><div class="card stack"><div class="field"><label>毎月の車両購入積立目標</label><input type="number" value="${db.monthly}" onchange="db.monthly=Number(this.value)||0;save();render()"></div><div class="field"><label>車両購入向けボーナス積立（1回分）</label><input type="number" value="${db.bonus}" onchange="db.bonus=Number(this.value)||0;save();render()"></div><p class="caption">2027年夏は修理予備費へ20万円を補填する計画。</p><div class="actions"><button onclick="ui.type='saving';setTab('entry')">積立を記録</button><button class="secondary" onclick="setTab('withdraw')">資金を取り崩す</button></div></div>`}
+function savingView(){const f=funds();return `<h2>積立・将来の見通し</h2><div class="grid">${db.fundCategories.map(x=>`<div class="card"><small>${esc(x.name)}</small><strong class="blue" style="display:block;font-size:22px">${fmt(f[x.id]||0)}</strong><small>${x.goal?'目標 '+fmt(x.goal):'用途別積立'}</small></div>`).join('')}</div><div class="card"><div class="row"><h3>積立項目の管理</h3><button type="button" class="secondary fund-add-button" onclick="ui.addFund=!ui.addFund;render()"><span class="fund-add-plus" aria-hidden="true">＋</span><span>項目を追加</span></button></div>${ui.addFund?`<form class="stack" onsubmit="addFund(event)" style="padding:12px 0"><div class="field"><label>積立項目名</label><input name="fundName" placeholder="例：旅行資金" maxlength="40" required></div><div class="field"><label>目標金額（円・任意）</label><input name="fundGoal" type="number" min="0" step="1" placeholder="未設定なら0"></div><div class="actions"><button type="button" class="secondary" onclick="ui.addFund=false;render()">キャンセル</button><button type="submit">追加する</button></div></form>`:''}${db.fundCategories.map(x=>`<div class="row entry"><span>${esc(x.name)}</span><span>${!['repair','car'].includes(x.id)?`<button class="outline" style="padding:6px 9px" onclick="ui.deleteFund='${x.id}';render()">削除</button>`:''}</span></div>`).join('')}${ui.deleteFund?`<div class="notice"><b>${esc(fundName(ui.deleteFund))}を削除する？</b><p>残高0円の項目だけ削除できるで。取引履歴は残す。</p><div class="actions"><button class="secondary" onclick="ui.deleteFund=null;render()">キャンセル</button><button class="danger" onclick="removeFund(ui.deleteFund)">削除を確定</button></div></div>`:""}<p class="caption">追加した項目は「入出金 → 積立」から選べるで。残高が0円なら削除できるで。過去の履歴は保持する。</p></div><div class="card"><h3>資金推移グラフ</h3><canvas id="chart" width="700" height="320" aria-label="積立資金の推移グラフ。点をタップすると日付と金額を表示"></canvas><div id="chart-detail" class="chart-detail" aria-live="polite">グラフの点をタップすると、年月日と金額が表示されるで。</div><p class="chart-tip">青：車両購入資金 ／ 緑：修理予備費 ／ その他：追加項目</p><p class="caption">追加項目は将来の積立額が未設定のため、現状維持で表示するで。</p></div><div class="card stack"><div class="field"><label>毎月の車両購入積立目標</label><input type="number" value="${db.monthly}" onchange="db.monthly=Number(this.value)||0;save();render()"></div><div class="field"><label>車両購入向けボーナス積立（1回分）</label><input type="number" value="${db.bonus}" onchange="db.bonus=Number(this.value)||0;save();render()"></div><p class="caption">2027年夏は修理予備費へ20万円を補填する計画。</p><div class="actions"><button onclick="ui.type='saving';setTab('entry')">積立を記録</button><button class="secondary" onclick="setTab('withdraw')">資金を取り崩す</button></div></div>`}
 function addFund(event){event.preventDefault();const form=event.currentTarget;const n=form.elements.fundName.value.trim();const raw=form.elements.fundGoal.value;const goal=raw===''?0:Number(raw);if(!n||n.length>40)return alert('1〜40文字で入力してな');if(db.fundCategories.some(x=>x.name===n))return alert('同じ名前があるで');if(!Number.isSafeInteger(goal)||goal<0)return alert('0以上の整数で入力してな');db.fundCategories.push({id:'fund_'+id(),name:n,goal});ui.addFund=false;save();render()}
 function removeFund(fid){if(['repair','car'].includes(fid))return;if((funds()[fid]||0)!==0)return alert('残高がある項目は削除できへん');db.fundCategories=db.fundCategories.filter(x=>x.id!==fid);ui.deleteFund=null;if(!db.tx.some(t=>t.purpose===fid))delete db.fundInitial[fid];save();render()}
 function drawChart(){
@@ -1142,7 +1148,7 @@ home=function(){
 };
 
 /* v36: safe in-app PWA update check. Does not modify financial storage. */
-const TAKUWAE_APP_VERSION=69;
+const TAKUWAE_APP_VERSION=70;
 let takuwaeUpdateBusy=false;
 const settingsViewBeforeUpdate=settingsView;
 settingsView=function(){
