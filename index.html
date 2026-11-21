@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#e9eef3"><title>たくわえ｜資金管理</title><meta name="takuwae-version" content="49"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" sizes="512x512" href="./icon-wallet-b.png?v=20261120b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="たくわえ"><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#e9eef3"><title>たくわえ｜資金管理</title><meta name="takuwae-version" content="50"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" sizes="512x512" href="./icon-wallet-b.png?v=20261120b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="たくわえ"><style>
 :root{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',sans-serif;color:#263a50;background:#e9eef3}*{box-sizing:border-box}body{margin:0}main{max-width:620px;margin:auto;padding:18px 14px 95px}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}h1{font-size:24px;margin:0}h2{font-size:18px;margin:4px 0 14px}h3{font-size:15px;margin:0 0 10px}small,.muted{color:#69788a;font-size:12px}.card{background:white;border-radius:17px;padding:17px;margin-bottom:12px;box-shadow:0 1px 4px #2030400b}.hero{background:#fff;padding:22px;border-radius:20px;margin-bottom:12px}.hero .big{font-size:34px;font-weight:750;letter-spacing:-1px;margin:9px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{padding:13px;background:#f2f5f8;border-radius:12px}.stat strong{display:block;font-size:20px;margin-top:5px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:grid;gap:10px}.field{display:grid;gap:5px;min-width:0}label{font-size:12px;color:#607085;font-weight:650}input,select,textarea{width:100%;min-width:0;padding:12px;border:1px solid #cbd5df;border-radius:10px;background:#fff;color:#263a50;font:inherit;font-size:16px}input[type=checkbox]{width:27px;height:27px;accent-color:#32815c;cursor:pointer}button{border:0;background:#3f627e;color:white;padding:12px 15px;border-radius:11px;font-weight:650;font-size:14px;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.secondary{background:#e9eef3;color:#34516a}.danger{background:#bb3f4b}.outline{background:white;border:1px solid #cbd5df;color:#34516a}.seg{display:flex;gap:5px}.seg button{flex:1;padding:11px 5px;background:#eef2f6;color:#52657a}.seg .active{color:white;background:#3f627e}.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #d5dde5;display:flex;justify-content:center;padding:8px 3px max(10px,env(safe-area-inset-bottom));z-index:2}.nav-inner{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:min(620px,100%);gap:2px}.nav button{background:transparent;color:#66788b;padding:11px 1px;font-size:16px;font-weight:650;letter-spacing:-.35px;min-height:48px;white-space:nowrap}.nav button.active{background:#e9eef3;color:#243f65;font-weight:800;border-radius:10px}.bill{padding:13px 0;border-bottom:1px solid #e4e9ee}.bill:last-child{border:0}.bill-fields{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:7px;align-items:center;margin-top:8px}.tick{display:grid;place-items:center;height:44px;width:48px;cursor:pointer}.tick input{width:30px;height:30px}.green{color:#32815c}.navy{color:#243f65}.blue{color:#3478d4}.amber{color:#9b681e}.progress{height:9px;background:#e4e9ef;border-radius:10px;overflow:hidden}.progress div{height:100%;background:#6d9c8c}.notice{font-size:13px;background:#fff6e7;padding:11px;border-radius:10px;color:#785521;margin-bottom:12px}.pill{font-size:11px;border-radius:20px;padding:4px 8px;background:#edf1f5;color:#536579}.entry{padding:10px 0;border-bottom:1px solid #e7ebef}.entry:last-child{border:0}.entry strong{font-size:16px}.foot{font-size:11px;color:#758498;margin-top:14px;line-height:1.6}.bar{height:12px;border-radius:8px;background:#e8edf3;overflow:hidden;display:flex}.bar span{background:#3478d4}canvas{width:100%;height:220px;display:block;touch-action:pan-y;cursor:crosshair}.chart-detail{min-height:54px;margin-top:8px;padding:10px 12px;border-radius:10px;background:#f2f5f8;font-size:13px;line-height:1.65}.chart-detail strong{font-size:16px}.chart-tip{color:#64748b;font-size:12px;margin-top:5px}.hidden{display:none}.checkselect{width:20px;height:20px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}.caption{font-size:12px;color:#66778a;line-height:1.5}hr{border:0;border-top:1px solid #e5eaf0;margin:15px 0}
 .bill-hint{font-size:12px;color:#9b5b20;margin-top:7px;line-height:1.5}
 /* v0.9 入出金：手描きレイアウトをもとにした2カラム */
@@ -453,6 +453,25 @@ header.washi-header .pill{position:absolute;right:0;bottom:-12px;z-index:1}
   box-shadow:0 3px 9px rgba(83,72,61,.12),0 9px 18px rgba(83,72,61,.055),inset 0 1px 0 rgba(255,255,255,.93);
 }
 
+
+/* v50: bounded date input and three-column spinning wheel; no financial-logic changes */
+#view .tx-date{min-width:0;max-width:100%;width:100%;overflow:visible}
+#view .tx-date-open{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;background:rgba(250,253,255,.77);border:1px solid #cfc6b8;border-radius:11px;color:#263f50;text-align:center;font-size:17px;font-weight:650;min-height:50px;padding:10px 12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.tx-wheel-overlay{position:fixed;inset:0;z-index:2000;background:rgba(15,31,45,.40);display:flex;align-items:flex-end;justify-content:center;padding:16px 12px calc(16px + env(safe-area-inset-bottom));}
+.tx-wheel-dialog{width:min(100%,460px);background:#f8f5f0;color:#263f50;border:1px solid #fff;border-radius:22px;padding:15px 14px 18px;box-shadow:0 12px 38px rgba(15,31,45,.23)}
+.tx-wheel-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;font-weight:700}
+.tx-wheel-heading button{background:transparent;color:#34516a;box-shadow:none;padding:9px 12px}
+.tx-wheel-columns{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:5px;min-width:0}
+.tx-wheel-col{position:relative;min-width:0;height:220px;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+.tx-wheel-col::-webkit-scrollbar{display:none}
+.tx-wheel-item{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-size:19px;color:#617083;user-select:none}
+.tx-wheel-item[aria-selected="true"]{color:#1e4960;font-weight:800}
+.tx-wheel-spacer{height:88px;pointer-events:none}
+.tx-wheel-picker{position:relative}
+.tx-wheel-picker:before{content:"";position:absolute;z-index:0;top:88px;left:0;right:0;height:44px;border-top:1px solid #d7dce0;border-bottom:1px solid #d7dce0;border-radius:8px;background:rgba(210,231,239,.33);pointer-events:none}
+.tx-wheel-confirm{display:block;width:100%;margin-top:12px;min-height:48px;background:#2b7189;font-weight:700}
+@media(max-width:350px){.tx-wheel-dialog{padding:12px 9px}.tx-wheel-item{font-size:17px}}
+
 /* v46 history month selector uses bounded controls on iPhone too. */
 #view .history-month-nav{margin:6px 0 8px;max-width:100%;box-sizing:border-box}
 </style></head><body><main><header class="washi-header"><div class="washi-heading"><h1>たくわえ</h1><small>パーソナルファイナンス</small></div><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
@@ -490,7 +509,7 @@ const source=ui.type==='income'?'入金先':'支払い元・振替元';
 const extra=ui.type==='expense'?'<div class="field"><label>支出区分</label><select name="category">'+['コンビニ','スーパー','ネット','食費','日用品','燃料費','趣味・娯楽','その他'].map(x=>'<option>'+x+'</option>').join('')+'</select></div><div class="field"><label>支払い方法</label><select name="method"><option value="instant">即時払い</option><option value="credit">クレジットカード（後払い）</option></select></div>':ui.type==='income'?'<div class="field"><label>入金区分</label><select name="category"><option>給与</option><option>ボーナス</option><option>返金</option><option>その他</option></select></div>':'';
 const destination=['saving','transfer'].includes(ui.type)?'<div class="field"><label>振替先</label><select name="to">'+options('s2')+'</select></div>':'';
 const purpose=ui.type==='saving'?'<div class="field"><label>積立用途</label><select name="purpose">'+db.fundCategories.map(f=>'<option value="'+esc(f.id)+'">'+esc(f.name)+'</option>').join('')+'</select></div>':'';
-return '<div class="card"><h2>入出金を記録</h2><form id="txform" onsubmit="submitTx(event)"><div class="tx-layout"><div class="tx-fields"><div class="field"><label>金額（円）</label><input name="amount" inputmode="numeric" type="number" min="1" step="1" required placeholder="¥ 0"></div>'+extra+'<div class="field"><label>'+source+'</label><select name="from">'+options(ui.type==='income'?'s1':ui.type==='saving'?'s1':'r')+'</select></div>'+destination+purpose+'<div class="field"><label>メモ（任意）</label><input name="note" placeholder="内容を入力"></div></div><div class="tx-actions">'+buttons+'<button type="submit" class="tx-submit">記録する<small>'+current+'を登録</small></button></div></div><div class="tx-date field"><label>日付</label><input name="date" type="date" value="'+today()+'" required></div></form><p class="caption" style="margin-top:12px">右側で取引の種類を選び、左側に金額などを入力してな。</p></div>';
+return '<div class="card"><h2>入出金を記録</h2><form id="txform" onsubmit="submitTx(event)"><div class="tx-layout"><div class="tx-fields"><div class="field"><label>金額（円）</label><input name="amount" inputmode="numeric" type="number" min="1" step="1" required placeholder="¥ 0"></div>'+extra+'<div class="field"><label>'+source+'</label><select name="from">'+options(ui.type==='income'?'s1':ui.type==='saving'?'s1':'r')+'</select></div>'+destination+purpose+'<div class="field"><label>メモ（任意）</label><input name="note" placeholder="内容を入力"></div></div><div class="tx-actions">'+buttons+'<button type="submit" class="tx-submit">記録する<small>'+current+'を登録</small></button></div></div><div class="tx-date field"><label for="tx-date-open">日付</label><input type="hidden" name="date" id="tx-date-value" value="'+today()+'"><button type="button" id="tx-date-open" class="tx-date-open" onclick="openTxDateWheel()" aria-haspopup="dialog">'+today().replace(/^(\d{4})-(\d{2})-(\d{2})$/,(_,y,m,d)=>y+'年'+Number(m)+'月'+Number(d)+'日')+'</button></div></form><p class="caption" style="margin-top:12px">右側で取引の種類を選び、左側に金額などを入力してな。</p></div>';
 }
 function submitTx(e){e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const n=Number(d.amount);if(!(n>0))return;let t={kind:ui.type,amount:n,date:d.date,note:d.note||'',category:d.category||titleKind(ui.type)};if(ui.type==='income'){t.to=d.from}else if(ui.type==='expense'){t.from=d.from;t.settled=d.method!=='credit';t.method=d.method}else{if(d.from===d.to)return alert('振替元と振替先は別にしてな');if(ui.type==='saving'&&d.to!=='s2')return alert('積立先は三井住友②にしてな');if(ui.type==='saving'&&d.from==='s2')return alert('同じ貯蓄口座内の用途変更は設定から行ってな');t.from=d.from;t.to=d.to;t.purpose=d.purpose}if(['saving','transfer'].includes(ui.type)&&balances()[t.from]<n)return alert('振替元の帳簿残高が不足してるで。先に残高を確認してな');record(t);ui.tab='history';render()}
 function billMonthLabel(){const [y,m]=ui.month.split('-').map(Number);const d=new Date(y,m-1,1);return new Intl.DateTimeFormat('ja-JP-u-ca-japanese',{era:'short',year:'numeric',month:'long'}).format(d)}
@@ -721,7 +740,7 @@ home=function(){
 };
 
 /* v36: safe in-app PWA update check. Does not modify financial storage. */
-const TAKUWAE_APP_VERSION=49;
+const TAKUWAE_APP_VERSION=50;
 let takuwaeUpdateBusy=false;
 const settingsViewBeforeUpdate=settingsView;
 settingsView=function(){
@@ -767,6 +786,74 @@ async function checkTakuwaeUpdate(){
  }
 }
 
+
+
+/* v50 date wheel: draft selection remains local until confirmed. */
+let txWheelDraft=null;
+function txWheelISO(v){const [y,m,d]=v;return String(y).padStart(4,'0')+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0')}
+function txWheelDays(y,m){return new Date(y,m,0).getDate()}
+function txWheelOptions(type){
+ const d=txWheelDraft,yearNow=new Date().getFullYear();
+ if(type==='year')return Array.from({length:yearNow-1990+6},(_,i)=>1990+i);
+ if(type==='month')return Array.from({length:12},(_,i)=>i+1);
+ return Array.from({length:txWheelDays(d[0],d[1])},(_,i)=>i+1);
+}
+function txWheelFill(type){
+ const col=document.getElementById('tx-wheel-'+type);if(!col)return;
+ const pos={year:0,month:1,day:2}[type],options=txWheelOptions(type);
+ col.innerHTML='<div class="tx-wheel-spacer"></div>'+options.map(v=>'<div class="tx-wheel-item" data-value="'+v+'" aria-selected="'+(v===txWheelDraft[pos])+'">'+v+(type==='year'?'年':type==='month'?'月':'日')+'</div>').join('')+'<div class="tx-wheel-spacer"></div>';
+ col.scrollTop=options.indexOf(txWheelDraft[pos])*44;
+}
+function txWheelSync(type){
+ if(!txWheelDraft)return;
+ const col=document.getElementById('tx-wheel-'+type);if(!col)return;
+ const vals=txWheelOptions(type),pos={year:0,month:1,day:2}[type];
+ const idx=Math.max(0,Math.min(vals.length-1,Math.round(col.scrollTop/44)));
+ const next=vals[idx];if(next===undefined)return;
+ const old=txWheelDraft[pos];txWheelDraft[pos]=next;
+ col.querySelectorAll('.tx-wheel-item').forEach((item,i)=>item.setAttribute('aria-selected',i===idx?'true':'false'));
+ if(old!==next&&(type==='year'||type==='month')){
+  const max=txWheelDays(txWheelDraft[0],txWheelDraft[1]);
+  if(txWheelDraft[2]>max)txWheelDraft[2]=max;
+  txWheelFill('day');
+ }
+}
+function openTxDateWheel(){
+ const input=document.getElementById('tx-date-value');if(!input)return;
+ const parts=input.value.split('-').map(Number);
+ if(parts.length!==3||parts.some(x=>!Number.isFinite(x)))return;
+ txWheelDraft=parts;
+ document.getElementById('tx-wheel-overlay')?.remove();
+ const overlay=document.createElement('div');overlay.className='tx-wheel-overlay';overlay.id='tx-wheel-overlay';
+ overlay.innerHTML='<section class="tx-wheel-dialog" role="dialog" aria-modal="true" aria-label="日付を選択"><div class="tx-wheel-heading"><span>日付を選択</span><button type="button" onclick="closeTxDateWheel()">キャンセル</button></div><div class="tx-wheel-picker"><div class="tx-wheel-columns">'+['year','month','day'].map(t=>'<div class="tx-wheel-col" id="tx-wheel-'+t+'" role="listbox" aria-label="'+({year:'年',month:'月',day:'日'}[t])+'"></div>').join('')+'</div></div><button type="button" class="tx-wheel-confirm" onclick="confirmTxDateWheel()">この日付に決定</button></section>';
+ overlay.addEventListener('click',e=>{if(e.target===overlay)closeTxDateWheel()});
+ document.body.appendChild(overlay);
+ ['year','month','day'].forEach(type=>{
+  txWheelFill(type);
+  const col=document.getElementById('tx-wheel-'+type);
+  let timer;
+  col.addEventListener('scroll',()=>{
+   txWheelSync(type);
+   clearTimeout(timer);timer=setTimeout(()=>{const vals=txWheelOptions(type),pos={year:0,month:1,day:2}[type];col.scrollTo({top:Math.max(0,vals.indexOf(txWheelDraft[pos]))*44,behavior:'smooth'});},110);
+  },{passive:true});
+  col.addEventListener('click',e=>{
+   const item=e.target.closest('.tx-wheel-item');if(!item)return;
+   col.scrollTo({top:Math.max(0,txWheelOptions(type).indexOf(Number(item.dataset.value)))*44,behavior:'smooth'});
+  });
+ });
+}
+function closeTxDateWheel(){document.getElementById('tx-wheel-overlay')?.remove();txWheelDraft=null}
+function confirmTxDateWheel(){
+ if(!txWheelDraft)return;
+ ['year','month','day'].forEach(txWheelSync);
+ const input=document.getElementById('tx-date-value'),button=document.getElementById('tx-date-open');
+ if(input&&button){
+  const [y,m,d]=txWheelDraft;input.value=txWheelISO(txWheelDraft);
+  button.textContent=y+'年'+m+'月'+d+'日';
+ }
+ closeTxDateWheel();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('tx-wheel-overlay'))closeTxDateWheel()});
 
 render();
 function syncBottomNavHeight(){const nav=document.querySelector('.nav'),sw=document.getElementById('home-switch');if(!nav)return;const navHeight=Math.ceil(nav.getBoundingClientRect().height),switchHeight=sw&&!sw.hidden?Math.ceil(sw.getBoundingClientRect().height):0;document.documentElement.style.setProperty('--base-nav-height',navHeight+'px');document.documentElement.style.setProperty('--installed-nav-height',(navHeight+switchHeight+6)+'px')}
