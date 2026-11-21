@@ -271,8 +271,7 @@ function quickEntryView(){
  (quickNotice?'<p class="caption" role="status">'+esc(quickNotice)+'</p>':'')+'</div>';
 }
 home=function(){
- return 
- (quickMode==='quick'?quickEntryView():homeV09());
+ return (quickMode==='quick'?quickEntryView():homeV09());
 };
 
 render();
