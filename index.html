@@ -24,6 +24,12 @@ body:has(.quick-tabs) #view{flex:1;display:flex;flex-direction:column;min-height
 body:has(.quick-tabs) .quick-panel{flex:1;display:flex;flex-direction:column;justify-content:space-between;margin-bottom:10px}
 body:has(.quick-tabs) .foot{margin-top:0}
 @media(max-height:700px){body:has(.quick-tabs) .quick-panel{flex:0 0 auto}}
+/* Two totals remain baseline-aligned even when the labels wrap. */
+.fund-summary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:end;margin-bottom:12px}
+.fund-metric{min-width:0;display:flex;flex-direction:column;justify-content:flex-end}
+.fund-metric small{min-height:35px;display:flex;align-items:flex-end;line-height:1.35}
+.fund-metric .big{font-size:clamp(20px,5vw,31px);line-height:1.2;margin:6px 0 0;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fund-metric .fund-total{color:#17836e}
 /* Installed iPhone PWA: fit content exactly above the measured bottom navigation. */
 @media (display-mode: standalone){
   body:has(.quick-tabs) main{padding-bottom:var(--installed-nav-height,calc(64px + env(safe-area-inset-bottom)))}
@@ -101,7 +107,7 @@ home=function(){
  const s1Need=fixedUnpaid('s1')+unpaidCredit('s1')+carShort;
  const unknowns=db.bills.filter(b=>b.active!==false&&(!b.end||ym()<b.end)&&(!b.start||ym()>=b.start)).filter(b=>!(Number(db.months[ym()]?.[b.id]?.amount)>0)).length;
  const explanation='<div class="card"><h3>配分額の計算内訳</h3><p>選択 '+db.intervalDays+'日 ／ 給料日まで残り '+remaining+'日 ／ 計算対象 '+duration+'日</p><p>'+fmt(free)+' × '+duration+' ÷ '+remaining+' = <b>'+fmt(allowance)+'</b></p>'+(remaining<db.intervalDays?'<div class="notice">給料日まで残り'+remaining+'日やから、選択した'+db.intervalDays+'日ではなく残り'+remaining+'日分を表示しているで。</div>':'')+(free<=0?'<div class="notice">配分可能額が0円以下のため、すべての期間が0円になるで。</div>':'')+'</div>';
- const header='<div class="hero"><small>次の'+duration+'日間に使える目安</small><div class="big">'+fmt(allowance)+'</div><div class="seg">'+[1,3,5,7].map(n=>'<button class="'+(db.intervalDays===n?'active':'')+'" onclick="changeInterval('+n+')">'+n+'日</button>').join('')+'</div><p class="caption">対象残高：りそな '+fmt(a.r)+' ＋ 現金財布 '+fmt(a.cash)+' ＋ 電子マネー '+fmt(a.em)+'。対象支払元の未払固定費・後払い予定と予備枠 '+fmt(db.weeklyBuffer)+' を差し引く。次の給料日まで'+remaining+'日で日割り計算。支出記録で自動更新するで。</p><p class="caption">三井住友①の確保予定 '+fmt(s1Need)+'（未払固定費・後払い・今月の未積立目標）。上記の対象残高からは二重に引かへん。</p>'+(unknowns?'<div class="notice">固定費の金額未入力が'+unknowns+'件。金額は暫定やで。</div>':'')+(free<0?'<div class="notice">対象残高から確保額を差し引くと不足しているで。</div>':'')+(a.s1<s1Need?'<div class="notice">三井住友①の確保予定額が残高を上回っているで。</div>':'')+'</div>';
+ const header='<div class="hero"><div class="fund-summary"><div class="fund-metric"><small>次の'+duration+'日間に使える目安</small><div class="big">'+fmt(allowance)+'</div></div><div class="fund-metric"><small>可処分資産合計</small><div class="big fund-total">'+fmt(Math.max(0,free))+'</div></div></div><div class="seg">'+[1,3,5,7].map(n=>'<button class="'+(db.intervalDays===n?'active':'')+'" onclick="changeInterval('+n+')">'+n+'日</button>').join('')+'</div><p class="caption">対象残高：りそな '+fmt(a.r)+' ＋ 現金財布 '+fmt(a.cash)+' ＋ 電子マネー '+fmt(a.em)+'。対象支払元の未払固定費・後払い予定と予備枠 '+fmt(db.weeklyBuffer)+' を差し引く。次の給料日まで'+remaining+'日で日割り計算。支出記録で自動更新するで。</p><p class="caption">三井住友①の確保予定 '+fmt(s1Need)+'（未払固定費・後払い・今月の未積立目標）。上記の対象残高からは二重に引かへん。</p>'+(unknowns?'<div class="notice">固定費の金額未入力が'+unknowns+'件。金額は暫定やで。</div>':'')+(free<0?'<div class="notice">対象残高から確保額を差し引くと不足しているで。</div>':'')+(a.s1<s1Need?'<div class="notice">三井住友①の確保予定額が残高を上回っているで。</div>':'')+'</div>';
  return '<div class="notice">v0.9｜給与期間・積立・生活費管理</div>'+header+explanation+original.slice(original.indexOf('</div><div class="card"><h3>口座・財布の残高</h3>')+6);
 };
 savingView=function(){
