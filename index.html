@@ -51,6 +51,66 @@ body:has(.quick-tabs) .foot{margin-top:0}
 
 body:has(.home-switch:not([hidden])) main{padding-bottom:calc(var(--installed-nav-height, 130px) + 16px)}
 body:has(.home-switch:not([hidden])) #view{min-height:0}
+
+/* Takuwae ledger theme prototype v1: presentation only, no ledger logic changes. */
+:root{
+ --ledger-ink:#203b55;--ledger-paper:#fbf7ef;--ledger-line:#e4ded2;
+ --ledger-teal:#337d8f;--ledger-gold:#d9a53f;
+ color:var(--ledger-ink);background:#f1ede5;
+}
+body{background:linear-gradient(180deg,#f6f2e9 0%,#f0ebe2 100%);color:var(--ledger-ink)}
+main{background:transparent}
+header{padding:7px 4px 12px;border-bottom:1px solid #dbd4c9;margin-bottom:16px}
+header h1{color:#1d4059;letter-spacing:.045em;font-weight:800}
+header small{color:#74808b;letter-spacing:.07em}
+.card,.hero{
+ background:var(--ledger-paper);
+ border:1px solid #e4ddd1;
+ border-radius:16px;
+ box-shadow:0 3px 10px #3d3a3110,0 1px 2px #263a5008
+}
+.card{padding:17px}
+h2,h3{color:#1f3e56;letter-spacing:.015em}
+.card h3{padding-bottom:8px;border-bottom:1px solid var(--ledger-line)}
+.stat,.chart-detail{background:#f2eee7;border:1px solid #e5ded2}
+.hero .big{color:#24687a;font-variant-numeric:tabular-nums}
+.fund-metric .fund-total{color:#21806c}
+.entry{border-bottom:1px dashed #d8d0c2;padding:12px 0}
+.entry:last-child{border-bottom:0}
+.bill{border-bottom:1px dashed #d8d0c2}
+label{color:#647485}
+small,.muted,.caption{color:#74808c}
+input,select,textarea{
+ background:#fffdf9;color:#243d53;border:1px solid #cdcfcf;
+ border-radius:9px;box-shadow:inset 0 1px 1px #243a4a07
+}
+input:focus,select:focus,textarea:focus{
+ outline:2px solid #67aabc;outline-offset:1px;border-color:#43899c
+}
+button{background:#2e6780;border-radius:10px;box-shadow:0 1px 2px #263a5014}
+button.secondary{background:#eeeae2;color:#284a61}
+button.danger{background:#b95157}
+.seg{background:#f0ece5;padding:4px;border-radius:13px;border:1px solid #e0d8cb}
+.seg button{background:transparent;color:#425b70;box-shadow:none;border-radius:10px}
+.seg .active{background:#326fa5;color:#fff;box-shadow:0 1px 4px #23486225}
+.quick-panel{background:#fbf7ef}
+.quick-choice{background:#fffcf6;border-color:#dcd7ce;color:#284457;box-shadow:0 1px 2px #253b5010}
+.quick-choice.chosen{background:#e5f0ec;border-color:#468f7b;color:#25644f}
+.quick-record{background:#327a70}
+.nav{background:#fffaf1;border-top:1px solid #dcd3c5;box-shadow:0 -3px 12px #2a3d4912}
+.nav button{color:#61778a;box-shadow:none}
+.nav button.active{background:#e6eee8;color:#245d51}
+.home-switch{background:transparent}
+.home-switch button:first-child.active{background:#326fa5;color:#fff}
+.home-switch button:nth-child(2).active{background:#f2d77b;color:#493b18}
+.progress{background:#e9e3d9}
+.progress div{background:#4b9e8a}
+.bar{background:#e5e0d7}
+.bar span{background:#468a9d}
+.pill{background:#ece9e2;color:#516b7b}
+.notice{background:#fff2d9;color:#785521}
+@media(max-width:390px){.card{padding:13px}}
+
 </style></head><body><main><header><div><small>PERSONAL FINANCE</small><h1>たくわえ</h1></div><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><nav class="nav"><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><div class="nav-inner" id="nav"></div></nav><script>
 const KEY='takuwae-v1';const names={s1:'三井住友①',r:'りそな',s2:'三井住友②',cash:'現金財布',em:'電子マネー'};const seedBills=[['rent','家賃','r'],['parking','駐車場','s1'],['insurance','傷害保険','s1'],['phone','携帯電話','s1'],['chat','ChatGPT','s1'],['adobe','Adobe','s1'],['youtube','YouTube',''],['weather','ウェザーニュース',''],['prime','Amazonプライム','']].map(([id,name,bank])=>({id,name,bank,active:true}));
 const today=()=>new Date().toLocaleDateString('sv-SE');const ym=()=>new Date().toLocaleDateString('sv-SE').slice(0,7);const fresh=()=>({initial:{s1:0,r:0,s2:0,cash:0,em:0},fundInitial:{repair:0,car:0},fundCategories:[{id:'repair',name:'修理予備費',goal:300000},{id:'car',name:'車両購入資金',goal:0}],bills:seedBills,months:{},tx:[],monthly:30000,bonus:150000,payday:25,weeklyBuffer:0});let db;try{db=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){db=fresh()}if(!Array.isArray(db.fundCategories))db.fundCategories=fresh().fundCategories;const ui={tab:'home',type:'expense',edit:false,selected:[],add:false,withdrawStep:0,wd:{fund:'repair',amount:'',reason:'フレアの修理',to:'s1'},filter:'all',month:ym(),addFund:false,deleteFund:null,editTx:null,billNotice:null};const fmt=n=>'¥'+Math.round(Number(n)||0).toLocaleString('ja-JP');const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);let save=()=>localStorage.setItem(KEY,JSON.stringify(db));const month=()=>db.months[ui.month]??(db.months[ui.month]={});const billState=b=>month()[b.id]??(month()[b.id]={amount:'',paid:false,bank:b.bank});const activeBills=()=>db.bills.filter(b=>b.active!==false&&(!b.end||ui.month<b.end)&&(!b.start||ui.month>=b.start));const balances=()=>{const a={...db.initial};for(const t of db.tx){if(t.kind==='income')a[t.to]=(a[t.to]||0)+t.amount;else if(t.kind==='expense') {if(t.settled)a[t.from]=(a[t.from]||0)-t.amount;}else {a[t.from]=(a[t.from]||0)-t.amount;a[t.to]=(a[t.to]||0)+t.amount;}}return a};const fundName=k=>db.fundCategories.find(f=>f.id===k)?.name||k;const funds=()=>{const a={...db.fundInitial};for(const t of db.tx){if(t.kind==='saving')a[t.purpose]=(a[t.purpose]||0)+t.amount;if(t.kind==='withdraw')a[t.purpose]=(a[t.purpose]||0)-t.amount;}return a};const options=(selected,includeEmpty=false,subset=Object.keys(names))=>(includeEmpty?'<option value="">支払元</option>':'')+subset.map(k=>`<option value="${k}" ${selected===k?'selected':''}>${names[k]}</option>`).join('');const totalBill=()=>activeBills().reduce((s,b)=>s+(billState(b).paid?Number(billState(b).amount)||0:0),0);const pending=()=>activeBills().filter(b=>!billState(b).paid).reduce((s,b)=>s+(Number(billState(b).amount)||0),0);const unknown=()=>activeBills().filter(b=>!billState(b).amount).length;const moneyColor=k=>({expense:'navy',income:'green',saving:'blue',withdraw:'amber',transfer:'muted'}[k]||'muted');const titleKind=k=>({expense:'出金',income:'入金',saving:'積立',withdraw:'取り崩し',transfer:'振替'}[k]);function record(t){db.tx.unshift({id:id(),date:today(),...t});save();render()};function setTab(t){ui.tab=t;ui.withdrawStep=0;render()};function nav(){document.getElementById('nav').innerHTML=['home:ホーム','entry:入出金','bills:固定費','saving:積立','history:履歴','settings:設定'].map(s=>{const [k,n]=s.split(':');return `<button class="${ui.tab===k?'active':''}" onclick="setTab('${k}')">${n}</button>`}).join('')};
