@@ -1309,7 +1309,7 @@ async function checkTakuwaeUpdate(){
   const response=await fetch(url.href,{cache:'no-store'});
   if(!response.ok)throw new Error('最新版の取得に失敗したで（HTTP '+response.status+'）。');
   const html=await response.text();
-  const match=html.match(/<meta name="takuwae-version" content="([0-9]+\\.[0-9]+\\.[0-9]+)">/);
+  const match=html.match(/<meta name="takuwae-version" content="([0-9]+\.[0-9]+\.[0-9]+)">/);
   if(!match)throw new Error('公開版のバージョンを確認できへんかった。再読み込みはせずに終了するで。');
   const published=match[1];
   const compareVersions=(a,b)=>{
