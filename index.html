@@ -263,6 +263,23 @@ body:has(.home-switch:not([hidden])) main{padding-bottom:calc(var(--installed-na
 /* Approved B: vivid red/blue cashflow arrows and gold yen coin. */
 .nav-inner .entry-money-icon{width:34px;height:34px;object-fit:contain;display:block;border-radius:9px;flex:none}
 .nav-inner button.active .entry-money-icon{filter:brightness(1.08);transform:translateY(-1px)}
+
+/* v27: clear selected tab using a softly lit floating tile. */
+.nav-inner{align-items:center}
+.nav-inner button{
+ position:relative;transform-origin:center bottom;
+ transition:transform 170ms ease, background-color 170ms ease, box-shadow 170ms ease;
+}
+.nav-inner button.active{
+ background:linear-gradient(180deg,rgba(255,251,231,.25),rgba(240,230,198,.13));
+ color:#ffe184;
+ border-radius:13px;
+ box-shadow:0 0 0 1px rgba(255,245,209,.32),0 4px 10px rgba(0,12,22,.25);
+ transform:translateY(-2px) scale(1.055);
+ z-index:1;
+}
+.nav-inner button.active .nav-label{color:#ffe184}
+@media(prefers-reduced-motion:reduce){.nav-inner button{transition:none}}
 </style></head><body><main><header><div><small>PERSONAL FINANCE</small><h1>たくわえ</h1></div><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
 const KEY='takuwae-v1';const names={s1:'三井住友①',r:'りそな',s2:'三井住友②',cash:'現金財布',em:'電子マネー'};const seedBills=[['rent','家賃','r'],['parking','駐車場','s1'],['insurance','傷害保険','s1'],['phone','携帯電話','s1'],['chat','ChatGPT','s1'],['adobe','Adobe','s1'],['youtube','YouTube',''],['weather','ウェザーニュース',''],['prime','Amazonプライム','']].map(([id,name,bank])=>({id,name,bank,active:true}));
 const today=()=>new Date().toLocaleDateString('sv-SE');const ym=()=>new Date().toLocaleDateString('sv-SE').slice(0,7);const fresh=()=>({initial:{s1:0,r:0,s2:0,cash:0,em:0},fundInitial:{repair:0,car:0},fundCategories:[{id:'repair',name:'修理予備費',goal:300000},{id:'car',name:'車両購入資金',goal:0}],bills:seedBills,months:{},tx:[],monthly:30000,bonus:150000,payday:25,weeklyBuffer:0});let db;try{db=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){db=fresh()}if(!Array.isArray(db.fundCategories))db.fundCategories=fresh().fundCategories;const ui={tab:'home',type:'expense',edit:false,selected:[],add:false,withdrawStep:0,wd:{fund:'repair',amount:'',reason:'フレアの修理',to:'s1'},filter:'all',month:ym(),addFund:false,deleteFund:null,editTx:null,billNotice:null};const fmt=n=>'¥'+Math.round(Number(n)||0).toLocaleString('ja-JP');const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);let save=()=>localStorage.setItem(KEY,JSON.stringify(db));const month=()=>db.months[ui.month]??(db.months[ui.month]={});const billState=b=>month()[b.id]??(month()[b.id]={amount:'',paid:false,bank:b.bank});const activeBills=()=>db.bills.filter(b=>b.active!==false&&(!b.end||ui.month<b.end)&&(!b.start||ui.month>=b.start));const balances=()=>{const a={...db.initial};for(const t of db.tx){if(t.kind==='income')a[t.to]=(a[t.to]||0)+t.amount;else if(t.kind==='expense') {if(t.settled)a[t.from]=(a[t.from]||0)-t.amount;}else {a[t.from]=(a[t.from]||0)-t.amount;a[t.to]=(a[t.to]||0)+t.amount;}}return a};const fundName=k=>db.fundCategories.find(f=>f.id===k)?.name||k;const funds=()=>{const a={...db.fundInitial};for(const t of db.tx){if(t.kind==='saving')a[t.purpose]=(a[t.purpose]||0)+t.amount;if(t.kind==='withdraw')a[t.purpose]=(a[t.purpose]||0)-t.amount;}return a};const options=(selected,includeEmpty=false,subset=Object.keys(names))=>(includeEmpty?'<option value="">支払元</option>':'')+subset.map(k=>`<option value="${k}" ${selected===k?'selected':''}>${names[k]}</option>`).join('');const totalBill=()=>activeBills().reduce((s,b)=>s+(billState(b).paid?Number(billState(b).amount)||0:0),0);const pending=()=>activeBills().filter(b=>!billState(b).paid).reduce((s,b)=>s+(Number(billState(b).amount)||0),0);const unknown=()=>activeBills().filter(b=>!billState(b).amount).length;const moneyColor=k=>({expense:'navy',income:'green',saving:'blue',withdraw:'amber',transfer:'muted'}[k]||'muted');const titleKind=k=>({expense:'出金',income:'入金',saving:'積立',withdraw:'取り崩し',transfer:'振替'}[k]);function record(t){db.tx.unshift({id:id(),date:today(),...t});save();render()};function setTab(t){ui.tab=t;ui.withdrawStep=0;render()};function navIcon(k){
