@@ -302,13 +302,13 @@ body:has(.home-switch:not([hidden])) main{padding-bottom:calc(var(--installed-na
  .nav-inner button:not(.active) .entry-money-icon{transition:none}
 }
 
-/* v29 approved six illustrated tabs: no permanent icon backdrop or accent rays. */
-.nav-inner .nav-illustration{display:block;flex:none;width:39px;height:39px;max-width:100%;overflow:visible;transition:filter 170ms ease}
+/* v30 six softly dimensional tab illustrations: icon-only, no background panels. */
+.nav-inner .nav-illustration{display:block;flex:none;width:42px;height:42px;max-width:100%;overflow:visible;filter:drop-shadow(0 2px 1px rgba(0,10,25,.28));transition:filter 170ms ease}
 .nav-inner button{gap:1px;padding-top:5px;padding-bottom:6px;min-height:65px}
-.nav-inner button:not(.active) .nav-illustration{filter:saturate(.68) brightness(.88);opacity:.88}
-.nav-inner button.active .nav-illustration{filter:none;opacity:1}
+.nav-inner button:not(.active) .nav-illustration{filter:saturate(.68) brightness(.88) drop-shadow(0 1px 1px rgba(0,10,25,.18));opacity:.88}
+.nav-inner button.active .nav-illustration{filter:drop-shadow(0 3px 2px rgba(0,10,25,.3));opacity:1}
 .nav-inner button .nav-label{font-size:11px}
-@media(max-width:390px){.nav-inner .nav-illustration{width:35px;height:35px}.nav-inner button .nav-label{font-size:10px}}
+@media(max-width:390px){.nav-inner .nav-illustration{width:37px;height:37px}.nav-inner button .nav-label{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.nav-inner .nav-illustration{transition:none}}
 </style></head><body><main><header><div><small>PERSONAL FINANCE</small><h1>たくわえ</h1></div><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
 const KEY='takuwae-v1';const names={s1:'三井住友①',r:'りそな',s2:'三井住友②',cash:'現金財布',em:'電子マネー'};const seedBills=[['rent','家賃','r'],['parking','駐車場','s1'],['insurance','傷害保険','s1'],['phone','携帯電話','s1'],['chat','ChatGPT','s1'],['adobe','Adobe','s1'],['youtube','YouTube',''],['weather','ウェザーニュース',''],['prime','Amazonプライム','']].map(([id,name,bank])=>({id,name,bank,active:true}));
@@ -322,7 +322,18 @@ const art={
  history:`<path d="M8 7h29q-3 4-3 7v29H8q4-4 1-8V14q3-4-1-7z" fill="${cream}"/><path d="M8 7h29q-5 3-3 8H8q-4-4 0-8z" fill="${gold}"/><circle cx="15" cy="23" r="2.5" fill="${red}" stroke="none"/><circle cx="15" cy="30" r="2.5" fill="${blue}" stroke="none"/><circle cx="15" cy="37" r="2.5" fill="#65c967" stroke="none"/><path d="M22 23h8M22 30h5M22 37h4" stroke-width="3"/><circle cx="36" cy="35" r="11" fill="${gold}"/><path d="M36 28v7l5 3" fill="none" stroke-width="3"/><path d="M28 28q8-8 17 0" fill="none" stroke="${blue}" stroke-width="3"/>`,
  settings:`<path d="M20 3h8l2 6 5 2 6-2 5 7-4 5v6l4 5-5 7-6-2-5 2-2 6h-8l-2-6-5-2-6 2-5-7 4-5v-6l-4-5 5-7 6 2 5-2z" fill="#d9dbe4"/><circle cx="24" cy="24" r="9" fill="${gold}"/>`
 };
-return '<svg class="nav-illustration" viewBox="0 0 48 48" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" stroke="'+outline+'" stroke-width="3.3" stroke-linejoin="round" stroke-linecap="round">'+(art[k]||'')+'</svg>';
+const gradients='<defs>'+
+'<linearGradient id="g-cream" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#fffdf4"/><stop offset=".54" stop-color="#fff0c8"/><stop offset="1" stop-color="#dcaa70"/></linearGradient>'+
+'<linearGradient id="g-red" x1="0" y1="0" x2=".15" y2="1"><stop stop-color="#ff8580"/><stop offset=".44" stop-color="#ff5147"/><stop offset="1" stop-color="#ca283e"/></linearGradient>'+
+'<linearGradient id="g-blue" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#75d6ff"/><stop offset=".45" stop-color="#2baaf7"/><stop offset="1" stop-color="#1263d4"/></linearGradient>'+
+'<linearGradient id="g-gold" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#fff29a"/><stop offset=".42" stop-color="#ffc92e"/><stop offset="1" stop-color="#e38a14"/></linearGradient>'+
+'<linearGradient id="g-pink" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#ffd2da"/><stop offset=".55" stop-color="#f5a0b5"/><stop offset="1" stop-color="#d96a8f"/></linearGradient>'+
+'<linearGradient id="g-silver" x1="0" y1="0" x2=".3" y2="1"><stop stop-color="#f4f9ff"/><stop offset=".5" stop-color="#b6d9fa"/><stop offset="1" stop-color="#498ccf"/></linearGradient></defs>';
+let shapes=art[k]||'';
+for(const [solid,gradient] of [[cream,'cream'],[red,'red'],[blue,'blue'],[gold,'gold'],['#f5a0b5','pink'],['#d9dbe4','silver']]){
+ shapes=shapes.split('fill="'+solid+'"').join('fill="url(#g-'+gradient+')"');
+}
+return '<svg class="nav-illustration" viewBox="0 0 48 48" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" stroke="'+outline+'" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">'+gradients+shapes+'</svg>';
 }
 function nav(){document.getElementById('nav').innerHTML=['home:ホーム','entry:入出金','bills:固定費','saving:積立','history:履歴','settings:設定'].map(s=>{const [k,n]=s.split(':');return `<button class="${ui.tab===k?'active':''}" onclick="setTab('${k}')">${navIcon(k)}<span class="nav-label">${n}</span></button>`}).join('')};
 function home(){const a=balances(),f=funds(),unknowns=unknown();const unpaid=pending();const reserveNeeded=Math.max(0,300000-f.repair);const all=Object.values(a).reduce((x,y)=>x+y,0);const pendingCards=db.tx.filter(t=>t.kind==='expense'&&!t.settled).reduce((x,t)=>x+t.amount,0);const monthSaved=db.tx.filter(t=>t.kind==='saving'&&t.purpose==='car'&&String(t.date||'').slice(0,7)===ym()).reduce((sum,t)=>sum+Number(t.amount||0),0);const savingToProtect=Math.max(0,Number(db.monthly||0)-monthSaved);const free=Math.max(0,a.r-unpaid-pendingCards-db.weeklyBuffer-savingToProtect);const weekly=Math.floor(free/4);return `<div class="hero"><small>今週あと使えるお金 · 暫定目安</small><div class="big">${fmt(weekly)}</div><div class="progress"><div style="width:${Math.min(100,Math.max(0,weekly/30000*100))}%"></div></div><p class="caption">りそなの帳簿残高から、未払いの入力済み固定費・後払い予定・生活費確保額・今月の未積立予定額 ${fmt(savingToProtect)} を差し引き、4等分した簡易試算。積立が三井住友①から行われる場合も安全側に控除する暫定方式。</p>${unknowns?`<div class="notice">金額未入力の固定費が${unknowns}件あるため、使える額は確定してへんで。</div>`:''}</div><div class="card"><h3>口座・財布の残高</h3>${Object.keys(names).map(k=>`<div class="row entry"><span>${names[k]}</span><strong>${fmt(a[k])}</strong></div>`).join('')}<div class="row" style="margin-top:12px"><b>帳簿上の資産合計</b><b>${fmt(all)}</b></div></div><div class="grid"><div class="card"><small>修理予備費</small><strong class="blue" style="display:block;font-size:21px">${fmt(f.repair)}</strong><small>目標まであと${fmt(reserveNeeded)}</small></div><div class="card"><small>車両購入資金</small><strong class="blue" style="display:block;font-size:21px">${fmt(f.car)}</strong><small>毎月${fmt(db.monthly)}目標</small></div></div><button style="width:100%" onclick="setTab('entry')">＋ 入出金を記録</button><p class="caption">※三井住友②の用途別合計 ${fmt(f.repair+f.car)} ／ 実残高 ${fmt(a.s2)}。差額 ${fmt(a.s2-f.repair-f.car)} は未分類資金として扱う。</p>`}
