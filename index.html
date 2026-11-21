@@ -325,7 +325,69 @@ body:has(.home-switch:not([hidden])) main{padding-bottom:calc(var(--installed-na
 .nav-inner .sprite-history{background-position:80% 0}
 .nav-inner .sprite-settings{background-position:100% 0}
 @media(max-width:390px){.nav-inner .sprite-icon{width:37px;height:37px}}
-</style></head><body><main><header><div><small>PERSONAL FINANCE</small><h1>たくわえ</h1></div><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
+
+/* v37 notebook-inspired masthead and subtle Japanese washi paper texture */
+html{background:#f6f1e7}
+body{
+ background-color:#f6f1e7;
+ background-image:
+  radial-gradient(ellipse 1px 13px at 16% 22%,rgba(129,112,87,.075) 1%,transparent 76%),
+  radial-gradient(ellipse 13px 1px at 72% 61%,rgba(142,118,80,.065) 1%,transparent 80%),
+  radial-gradient(ellipse 1px 9px at 88% 11%,rgba(162,138,99,.055) 1%,transparent 80%),
+  repeating-linear-gradient(12deg,rgba(151,130,99,.022) 0px,rgba(151,130,99,.022) .5px,transparent .5px,transparent 7px),
+  repeating-linear-gradient(104deg,rgba(255,255,255,.14) 0px,rgba(255,255,255,.14) .6px,transparent .6px,transparent 13px),
+  linear-gradient(180deg,#f9f5ec 0%,#f4eddf 100%);
+ background-size:97px 83px,113px 107px,71px 99px,auto,auto,auto;
+ min-height:100dvh;
+}
+header.washi-header{
+ position:relative;
+ min-height:126px;
+ margin:0 0 18px;
+ padding:26px 38px 20px;
+ border:0;
+ border-bottom:1px solid rgba(132,110,80,.20);
+ display:flex;align-items:center;justify-content:center;
+ text-align:center;
+ background:linear-gradient(180deg,rgba(255,252,245,.60),rgba(255,250,240,.13));
+}
+header.washi-header:before{
+ content:"";
+ position:absolute;
+ left:-14px;top:16px;bottom:18px;width:34px;
+ background-image:
+  radial-gradient(ellipse 15px 10px at 17px 9px,transparent 55%,#8d7858 59%,#e3c68c 68%,#786342 73%,transparent 80%),
+  radial-gradient(ellipse 15px 10px at 17px 48px,transparent 55%,#8d7858 59%,#e3c68c 68%,#786342 73%,transparent 80%),
+  radial-gradient(ellipse 15px 10px at 17px 87px,transparent 55%,#8d7858 59%,#e3c68c 68%,#786342 73%,transparent 80%);
+ background-repeat:no-repeat;
+ background-size:34px 22px,34px 22px,34px 22px;
+ background-position:0 0,0 39px,0 78px;
+ opacity:.94;
+}
+header.washi-header:after{
+ content:"✒";
+ right:2px;top:52px;
+ font-size:31px;color:#9b6b35;
+ transform:rotate(-26deg);
+ opacity:.92;
+}
+header.washi-header h1{
+ font-size:clamp(27px,7.3vw,37px);
+ letter-spacing:.12em;font-weight:750;
+ color:#142d49;text-shadow:0 1px 0 #fff9;
+ white-space:nowrap;
+}
+header.washi-header h1:before{content:"🌱";font-size:.66em;vertical-align:3px;margin-right:8px;letter-spacing:0}
+header.washi-header small{
+ display:block;margin-top:7px;font-size:clamp(11px,3vw,14px);
+ font-weight:500;letter-spacing:.055em;color:#334151;
+}
+header.washi-header .pill{position:absolute;right:0;bottom:-12px;z-index:1}
+@media(max-width:390px){
+ header.washi-header{min-height:117px;padding:23px 21px 20px}
+ header.washi-header:after{right:-2px;font-size:25px}
+}
+</style></head><body><main><header class="washi-header"><div class="washi-heading"><h1>たくわえ</h1><small>パーソナルファイナンス</small></div><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
 const KEY='takuwae-v1';const names={s1:'三井住友①',r:'りそな',s2:'三井住友②',cash:'現金財布',em:'電子マネー'};const seedBills=[['rent','家賃','r'],['parking','駐車場','s1'],['insurance','傷害保険','s1'],['phone','携帯電話','s1'],['chat','ChatGPT','s1'],['adobe','Adobe','s1'],['youtube','YouTube',''],['weather','ウェザーニュース',''],['prime','Amazonプライム','']].map(([id,name,bank])=>({id,name,bank,active:true}));
 const today=()=>new Date().toLocaleDateString('sv-SE');const ym=()=>new Date().toLocaleDateString('sv-SE').slice(0,7);const fresh=()=>({initial:{s1:0,r:0,s2:0,cash:0,em:0},fundInitial:{repair:0,car:0},fundCategories:[{id:'repair',name:'修理予備費',goal:300000},{id:'car',name:'車両購入資金',goal:0}],bills:seedBills,months:{},tx:[],monthly:30000,bonus:150000,payday:25,weeklyBuffer:0});let db;try{db=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){db=fresh()}if(!Array.isArray(db.fundCategories))db.fundCategories=fresh().fundCategories;const ui={tab:'home',type:'expense',edit:false,selected:[],add:false,withdrawStep:0,wd:{fund:'repair',amount:'',reason:'フレアの修理',to:'s1'},filter:'all',month:ym(),addFund:false,deleteFund:null,editTx:null,billNotice:null};const fmt=n=>'¥'+Math.round(Number(n)||0).toLocaleString('ja-JP');const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);let save=()=>localStorage.setItem(KEY,JSON.stringify(db));const month=()=>db.months[ui.month]??(db.months[ui.month]={});const billState=b=>month()[b.id]??(month()[b.id]={amount:'',paid:false,bank:b.bank});const activeBills=()=>db.bills.filter(b=>b.active!==false&&(!b.end||ui.month<b.end)&&(!b.start||ui.month>=b.start));const balances=()=>{const a={...db.initial};for(const t of db.tx){if(t.kind==='income')a[t.to]=(a[t.to]||0)+t.amount;else if(t.kind==='expense') {if(t.settled)a[t.from]=(a[t.from]||0)-t.amount;}else {a[t.from]=(a[t.from]||0)-t.amount;a[t.to]=(a[t.to]||0)+t.amount;}}return a};const fundName=k=>db.fundCategories.find(f=>f.id===k)?.name||k;const funds=()=>{const a={...db.fundInitial};for(const t of db.tx){if(t.kind==='saving')a[t.purpose]=(a[t.purpose]||0)+t.amount;if(t.kind==='withdraw')a[t.purpose]=(a[t.purpose]||0)-t.amount;}return a};const options=(selected,includeEmpty=false,subset=Object.keys(names))=>(includeEmpty?'<option value="">支払元</option>':'')+subset.map(k=>`<option value="${k}" ${selected===k?'selected':''}>${names[k]}</option>`).join('');const totalBill=()=>activeBills().reduce((s,b)=>s+(billState(b).paid?Number(billState(b).amount)||0:0),0);const pending=()=>activeBills().filter(b=>!billState(b).paid).reduce((s,b)=>s+(Number(billState(b).amount)||0),0);const unknown=()=>activeBills().filter(b=>!billState(b).amount).length;const moneyColor=k=>({expense:'navy',income:'green',saving:'blue',withdraw:'amber',transfer:'muted'}[k]||'muted');const titleKind=k=>({expense:'出金',income:'入金',saving:'積立',withdraw:'取り崩し',transfer:'振替'}[k]);function record(t){db.tx.unshift({id:id(),date:today(),...t});save();render()};function setTab(t){ui.tab=t;ui.withdrawStep=0;render()};function navIcon(k){return '<span class="nav-illustration sprite-icon sprite-'+k+'" aria-hidden="true"></span>';
 const outline='#632607',cream='#fff6df',red='#ff5147',blue='#2baaf7',gold='#ffc92e';
