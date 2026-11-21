@@ -45,6 +45,10 @@ body:has(.quick-tabs) .foot{margin-top:0}
 .home-switch{width:min(620px,100%);padding:0 8px 7px;flex-shrink:0}
 .home-switch[hidden]{display:none}
 .home-switch button{min-height:46px;font-size:14px;padding:11px 8px}
+/* Clearly distinguish the active home sections. */
+.home-switch button:first-child.active{background:#326fa5;color:#fff}
+.home-switch button:nth-child(2).active{background:#f2d77b;color:#493b18}
+
 body:has(.home-switch:not([hidden])) main{padding-bottom:calc(var(--installed-nav-height, 130px) + 16px)}
 body:has(.home-switch:not([hidden])) #view{min-height:0}
 </style></head><body><main><header><div><small>PERSONAL FINANCE</small><h1>たくわえ</h1></div><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><nav class="nav"><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><div class="nav-inner" id="nav"></div></nav><script>
