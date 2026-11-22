@@ -52,3 +52,9 @@
 - 対応するテストケースを追加したが、**Node自動テストの成功を確認できていない**。
 - 注意：Supabase初期メールテンプレートが数字OTPではなくマジックリンクの場合、送信メールの形式・リダイレクト設定を調整してから実機検証する必要がある。現時点ではリンク経由ログイン未実装。
 - 開発上の次のアクション：ブラウザで実行可能な隔離テスト環境を確保し、AuthおよびRPCの通し試験を実施してから本体の双方向同期を有効化。
+
+## 2026-11-22：ログイン検証用Edge Function
+- Supabase Edge Function `takuwae-sync-lab` をデプロイし、ACTIVE状態を確認。URLは `https://qajwwulbrvdtbukxpvvy.supabase.co/functions/v1/takuwae-sync-lab`。
+- この画面は公開アクセス可能だが、認証無しに家計データへアクセスできない。本人のトークンによるログイン・レコード件数の読取、ログアウトのみ。書込、初回移行、端末localStorageアクセス無し。
+- Supabase標準のMagic Linkメールを使う。メール送信時にこの検証画面URLを戻り先として指定。**URL Configuration の Redirect URLs に追加するユーザー操作が次に必要**。
+- Edge Functionの自動テスト・実機ログインはまだ実施できていない。既存main版と家計データには変更無し。
