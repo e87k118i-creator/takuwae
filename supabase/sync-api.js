@@ -2,7 +2,7 @@
 // A signed-in session is required. Callers must retain batch_id+operations across retries.
 import {SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY} from './config.js';
 
-const base = SUPABASE_URL.replace(/\\/$/, '');
+const base = SUPABASE_URL.replace(/\/$/, '');
 const allowed = new Set(['transaction','bill','bill_month','fund','setting','closing','rollover']);
 function checkedToken(token) {
   if (typeof token !== 'string' || token.length < 16) throw new Error('ログインが必要です');
@@ -72,7 +72,7 @@ export async function applyBatch(token,{batchId,operations,fetchImpl=fetch}={}) 
 }
 /** OTP mail sender: calls auth endpoint only after an explicit login action. */
 export async function sendEmailOtp(email,{fetchImpl=fetch}={}) {
-  if (typeof email!=='string' || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))
+  if (typeof email!=='string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     throw new Error('メールアドレスを確認してな');
   const res = await fetchImpl(base+'/auth/v1/otp',{
     method:'POST', cache:'no-store',
@@ -84,7 +84,7 @@ export async function sendEmailOtp(email,{fetchImpl=fetch}={}) {
 }
 /** Verify a numeric email OTP: NEVER log or commit the token. */
 export async function verifyEmailOtp(email,code,{fetchImpl=fetch}={}) {
-  if(typeof code!=='string' || !/^\\d{6,8}$/.test(code))
+  if(typeof code!=='string' || !/^\d{6,8}$/.test(code))
     throw new Error('メールの認証コードを確認してな');
   const res=await fetchImpl(base+'/auth/v1/verify',{
     method:'POST',cache:'no-store',
