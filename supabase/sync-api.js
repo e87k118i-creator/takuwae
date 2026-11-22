@@ -71,13 +71,13 @@ export async function applyBatch(token,{batchId,operations,fetchImpl=fetch}={}) 
   return result;
 }
 /** OTP mail sender: calls auth endpoint only after an explicit login action. */
-export async function sendEmailOtp(email,{fetchImpl=fetch}={}) {
+export async function sendEmailOtp(email,{fetchImpl=fetch,redirectTo}={}) {
   if (typeof email!=='string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     throw new Error('メールアドレスを確認してな');
   const res = await fetchImpl(base+'/auth/v1/otp',{
     method:'POST', cache:'no-store',
     headers:{apikey:SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},
-    body:JSON.stringify({email,create_user:true})
+    body:JSON.stringify({email,create_user:true,...(redirectTo?{options:{email_redirect_to:redirectTo}}:{})})
   });
   if(!res.ok) throw new Error('認証メールを送信できませんでした ('+res.status+')');
   return true;
@@ -106,4 +106,27 @@ export async function signOut(accessToken,{fetchImpl=fetch}={}) {
   });
   if(!res.ok) throw new Error('ログアウトを完了できませんでした ('+res.status+')');
   return true;
+}
+
+/** Magic-link implicit callback. Browser only. Never persist the URL fragment. */
+export function readMagicLinkSession(fragment) {
+  const params=new URLSearchParams(String(fragment||'').replace(/^#/,''));
+  if(params.get('error')) throw new Error('メールリンクが無効か期限切れです');
+  const access_token=params.get('access_token');
+  const refresh_token=params.get('refresh_token');
+  if(!access_token || !refresh_token) return null;
+  if(params.get('token_type')!=='bearer') throw new Error('認証方式が一致しません');
+  return {access_token,refresh_token,expires_in:Number(params.get('expires_in'))||0};
+}
+/** A REST userinfo request validates the token and discovers the real user ID. */
+export async function getAuthUser(accessToken,{fetchImpl=fetch}={}) {
+  const res=await fetchImpl(base+'/auth/v1/user',{
+    method:'GET',cache:'no-store',
+    headers:{apikey:SUPABASE_PUBLISHABLE_KEY,
+      Authorization:'Bearer '+checkedToken(accessToken)}
+  });
+  if(!res.ok) throw new Error('ログイン状態を確認できませんでした ('+res.status+')');
+  const user=await res.json();
+  if(!user?.id || typeof user.id!=='string') throw new Error('ユーザー情報が不正です');
+  return user;
 }
