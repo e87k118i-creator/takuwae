@@ -22,4 +22,11 @@ const deleted=structuredClone(base);deleted.tx=[];
 assert.equal(diffRecords(new Map(rows.map(r=>[r.entity_type+':'+r.entity_id,r])),encodeRecords(deleted)).filter(c=>c.deleted).length,1);
 assert.throws(()=>validateTakuwae({...base,tx:[{id:''}]}));
 assert.throws(()=>encodeRecords({...base,tx:[base.tx[0],base.tx[0]]}));
+// Semantically identical JSONB should not appear modified if key order changes.
+const reordered=structuredClone(base);
+reordered.initial={r:1000,s1:2000};
+assert.equal(diffRecords(new Map(rows.map(r=>[r.entity_type+':'+r.entity_id,r])),encodeRecords(reordered)).length,0);
+// Never let a rogue settings row overwrite decoded transaction array.
+assert.throws(()=>decodeRecords(rows.map(r=>r.entity_type==='setting'
+  ? {...r,payload:{...r.payload,tx:[]}}:r)),/予約された項目/);
 console.log('record codec tests passed');
