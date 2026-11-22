@@ -1,6 +1,12 @@
 /* Explicit, backup-gated first import. No localStorage writes or auto-run. */
 import {encodeRecords,decodeRecords,validateTakuwae} from './sync-model.js';
 export const MIGRATION_CONFIRMATION='iPhoneから初回登録する';
+// Postgres jsonb can reorder object keys: compare parsed content, not key order.
+const canonical=value=>JSON.stringify(value,(_key,part)=>{
+  if(part && typeof part==='object' && !Array.isArray(part))
+    return Object.fromEntries(Object.keys(part).sort().map(k=>[k,part[k]]));
+  return part;
+});
 export function inspectFirstImport(localDb, serverRows) {
   validateTakuwae(localDb);
   if (!Array.isArray(serverRows)) throw new Error('サーバーデータを確認できません');
@@ -26,10 +32,10 @@ export async function firstImport({localDb,confirmation,hasExternalBackup,fetchR
   if(result?.status!=='applied') throw new Error('初回移行の結果を確認できません');
   const verified=await fetchRows();
   if(verified.length!==plan.recordCount) throw new Error('クラウド上の記録件数が一致しません。同期は有効にしません');
-  const expected=new Map(plan.operations.map(r=>[r.entity_type+':'+r.entity_id,JSON.stringify(r.payload)]));
+  const expected=new Map(plan.operations.map(r=>[r.entity_type+':'+r.entity_id,canonical(r.payload)]));
   for(const row of verified) {
     const k=row.entity_type+':'+row.entity_id;
-    if(row.deleted_at || expected.get(k)!==JSON.stringify(row.payload))
+    if(row.deleted_at || expected.get(k)!==canonical(row.payload))
       throw new Error('クラウド上の記録内容が一致しません。同期は有効にしません');
     expected.delete(k);
   }
