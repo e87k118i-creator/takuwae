@@ -13,6 +13,20 @@ const rehydrated=decodeRecords(rows);
 assert.equal(rehydrated.initial.s1,2000);
 assert.equal(rehydrated.months['2026-11'].rent.amount,500);
 assert.equal(rehydrated.tx[0].id,'unique1');
+const reorderedTx=structuredClone(base);
+reorderedTx.tx=[
+  {id:'later',date:'2026-11-22',kind:'expense',amount:20,from:'r'},
+  {id:'earlier',date:'2026-11-22',kind:'expense',amount:10,from:'r'}
+];
+reorderedTx.bills=[{id:'second',name:'第二',bank:'r'},...base.bills];
+reorderedTx.fundCategories=[{id:'car',name:'車',goal:0},...base.fundCategories];
+const scrambled=[...encodeRecords(reorderedTx).values()]
+  .map(r=>({...r,revision:1}))
+  .reverse();
+const restoredOrder=decodeRecords(scrambled);
+assert.deepEqual(restoredOrder.tx.map(x=>x.id),['later','earlier']);
+assert.deepEqual(restoredOrder.bills.map(x=>x.id),['second','rent']);
+assert.deepEqual(restoredOrder.fundCategories.map(x=>x.id),['car','repair']);
 assert.equal(rows.length,5);
 assert.equal(diffRecords(new Map(rows.map(r=>[r.entity_type+':'+r.entity_id,r])),encodeRecords(base)).length,0);
 const newLocal=structuredClone(base);newLocal.tx.push({id:'second',date:'2026-11-23',kind:'income',amount:100});
