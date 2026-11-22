@@ -50,6 +50,13 @@ export function encodeRecords(db) {
       put(out,'bill_month',month + '/' + mustId(billId,'固定費のID'),state);
   const settings = Object.fromEntries(Object.entries(db).filter(([k]) =>
     !['tx','bills','months','fundCategories'].includes(k)));
+  // Keep exact user-visible ordering without changing ledger object payloads.
+  // This metadata is ONLY in the sync record, not in the original backup.
+  settings.__sync_order={
+    tx:db.tx.map(t=>t.id),
+    bills:db.bills.map(b=>b.id),
+    fundCategories:db.fundCategories.map(f=>f.id)
+  };
   put(out,'setting','global',settings);
   return out;
 }
@@ -58,6 +65,7 @@ export function decodeRecords(rows) {
   if (!Array.isArray(rows)) throw new Error('サーバーのデータ形式が違います');
   const db = {tx:[],bills:[],months:{},fundCategories:[]};
   const seen = new Set();
+  let syncOrder=null;
   for (const row of rows) {
     if (!TYPES.includes(row.entity_type)) throw new Error('未知のレコード種類');
     const k = key(row.entity_type,mustId(row.entity_id,'レコード'));
@@ -78,10 +86,25 @@ export function decodeRecords(rows) {
     if (row.entity_type === 'setting') {
       if (row.entity_id !== 'global' || !safe(data)) throw new Error('設定データが不正です');
       if(Object.keys(data).some(k=>RESERVED.has(k))) throw new Error('設定に予約された項目が含まれています');
+      syncOrder=data.__sync_order;
+      delete data.__sync_order;
       Object.assign(db,data);
     }
   }
-  db.tx.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  const applyOrder=(items,names)=>{
+    if(!Array.isArray(names)) return false;
+    const expected=new Set(items.map(x=>x.id));
+    if(names.length!==items.length || names.some(x=>!expected.has(x))
+       || new Set(names).size!==names.length)
+      throw new Error('同期データの並び順情報が不正です');
+    const order=new Map(names.map((id,i)=>[id,i]));
+    items.sort((a,b)=>order.get(a.id)-order.get(b.id));
+    return true;
+  };
+  if(!applyOrder(db.tx,syncOrder?.tx))
+    db.tx.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  applyOrder(db.bills,syncOrder?.bills);
+  applyOrder(db.fundCategories,syncOrder?.fundCategories);
   validateTakuwae(db);
   return db;
 }
