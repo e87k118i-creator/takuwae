@@ -1,11 +1,17 @@
--- Takuwae v2.1: review before manual execution in Supabase SQL Editor.
+-- Takuwae v2.1: controlled backend migration.
 -- This is a FOLLOW-UP migration after the initial schema.
 -- Do not run against a database with unexpected pre-existing Takuwae data.
 -- No personal ledger data is contained in this SQL.
 
 -- 1. Every client write must go through the checked, atomic batch API.
-revoke insert, update, delete on table public.takuwae_records from anon, authenticated;
+-- IMPORTANT: REVOKE ALL also removes TRUNCATE, which bypasses RLS.
+revoke all on table public.takuwae_records from public, anon, authenticated;
 grant select on table public.takuwae_records to authenticated;
+
+-- A separate, unused prototype table was discovered in the user's project.
+-- Preserve its rows/schema but close all browser-facing access to prevent
+-- clients from bypassing the version-checked record pipeline.
+revoke all on table public.takuwae_sync_records from public, anon, authenticated;
 
 -- Keep RLS enabled so direct reads remain owner-isolated.
 alter table public.takuwae_records enable row level security;
@@ -105,6 +111,95 @@ begin
        or (v_op->'expected_revision' <> 'null'::jsonb
          and jsonb_typeof(v_op->'expected_revision') <> 'number') then
       raise exception 'Expected revision required' using errcode = '22023';
+    end if;
+    if v_op->>'expected_revision' is not null
+       and (v_op->>'expected_revision' !~ '^[0-9]+ and v_expected < 1 then
+      raise exception 'Invalid revision' using errcode = '22023';
+    end if;
+    if jsonb_typeof(v_op->'deleted') <> 'boolean'
+       or jsonb_typeof(v_op->'payload') <> 'object' then
+      raise exception 'Invalid payload or deleted flag' using errcode = '22023';
+    end if;
+    v_deleted := (v_op->>'deleted')::boolean;
+    if v_type = 'setting' and (v_id <> 'global' or v_deleted) then
+      raise exception 'Global settings cannot be deleted' using errcode = '22023';
+    end if;
+
+    select revision into v_existing_revision
+    from public.takuwae_records
+    where owner_id = v_owner and entity_type = v_type and entity_id = v_id;
+
+    if v_existing_revision is distinct from v_expected
+       or (v_existing_revision is null and v_deleted) then
+      v_conflicts := v_conflicts || pg_catalog.jsonb_build_array(
+        pg_catalog.jsonb_build_object(
+          'entity_type',v_type,
+          'entity_id',v_id,
+          'expected_revision',v_expected,
+          'server_revision',v_existing_revision
+        )
+      );
+    end if;
+  end loop;
+
+  if pg_catalog.jsonb_array_length(v_conflicts) > 0 then
+    return pg_catalog.jsonb_build_object(
+      'status','conflict', 'conflicts',v_conflicts
+    );
+  end if;
+
+  -- Pass 2: apply all records in one DB transaction. A failure rolls back all.
+  for v_op in select value from pg_catalog.jsonb_array_elements(p_operations) loop
+    v_type := v_op->>'entity_type';
+    v_id := v_op->>'entity_id';
+    v_expected := (v_op->>'expected_revision')::bigint;
+    v_payload := v_op->'payload';
+    v_deleted := (v_op->>'deleted')::boolean;
+    v_next_revision := coalesce(v_expected,0) + 1;
+
+    if v_expected is null then
+      insert into public.takuwae_records
+        (owner_id,entity_type,entity_id,payload,revision,deleted_at,updated_at)
+      values
+        (v_owner,v_type,v_id,v_payload,1,null,pg_catalog.now());
+    else
+      update public.takuwae_records
+      set payload = v_payload,
+          revision = v_next_revision,
+          deleted_at = case when v_deleted then pg_catalog.now() else null end,
+          updated_at = pg_catalog.now()
+      where owner_id = v_owner
+        and entity_type = v_type and entity_id = v_id
+        and revision = v_expected;
+      if not found then
+        raise exception 'Revision changed while applying batch'
+          using errcode = '40001';
+      end if;
+    end if;
+    v_results := v_results || pg_catalog.jsonb_build_array(
+      pg_catalog.jsonb_build_object(
+        'entity_type',v_type,'entity_id',v_id,
+        'revision',v_next_revision,'deleted',v_deleted
+      )
+    );
+  end loop;
+
+  v_result := pg_catalog.jsonb_build_object('status','applied','records',v_results);
+  insert into public.takuwae_batch_receipts
+    (owner_id,batch_id,request_hash,response)
+  values (v_owner,p_batch_id,v_hash,v_result);
+  return v_result;
+end;
+$function$;
+
+-- 3. Supabase functions are executable by PUBLIC by default; revoke first.
+revoke all on function public.takuwae_apply_batch(uuid,jsonb)
+  from public, anon;
+grant execute on function public.takuwae_apply_batch(uuid,jsonb)
+  to authenticated;
+
+         or pg_catalog.length(v_op->>'expected_revision') > 18) then
+      raise exception 'Invalid integer revision' using errcode = '22023';
     end if;
     v_expected := (v_op->>'expected_revision')::bigint;
     if v_expected is not null and v_expected < 1 then
