@@ -35,11 +35,11 @@ code{font-size:.85rem} .warning{border-left:4px solid #cd9441;padding-left:12px}
 <button id="send" type="submit">認証メールを送る</button>
 </form>
 <form id="verify-form" class="hidden">
-<label for="otp">メールに届いた認証コード</label>
+<label for="otp">メールに数字コードがある場合のみ入力</label>
 <input id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,8}" required placeholder="6桁または8桁の数字">
 <button id="verify" type="submit">コードでログイン</button>
 </form>
-<p class="small">※ メール本文に数字コードがなくリンクだけ届く場合は、メールテンプレートの調整が必要です。リンクからのログインはこの検証画面では未対応です。</p>
+<p class="small">メール本文にリンクだけ届く場合は、そのリンクを開いてログインしてください。この検証画面のURLがSupabaseの許可済み戻り先として登録されている必要があります。</p>
 <button id="signout" type="button" class="secondary hidden">検証室からログアウト</button>
 <div id="auth-status" class="status" role="status">未ログイン</div>
 </section>
@@ -56,7 +56,7 @@ code{font-size:.85rem} .warning{border-left:4px solid #cd9441;padding-left:12px}
 </section>
 </main>
 <script type="module">
-import {sendEmailOtp,verifyEmailOtp,fetchRecords,signOut} from './supabase/sync-api.js';
+import {sendEmailOtp,verifyEmailOtp,fetchRecords,signOut,readMagicLinkSession,getAuthUser} from './supabase/sync-api.js';
 const $=id=>document.getElementById(id);
 let session=null;
 let busy=false;
@@ -79,9 +79,9 @@ async function run(button,action,statusId='auth-status'){
 $('send-form').addEventListener('submit',e=>{
   e.preventDefault();
   run($('send'),async()=>{
-    await sendEmailOtp($('email').value.trim());
+    await sendEmailOtp($('email').value.trim(),{redirectTo:location.origin+location.pathname});
     $('verify-form').classList.remove('hidden');
-    text('auth-status','認証メールを送信しました。数字コードが届いた場合は入力してください。');
+    text('auth-status','認証メールを送信しました。メール内のリンクを開いてください。数字コードの場合は下の欄に入力してください。');
   });
 });
 $('verify-form').addEventListener('submit',e=>{
@@ -89,7 +89,7 @@ $('verify-form').addEventListener('submit',e=>{
   run($('verify'),async()=>{
     const result=await verifyEmailOtp($('email').value.trim(),$('otp').value.trim());
     // Hold credentials only in this page's memory; refreshing logs out.
-    signedIn(result);
+    signedIn({...result,user:await getAuthUser(result.access_token)});
     $('otp').value='';
   });
 });
@@ -108,7 +108,23 @@ $('signout').addEventListener('click',()=>{
     $('otp').value='';
   });
 });
+async function finishMagicLink(){
+  if(!location.hash && !location.search.includes('error=')) return;
+  const fragment=location.hash;
+  // Remove credentials from address bar and browsing history immediately.
+  history.replaceState(null,'',location.pathname+location.search);
+  try{
+    const login=readMagicLinkSession(fragment);
+    if(!login)return;
+    const user=await getAuthUser(login.access_token);
+    signedIn({...login,user});
+    text('auth-status','メールリンクでのログインを確認できました。');
+  }catch(e){
+    text('auth-status',e.message||'メールリンクを検証できませんでした',true);
+  }
+}
 signedIn(null);
+finishMagicLink();
 </script>
 </body>
 </html>
