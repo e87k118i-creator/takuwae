@@ -56,7 +56,7 @@ code{font-size:.85rem} .warning{border-left:4px solid #cd9441;padding-left:12px}
 </section>
 </main>
 <script type="module">
-import {sendEmailOtp,verifyEmailOtp,fetchRecords} from './supabase/sync-api.js';
+import {sendEmailOtp,verifyEmailOtp,fetchRecords,signOut} from './supabase/sync-api.js';
 const $=id=>document.getElementById(id);
 let session=null;
 let busy=false;
@@ -70,10 +70,10 @@ function signedIn(s){
   text('auth-status',currentUser()?'ログイン確認済み（ユーザーIDは非表示）':'未ログイン');
   text('check-status',currentUser()?'読み取りテストを実行できます。':'ログイン後に利用できます。');
 }
-async function run(button,action){
+async function run(button,action,statusId='auth-status'){
   if(busy)return;
   busy=true;button.disabled=true;
-  try{await action()}catch(e){text('auth-status',e.message||'認証に失敗しました',true)}
+  try{await action()}catch(e){text(statusId,e.message||'処理に失敗しました',true)}
   finally{busy=false;button.disabled=button.id==='check'?!currentUser():false}
 }
 $('send-form').addEventListener('submit',e=>{
@@ -98,12 +98,15 @@ $('check').addEventListener('click',()=>{
   run($('check'),async()=>{
     const rows=await fetchRecords(session.access_token);
     text('check-status','サーバーの記録件数：'+rows.length+'件\nこの操作では記録を変更していません。');
-  });
+  },'check-status');
 });
 $('signout').addEventListener('click',()=>{
-  // No refresh-token persistence in this temporary lab.
-  signedIn(null);
-  $('otp').value='';
+  if(!session?.access_token)return;
+  run($('signout'),async()=>{
+    await signOut(session.access_token);
+    signedIn(null);
+    $('otp').value='';
+  });
 });
 signedIn(null);
 </script>
