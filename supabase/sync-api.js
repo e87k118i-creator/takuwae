@@ -97,3 +97,13 @@ export async function verifyEmailOtp(email,code,{fetchImpl=fetch}={}) {
     throw new Error('ログイン情報を受信できませんでした');
   return session;
 }
+
+/** Invalidate the current session on the auth server; never just hide the UI. */
+export async function signOut(accessToken,{fetchImpl=fetch}={}) {
+  const res=await fetchImpl(base+'/auth/v1/logout',{
+    method:'POST',cache:'no-store',
+    headers:{apikey:SUPABASE_PUBLISHABLE_KEY,Authorization:'Bearer '+checkedToken(accessToken)}
+  });
+  if(!res.ok) throw new Error('ログアウトを完了できませんでした ('+res.status+')');
+  return true;
+}
