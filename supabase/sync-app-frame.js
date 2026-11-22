@@ -28,7 +28,16 @@ window.syncAppView = {
 };
 importData=async()=>alert('同期中のバックアップ復元は、退避と照合が必要です。同期画面から操作してください');
 resetAll=()=>alert('同期中は全データ初期化を実行できません');
-checkTakuwaeUpdate=async()=>alert('同期候補の更新は同期画面から行ってください');
+checkTakuwaeUpdate=async()=>{
+  try {
+    const response=await fetch(new URL('index.html',document.baseURI),{cache:'no-store'});
+    if(!response.ok) throw Error();
+    const html=await response.text();
+    const version=new DOMParser().parseFromString(html,'text/html').querySelector('meta[name="takuwae-version"]')?.content;
+    if(!version) throw Error();
+    alert(version===TAKUWAE_APP_VERSION?'最新版です（v'+version+'）。':'使用中はv'+TAKUWAE_APP_VERSION+'、配信中はv'+version+'です。アプリを閉じて開き直してください。');
+  } catch { alert('公開版を確認できませんでした。通信を確認して再度お試しください。'); }
+};
 `;
   // Keep the synchronization controls in the host, with an entry in the ledger settings.
   html = html.replace('<h2>設定・口座管理</h2>',
