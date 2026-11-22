@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {fetchRecords,applyBatch,sendEmailOtp,verifyEmailOtp} from './sync-api.js';
+import {fetchRecords,applyBatch,sendEmailOtp,verifyEmailOtp,signOut} from './sync-api.js';
 const token='test-token-is-not-secret-12345';
 const responses=[];
 const fake=async (url,opts)=>{
@@ -19,4 +19,6 @@ assert.equal(responses.at(-1).opts.body.includes('123456'),true);
 await assert.rejects(()=>applyBatch(token,{batchId:'bad',operations:[operation],fetchImpl:fake}));
 await assert.rejects(()=>applyBatch(token,{batchId:'550e8400-e29b-41d4-a716-446655440000',operations:[{...operation,expected_revision:-1}],fetchImpl:fake}));
 await assert.rejects(()=>verifyEmailOtp('user@example.com','bad',{fetchImpl:fake}));
+await signOut(token,{fetchImpl:fake});
+assert.equal(responses.at(-1).opts.headers.Authorization,'Bearer '+token);
 console.log('sync transport tests passed');
