@@ -6,6 +6,11 @@
 export const TYPES = Object.freeze(['transaction','bill','bill_month','fund','setting','closing','rollover']);
 const key = (type, id) => type + ':' + id;
 const clone = x => JSON.parse(JSON.stringify(x));
+const canonical=x=>JSON.stringify(x,(_key,v)=>
+  v && typeof v==='object' && !Array.isArray(v)
+    ? Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]]))
+    : v);
+const RESERVED=new Set(['tx','bills','months','fundCategories']);
 const safe = x => x && typeof x === 'object' && !Array.isArray(x);
 const mustId = (value, label) => {
   if (typeof value !== 'string' || !value.trim() || value.length > 200) {
@@ -72,6 +77,7 @@ export function decodeRecords(rows) {
     }
     if (row.entity_type === 'setting') {
       if (row.entity_id !== 'global' || !safe(data)) throw new Error('設定データが不正です');
+      if(Object.keys(data).some(k=>RESERVED.has(k))) throw new Error('設定に予約された項目が含まれています');
       Object.assign(db,data);
     }
   }
@@ -88,7 +94,7 @@ export function diffRecords(baseline, local) {
   const changes = [];
   for (const [k,record] of local) {
     const prior=baseline.get(k);
-    if (!prior || JSON.stringify(prior.payload)!==JSON.stringify(record.payload)) {
+    if (!prior || canonical(prior.payload)!==canonical(record.payload)) {
       changes.push({...record, expected_revision: prior?.revision ?? null, deleted:false});
     }
   }
