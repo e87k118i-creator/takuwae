@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>たくわえ｜ログイン接続テスト（開発用）</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:light}
+body{background:#f7f8f5;color:#25372a;max-width:480px;padding:22px;margin:20px auto;line-height:1.7}
+main{background:white;border:1px solid #dbe3d9;border-radius:18px;padding:22px}
+h1{font-size:1.35rem;margin-top:0}label{display:block;font-weight:600;margin-top:14px}
+input{box-sizing:border-box;width:100%;padding:12px;border-radius:9px;border:1px solid #b8c5b9;font-size:16px}
+button{padding:12px 18px;border:0;background:#286846;color:white;border-radius:9px;margin-top:14px;font-size:16px}
+button:disabled{opacity:.5}#status{white-space:pre-wrap;background:#f4f7f2;padding:12px;border-radius:8px}
+small{display:block;color:#516354}.hidden{display:none}
+</style></head>
+<body><main>
+<h1>たくわえ｜ログイン接続テスト</h1>
+<p>開発専用。家計データは一切読み込まず、送信もせえへんで。公開版とは独立して動作するで。</p>
+<label for="url">Supabase Project URL</label>
+<input id="url" type="url" placeholder="https://xxxxxxxx.supabase.co" autocomplete="off">
+<label for="key">Publishable key（公開用キーのみ）</label>
+<input id="key" type="text" placeholder="sb_publishable_..." autocomplete="off" spellcheck="false">
+<small>Secret / service_role キーは入力禁止。キーはこの画面からGitHubには送信せえへん。入力内容は保存せえへんで。</small>
+<button id="connect">接続を確認</button>
+<div id="auth" class="hidden">
+<label for="email">メールアドレス</label><input id="email" type="email" autocomplete="email">
+<button id="send">確認メールを送る</button>
+<label for="otp">メールで届いた認証コード（コード方式のとき）</label>
+<input id="otp" inputmode="numeric" autocomplete="one-time-code">
+<button id="verify">コードでログイン</button>
+<button id="logout">ログアウト</button>
+</div>
+<p id="status" role="status" aria-live="polite">接続情報を入力してな。</p>
+</main>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createTakuwaeAuth } from './auth.js';
+const $=id=>document.getElementById(id);
+let auth;
+const status=message=>{$('status').textContent=message};
+const run=async(fn)=>{try{await fn()}catch(e){status('エラー: '+(e.message||String(e)))}};
+$('connect').onclick=()=>run(async()=>{
+ const url=$('url').value.trim(),key=$('key').value.trim();
+ if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(url))throw Error('Project URLを確認してな');
+ if(!key.startsWith('sb_publishable_'))throw Error('sb_publishable_ で始まる公開用キーだけ入力してな');
+ const client=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+ auth=createTakuwaeAuth(client);
+ $('auth').classList.remove('hidden');
+ status('クライアントの準備ができたで。通信テストにはメール認証を使ってな。');
+});
+$('send').onclick=()=>run(async()=>{
+ if(!auth)throw Error('先に接続情報を入力してな');
+ await auth.sendEmailCode($('email').value);
+ status('確認メールの送信を要求したで。メールの形式はSupabaseの設定によって変わるで。');
+});
+$('verify').onclick=()=>run(async()=>{
+ if(!auth)throw Error('先に接続してな');
+ const session=await auth.verifyEmailCode($('email').value,$('otp').value);
+ status(session?.user?.id?'ログイン成功。ユーザーIDを確認できたで。':'セッションを取得できへんかったで。');
+});
+$('logout').onclick=()=>run(async()=>{if(auth)await auth.signOut();status('ログアウトしたで')});
+</script></body></html>
