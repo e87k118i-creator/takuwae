@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import {makeSyncFlusher} from './sync-flusher.js';
+import {makeSyncQueue} from './sync-queue.js';
+const data=new Map();
+const storage={getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,v)};
+const q=makeSyncQueue({storage,ownerId:'550e8400-e29b-41d4-a716-446655440000'});
+const op=[{entity_type:'transaction',entity_id:'t',payload:{id:'t'},expected_revision:null,deleted:false}];
+q.enqueue('550e8400-e29b-41d4-a716-446655440001',op);
+q.enqueue('550e8400-e29b-41d4-a716-446655440002',op);
+let calls=[];
+let fail=true;
+const flusher=makeSyncFlusher({queue:q,applyBatch:async b=>{
+ calls.push(b.batchId);
+ if(fail) {fail=false;throw new Error('network');}
+ return {status:'applied'};
+}});
+let result=await flusher.flush();
+assert.equal(result.status,'retry_later');
+assert.equal(q.pending().length,2);
+assert.equal(q.peek().batchId,'550e8400-e29b-41d4-a716-446655440001');
+result=await flusher.flush();
+assert.equal(result.status,'empty');
+assert.equal(result.applied,2);
+assert.equal(q.pending().length,0);
+assert.deepEqual(calls.slice(0,2),[calls[2],calls[2]]);
+q.enqueue('550e8400-e29b-41d4-a716-446655440003',op);
+const conflicts=makeSyncFlusher({queue:q,applyBatch:async()=>({status:'conflict',conflicts:[{entity_id:'t'}]})});
+result=await conflicts.flush();
+assert.equal(result.status,'conflict');
+assert.equal(q.peek().status,'conflict');
+result=await conflicts.flush();
+assert.equal(result.status,'conflict');
+assert.equal(q.pending().length,1);
+console.log('sync flusher tests passed');
