@@ -1,0 +1,149 @@
+// Development-only transport. Does NOT initialize app data or write localStorage.
+// A signed-in session is required. Callers must retain batch_id+operations across retries.
+import {SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY} from './config.js';
+
+const base = SUPABASE_URL.replace(/\/$/, '');
+const allowed = new Set(['transaction','bill','bill_month','fund','setting','closing','rollover']);
+function checkedToken(token) {
+  if (typeof token !== 'string' || token.length < 16) throw new Error('ログインが必要です');
+  return token;
+}
+async function api(path, {method='GET', token, body, fetchImpl=fetch, extraHeaders={}}={}) {
+  const headers = {
+    apikey: SUPABASE_PUBLISHABLE_KEY,
+    Authorization: 'Bearer ' + checkedToken(token),
+    ...extraHeaders
+  };
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  const res = await fetchImpl(base+path, {
+    method, headers, cache:'no-store',
+    ...(body===undefined ? {} : {body: JSON.stringify(body)})
+  });
+  if (!res.ok) {
+    const responseText = await res.text();
+    throw new Error('同期サーバーエラー ('+res.status+'): '+responseText.slice(0,500));
+  }
+  return res.json();
+}
+/** One SELECT snapshot only. Multiple offset pages can mix two device commits. */
+export async function fetchRecords(token,{fetchImpl=fetch}={}) {
+  const res=await fetchImpl(base+'/rest/v1/takuwae_records?select=entity_type,entity_id,payload,revision,deleted_at,updated_at&order=entity_type.asc,entity_id.asc&limit=1000',{
+    method:'GET',cache:'no-store',headers:{apikey:SUPABASE_PUBLISHABLE_KEY,
+      Authorization:'Bearer '+checkedToken(token),Prefer:'count=exact'}
+  });
+  if(!res.ok) throw new Error(res.status===401?'認証の有効期限が切れています。再ログインが必要です':'受信に失敗しました ('+res.status+')');
+  const total=res.headers.get('content-range')?.split('/').pop();
+  const rows=await res.json();
+  if(!Array.isArray(rows)||!total||!/^\d+$/.test(total)||Number(total)!==rows.length)
+    throw new Error('受信データが一部だけです。上書きせず停止します（上限1000件）');
+  return rows;
+}
+/**
+ * Whole-batch write is atomic on the server. A conflict is a legitimate
+ * response; it MUST be shown to the user or explicitly reconciled, not retried
+ * with a new revision silently.
+ */
+export async function applyBatch(token,{batchId,operations,fetchImpl=fetch}={}) {
+  if (typeof batchId !== 'string' || !/^[a-f0-9-]{36}$/i.test(batchId))
+    throw new Error('UUID形式のbatchIdが必要です');
+  if (!Array.isArray(operations) || operations.length<1 || operations.length>250)
+    throw new Error('同期件数が不正です');
+  for (const op of operations) {
+    if (!op || !allowed.has(op.entity_type) || typeof op.entity_id!=='string'
+        || !op.entity_id.trim() || typeof op.deleted!=='boolean'
+        || !op.payload || typeof op.payload!=='object' || Array.isArray(op.payload)
+        || !('expected_revision' in op)
+        || (op.expected_revision!==null && (!Number.isSafeInteger(op.expected_revision)||op.expected_revision<1)))
+      throw new Error('同期レコードの形式が違います');
+  }
+  const result = await api('/rest/v1/rpc/takuwae_apply_batch',{
+    method:'POST', token, fetchImpl, body:{
+      p_batch_id:batchId,
+      p_operations:operations
+    }
+  });
+  if (result?.status!=='applied' && result?.status!=='conflict')
+    throw new Error('不明な同期結果です');
+  return result;
+}
+/** OTP mail sender: calls auth endpoint only after an explicit login action. */
+export async function sendEmailOtp(email,{fetchImpl=fetch,redirectTo}={}) {
+  if (typeof email!=='string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    throw new Error('メールアドレスを確認してな');
+  // GoTrue receives redirect_to in the query string (not body.options).
+  // The exact callback URL must be allowlisted in Auth → URL Configuration.
+  if(redirectTo && (typeof redirectTo!=='string' || !redirectTo.startsWith('https://')))
+    throw new Error('認証後の戻り先URLが不正です');
+  const endpoint=base+'/auth/v1/otp'+(redirectTo?'?redirect_to='+encodeURIComponent(redirectTo):'');
+  const res = await fetchImpl(endpoint,{
+    method:'POST', cache:'no-store',
+    headers:{apikey:SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({email,create_user:true})
+  });
+  if(!res.ok) throw new Error(res.status===429
+    ?'メール送信の回数制限中です（429）。再送を止め、制限解除を待ってください。'
+    :'認証メールを送信できませんでした ('+res.status+')');
+  return true;
+}
+/** Verify a numeric email OTP: NEVER log or commit the token. */
+export async function verifyEmailOtp(email,code,{fetchImpl=fetch}={}) {
+  if(typeof code!=='string' || !/^\d{6,8}$/.test(code))
+    throw new Error('メールの認証コードを確認してな');
+  const res=await fetchImpl(base+'/auth/v1/verify',{
+    method:'POST',cache:'no-store',
+    headers:{apikey:SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({email,token:code,type:'email'})
+  });
+  if(!res.ok) throw new Error('認証コードを確認できませんでした ('+res.status+')');
+  const session=await res.json();
+  if(!session?.access_token || !session?.refresh_token)
+    throw new Error('ログイン情報を受信できませんでした');
+  return session;
+}
+
+/** Invalidate the current session on the auth server; never just hide the UI. */
+export async function signOut(accessToken,{fetchImpl=fetch}={}) {
+  const res=await fetchImpl(base+'/auth/v1/logout?scope=local',{
+    method:'POST',cache:'no-store',
+    headers:{apikey:SUPABASE_PUBLISHABLE_KEY,Authorization:'Bearer '+checkedToken(accessToken)}
+  });
+  if(!res.ok) throw new Error('ログアウトを完了できませんでした ('+res.status+')');
+  return true;
+}
+
+/** Magic-link implicit callback. Browser only. Never persist the URL fragment. */
+export function readMagicLinkSession(fragment) {
+  const params=new URLSearchParams(String(fragment||'').replace(/^#/,''));
+  if(params.get('error')) throw new Error('メールリンクが無効か期限切れです');
+  const access_token=params.get('access_token');
+  const refresh_token=params.get('refresh_token');
+  if(!access_token || !refresh_token) return null;
+  if(params.get('token_type')!=='bearer') throw new Error('認証方式が一致しません');
+  return {access_token,refresh_token,expires_in:Number(params.get('expires_in'))||0};
+}
+/** A REST userinfo request validates the token and discovers the real user ID. */
+export async function getAuthUser(accessToken,{fetchImpl=fetch}={}) {
+  const res=await fetchImpl(base+'/auth/v1/user',{
+    method:'GET',cache:'no-store',
+    headers:{apikey:SUPABASE_PUBLISHABLE_KEY,
+      Authorization:'Bearer '+checkedToken(accessToken)}
+  });
+  if(!res.ok) throw new Error('ログイン状態を確認できませんでした ('+res.status+')');
+  const user=await res.json();
+  if(!user?.id || typeof user.id!=='string') throw new Error('ユーザー情報が不正です');
+  return user;
+}
+
+/** Refresh the existing login, without sending an authentication email. */
+export async function refreshAuthSession(refreshToken,{fetchImpl=fetch}={}) {
+  if(typeof refreshToken!=='string'||refreshToken.length<8)throw new Error('再ログインが必要です');
+  const response=await fetchImpl(base+'/auth/v1/token?grant_type=refresh_token',{
+    method:'POST',cache:'no-store',headers:{apikey:SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({refresh_token:refreshToken})
+  });
+  if(!response.ok)throw new Error('認証を更新できませんでした。再ログインしてください ('+response.status+')');
+  const session=await response.json();
+  if(!session.access_token||!session.refresh_token||!Number.isFinite(session.expires_in))
+    throw new Error('認証更新の応答が不正です');
+  return session;
+}
