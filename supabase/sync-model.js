@@ -29,7 +29,7 @@ export function validateTakuwae(db) {
   db.bills.forEach(b => { if (!safe(b)) throw new Error('固定費データが不正です');mustId(b.id,'固定費'); });
   db.fundCategories.forEach(f => { if (!safe(f)) throw new Error('積立項目が不正です');mustId(f.id,'積立'); });
   Object.entries(db.months).forEach(([m, value]) => {
-    if (!/^\\d{4}-\\d{2}$/.test(m) || !safe(value)) throw new Error('固定費の年月が不正です');
+    if (!/^\d{4}-\d{2}$/.test(m) || !safe(value)) throw new Error('固定費の年月が不正です');
   });
   return true;
 }
@@ -67,7 +67,7 @@ export function decodeRecords(rows) {
       const slash = row.entity_id.indexOf('/');
       if (slash < 1) throw new Error('年月キーが不正です');
       const month = row.entity_id.slice(0,slash), billId=row.entity_id.slice(slash+1);
-      if (!/^\\d{4}-\\d{2}$/.test(month)) throw new Error('年月キーが不正です');
+      if (!/^\d{4}-\d{2}$/.test(month)) throw new Error('年月キーが不正です');
       (db.months[month] ??= {})[billId] = data;
     }
     if (row.entity_type === 'setting') {
