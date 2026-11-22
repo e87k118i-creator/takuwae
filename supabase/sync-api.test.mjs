@@ -4,7 +4,7 @@ const token='test-token-is-not-secret-12345';
 const responses=[];
 const fake=async (url,opts)=>{
   responses.push({url,opts});
-  return {ok:true, json:async()=>url.includes('takuwae_records?')?[]:url.includes('/rpc/')?{status:'applied',records:[]}:url.includes('/verify')?{access_token:'a',refresh_token:'r'}:{}, text:async()=>''};
+  return {ok:true, headers:new Headers({'content-range':'*/0'}),json:async()=>url.includes('takuwae_records?')?[]:url.includes('/rpc/')?{status:'applied',records:[]}:url.includes('/verify')?{access_token:'a',refresh_token:'r'}:{}, text:async()=>''};
 };
 const rows=await fetchRecords(token,{fetchImpl:fake});
 assert.deepEqual(rows,[]);

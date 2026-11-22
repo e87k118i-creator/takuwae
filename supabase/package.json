@@ -2,6 +2,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node sync-model.test.mjs && node sync-api.test.mjs && node sync-queue.test.mjs && node first-import.test.mjs && node sync-flusher.test.mjs"
+    "test": "node --test *.test.mjs"
   }
 }

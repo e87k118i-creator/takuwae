@@ -25,6 +25,14 @@ const put = (out, type, id, value) => {
   out.set(k, {entity_type:type, entity_id:id, payload:clone(value)});
 };
 export function validateTakuwae(db) {
+  const inspect=(v)=>{
+    if(typeof v==='number' && !Number.isFinite(v)) throw new Error('有限でない数値があります');
+    if(v && typeof v==='object') for(const [k,value] of Object.entries(v)) {
+      if(['__proto__','constructor','prototype'].includes(k)) throw new Error('予約されたキーが含まれています');
+      inspect(value);
+    }
+  };
+  inspect(db);
   if (!safe(db) || !safe(db.initial) || !safe(db.fundInitial) ||
       !safe(db.months) || !Array.isArray(db.tx) ||
       !Array.isArray(db.bills) || !Array.isArray(db.fundCategories)) {
@@ -73,6 +81,10 @@ export function decodeRecords(rows) {
     seen.add(k);
     if (row.deleted_at) continue;
     const data = clone(row.payload);
+    if(!safe(data)) throw new Error('レコード内容が不正です');
+    if(['closing','rollover'].includes(row.entity_type)) throw new Error('未対応のレコード種類。受信を停止します');
+    if(['transaction','bill','fund'].includes(row.entity_type) && data.id!==row.entity_id)
+      throw new Error('レコードIDと内容のIDが一致しません');
     if (row.entity_type === 'transaction') db.tx.push(data);
     if (row.entity_type === 'bill') db.bills.push(data);
     if (row.entity_type === 'fund') db.fundCategories.push(data);
@@ -117,11 +129,11 @@ export function diffRecords(baseline, local) {
   const changes = [];
   for (const [k,record] of local) {
     const prior=baseline.get(k);
-    if (!prior || canonical(prior.payload)!==canonical(record.payload)) {
+    if (!prior || prior.deleted_at || canonical(prior.payload)!==canonical(record.payload)) {
       changes.push({...record, expected_revision: prior?.revision ?? null, deleted:false});
     }
   }
-  for (const [k,prior] of baseline) if (!local.has(k)) {
+  for (const [k,prior] of baseline) if (!prior.deleted_at && !local.has(k)) {
     changes.push({entity_type:prior.entity_type, entity_id:prior.entity_id,
       payload:prior.payload, expected_revision:prior.revision, deleted:true});
   }

@@ -25,22 +25,18 @@ async function api(path, {method='GET', token, body, fetchImpl=fetch, extraHeade
   }
   return res.json();
 }
-/** RLS additionally restricts rows to token's authenticated owner. */
-export async function fetchRecords(token,{fetchImpl=fetch, pageSize=500}={}) {
-  if (!Number.isInteger(pageSize) || pageSize<1 || pageSize>1000) throw new Error('無効なページサイズ');
-  let offset=0, all=[];
-  while(true) {
-    // Stable ordering is required for offset-based paging.
-    const range = offset+'-'+(offset+pageSize-1);
-    const page=await api('/rest/v1/takuwae_records?select=entity_type,entity_id,payload,revision,deleted_at,updated_at&order=entity_type.asc,entity_id.asc',{
-      token, fetchImpl,extraHeaders:{Range:range}
-    });
-    if (!Array.isArray(page)) throw new Error('サーバーのデータ形式が違います');
-    all.push(...page);
-    if (page.length<pageSize) return all;
-    offset+=pageSize;
-    if (offset>100000) throw new Error('同期データが多すぎます');
-  }
+/** One SELECT snapshot only. Multiple offset pages can mix two device commits. */
+export async function fetchRecords(token,{fetchImpl=fetch}={}) {
+  const res=await fetchImpl(base+'/rest/v1/takuwae_records?select=entity_type,entity_id,payload,revision,deleted_at,updated_at&order=entity_type.asc,entity_id.asc&limit=1000',{
+    method:'GET',cache:'no-store',headers:{apikey:SUPABASE_PUBLISHABLE_KEY,
+      Authorization:'Bearer '+checkedToken(token),Prefer:'count=exact'}
+  });
+  if(!res.ok) throw new Error(res.status===401?'認証の有効期限が切れています。再ログインが必要です':'受信に失敗しました ('+res.status+')');
+  const total=res.headers.get('content-range')?.split('/').pop();
+  const rows=await res.json();
+  if(!Array.isArray(rows)||!total||!/^\d+$/.test(total)||Number(total)!==rows.length)
+    throw new Error('受信データが一部だけです。上書きせず停止します（上限1000件）');
+  return rows;
 }
 /**
  * Whole-batch write is atomic on the server. A conflict is a legitimate
@@ -84,7 +80,9 @@ export async function sendEmailOtp(email,{fetchImpl=fetch,redirectTo}={}) {
     headers:{apikey:SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},
     body:JSON.stringify({email,create_user:true})
   });
-  if(!res.ok) throw new Error('認証メールを送信できませんでした ('+res.status+')');
+  if(!res.ok) throw new Error(res.status===429
+    ?'メール送信の回数制限中です（429）。再送を止め、制限解除を待ってください。'
+    :'認証メールを送信できませんでした ('+res.status+')');
   return true;
 }
 /** Verify a numeric email OTP: NEVER log or commit the token. */
@@ -105,7 +103,7 @@ export async function verifyEmailOtp(email,code,{fetchImpl=fetch}={}) {
 
 /** Invalidate the current session on the auth server; never just hide the UI. */
 export async function signOut(accessToken,{fetchImpl=fetch}={}) {
-  const res=await fetchImpl(base+'/auth/v1/logout',{
+  const res=await fetchImpl(base+'/auth/v1/logout?scope=local',{
     method:'POST',cache:'no-store',
     headers:{apikey:SUPABASE_PUBLISHABLE_KEY,Authorization:'Bearer '+checkedToken(accessToken)}
   });

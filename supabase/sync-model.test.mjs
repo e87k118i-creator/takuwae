@@ -31,7 +31,8 @@ assert.equal(rows.length,5);
 assert.equal(diffRecords(new Map(rows.map(r=>[r.entity_type+':'+r.entity_id,r])),encodeRecords(base)).length,0);
 const newLocal=structuredClone(base);newLocal.tx.push({id:'second',date:'2026-11-23',kind:'income',amount:100});
 const changes=diffRecords(new Map(rows.map(r=>[r.entity_type+':'+r.entity_id,r])),encodeRecords(newLocal));
-assert.equal(changes.length,1); assert.equal(changes[0].expected_revision,null);
+assert.equal(changes.length,2); // New transaction AND exact ordering metadata.
+assert.equal(changes.find(c=>c.entity_type==='transaction').expected_revision,null);
 const deleted=structuredClone(base);deleted.tx=[];
 assert.equal(diffRecords(new Map(rows.map(r=>[r.entity_type+':'+r.entity_id,r])),encodeRecords(deleted)).filter(c=>c.deleted).length,1);
 assert.throws(()=>validateTakuwae({...base,tx:[{id:''}]}));
