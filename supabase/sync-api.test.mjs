@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {fetchRecords,applyBatch,sendEmailOtp,verifyEmailOtp} from './sync-api.js';
+const token='test-token-is-not-secret-12345';
+const responses=[];
+const fake=async (url,opts)=>{
+  responses.push({url,opts});
+  return {ok:true, json:async()=>url.includes('takuwae_records?')?[]:url.includes('/rpc/')?{status:'applied',records:[]}:url.includes('/verify')?{access_token:'a',refresh_token:'r'}:{}, text:async()=>''};
+};
+const rows=await fetchRecords(token,{fetchImpl:fake});
+assert.deepEqual(rows,[]);
+assert.equal(responses[0].opts.headers.apikey.startsWith('sb_publishable_'),true);
+const operation={entity_type:'transaction',entity_id:'a',payload:{id:'a'},expected_revision:null,deleted:false};
+const r=await applyBatch(token,{batchId:'550e8400-e29b-41d4-a716-446655440000',operations:[operation],fetchImpl:fake});
+assert.equal(r.status,'applied');
+assert.equal(JSON.parse(responses[1].opts.body).p_operations[0].entity_id,'a');
+await sendEmailOtp('user@example.com',{fetchImpl:fake});
+await verifyEmailOtp('user@example.com','123456',{fetchImpl:fake});
+assert.equal(responses.at(-1).opts.body.includes('123456'),true);
+await assert.rejects(()=>applyBatch(token,{batchId:'bad',operations:[operation],fetchImpl:fake}));
+await assert.rejects(()=>applyBatch(token,{batchId:'550e8400-e29b-41d4-a716-446655440000',operations:[{...operation,expected_revision:-1}],fetchImpl:fake}));
+await assert.rejects(()=>verifyEmailOtp('user@example.com','bad',{fetchImpl:fake}));
+console.log('sync transport tests passed');
