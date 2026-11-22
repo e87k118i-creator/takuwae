@@ -11,7 +11,7 @@
 - `sync-model.test.mjs`: モデル単体検証用（動作確認はまだ）
 
 ## 今回追加した開発成果
-- `002_atomic_batch.sql`: 単一ユーザーの変更を直列化し、全件のrevision照合に成功した場合だけ一括反映するRPC、バッチIDによる冪等性の設計。**SQL未実行／DB上の検証前**。
+- `002_atomic_batch.sql`: 単一ユーザーの変更を直列化し、全件のrevision照合に成功した場合だけ一括反映するRPC、バッチIDによる冪等性の設計。**Supabaseへ適用済み**。ログイン済み実機によるCRUD・競合検証は未完了。
 - `sync-api.js`: 公開用キーとログイン済みアクセストークンでのレコード取得・一括変更、メールOTP操作を分離。**アプリへの組込み・実機検証前**。
 - `sync-api.test.mjs` と `sync-model.test.mjs`: 模擬通信と分割／復元のテストコード。
 - `.github/workflows/takuwae-sync-tests.yml`: Node.jsテストのGitHub Actions実行設定。**テスト結果は未確認**。
@@ -24,7 +24,7 @@
 
 ## 重要な未完了事項
 1. DBのRLSが実際に有効か、ログインした別ユーザーの読取・編集が拒否されるか検証
-2. 原子的更新RPCをSupabaseに適用し、認証・競合・二重送信・RLS・複数レコードの原子性を実測検証
+2. 原子的更新RPCのログイン済み端末での競合・二重送信・複数レコード原子性を実測検証
 3. Authログイン画面、OTPメールの送信・受信・リダイレクトの実機テスト
 4. ローカル変更を操作単位で保持するオフラインキューと再試行、二重登録防止
 5. 初回移行に「iPhoneがマスター」「サーバーが空」であることの二重確認
@@ -33,3 +33,14 @@
 8. ロールバック手順を確認後に本番公開
 
 **これらが済むまで本番の `index.html` を差し替えず、DBへ家計データを書き込まない。**
+
+## 接続済みSupabaseで確認（2026-11-22）
+- プロジェクト `qajwwulbrvdtbukxpvvy`（東京、ACTIVE_HEALTHY）。
+- `takuwae_atomic_batch_guard_v21` migration適用成功。
+- `takuwae_records`: authenticated=SELECTのみ（INSERT/UPDATE/DELETE/TRUNCATEなし）、RLS有効。
+- `takuwae_sync_records`（別の未使用テーブル）: authenticatedの全テーブル権限を撤去。スキーマ・データは保持。
+- `takuwae_batch_receipts`: クライアント側の直接権限なし、RLS有効。
+- `takuwae_apply_batch`: authenticatedのみEXECUTE可能、anonは不可。未認証で実行した場合はSQLSTATE 28000で拒否された。
+- 3テーブルの行数はいずれも0。個人の家計データは未送信。
+- Supabase Advisorは、意図的なsecurity-definer RPCの警告と、クライアント禁止のreceipt tableにRLSポリシーがない旨の情報を表示。外部公開前に改めて監査する。
+- 直近の課題: CI結果未確認、メールOTPの実機設定・ログイン導線未実装、操作別のローカル変更捕捉未実装、iPadへの受信反映未実装。
