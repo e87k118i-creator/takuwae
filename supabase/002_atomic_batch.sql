@@ -113,7 +113,12 @@ begin
       raise exception 'Expected revision required' using errcode = '22023';
     end if;
     if v_op->>'expected_revision' is not null
-       and (v_op->>'expected_revision' !~ '^[0-9]+ and v_expected < 1 then
+       and ((v_op->>'expected_revision') !~ '^[0-9]+$'
+         or pg_catalog.length(v_op->>'expected_revision') > 18) then
+      raise exception 'Invalid integer revision' using errcode = '22023';
+    end if;
+    v_expected := (v_op->>'expected_revision')::bigint;
+    if v_expected is not null and v_expected < 1 then
       raise exception 'Invalid revision' using errcode = '22023';
     end if;
     if jsonb_typeof(v_op->'deleted') <> 'boolean'
