@@ -74,10 +74,15 @@ export async function applyBatch(token,{batchId,operations,fetchImpl=fetch}={}) 
 export async function sendEmailOtp(email,{fetchImpl=fetch,redirectTo}={}) {
   if (typeof email!=='string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     throw new Error('メールアドレスを確認してな');
-  const res = await fetchImpl(base+'/auth/v1/otp',{
+  // GoTrue receives redirect_to in the query string (not body.options).
+  // The exact callback URL must be allowlisted in Auth → URL Configuration.
+  if(redirectTo && (typeof redirectTo!=='string' || !redirectTo.startsWith('https://')))
+    throw new Error('認証後の戻り先URLが不正です');
+  const endpoint=base+'/auth/v1/otp'+(redirectTo?'?redirect_to='+encodeURIComponent(redirectTo):'');
+  const res = await fetchImpl(endpoint,{
     method:'POST', cache:'no-store',
     headers:{apikey:SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},
-    body:JSON.stringify({email,create_user:true,...(redirectTo?{options:{email_redirect_to:redirectTo}}:{})})
+    body:JSON.stringify({email,create_user:true})
   });
   if(!res.ok) throw new Error('認証メールを送信できませんでした ('+res.status+')');
   return true;
