@@ -133,3 +133,17 @@ export async function getAuthUser(accessToken,{fetchImpl=fetch}={}) {
   if(!user?.id || typeof user.id!=='string') throw new Error('ユーザー情報が不正です');
   return user;
 }
+
+/** Refresh the existing login, without sending an authentication email. */
+export async function refreshAuthSession(refreshToken,{fetchImpl=fetch}={}) {
+  if(typeof refreshToken!=='string'||refreshToken.length<8)throw new Error('再ログインが必要です');
+  const response=await fetchImpl(base+'/auth/v1/token?grant_type=refresh_token',{
+    method:'POST',cache:'no-store',headers:{apikey:SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({refresh_token:refreshToken})
+  });
+  if(!response.ok)throw new Error('認証を更新できませんでした。再ログインしてください ('+response.status+')');
+  const session=await response.json();
+  if(!session.access_token||!session.refresh_token||!Number.isFinite(session.expires_in))
+    throw new Error('認証更新の応答が不正です');
+  return session;
+}

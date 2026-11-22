@@ -2,12 +2,18 @@ import {sendEmailOtp,readMagicLinkSession,signOut} from './sync-api.js';
 import {createSyncSession} from './sync-session.js';
 import {createSyncAppBridge} from './sync-app-bridge.js';
 import {buildSyncAppDocument} from './sync-app-frame.js';
+import {createAuthSession} from './sync-auth-session.js';
+import {createRemoteTrial} from './sync-remote-trial.js';
+import {encodeRecords} from './sync-model.js';
+import {canonical} from './sync-merge.js';
 
 const element = id => document.getElementById(id);
 const frame = element('app');
 let connection;
 let bridge;
-let accessToken;
+const auth = createAuthSession({storage:localStorage,withLock:(key,action)=>navigator.locks.request(key,action)});
+let conflictReview;
+let remoteTrial;
 let syncTimer;
 let stopped = false;
 function status(message) { element('status').textContent = message; }
@@ -35,6 +41,28 @@ function handleStatus(result) {
   };
   status((messages[result.status] || result.status) + (result.reason?'\n'+result.reason:''));
   if (result.status==='saved_locally') scheduleSync();
+  if (result.status==='conflict') showConflict().catch(error=>status(error.message));
+}
+async function showConflict() {
+  conflictReview=await connection.engine.previewConflict();
+  const local=encodeRecords(conflictReview.localDb);
+  const remote=encodeRecords(conflictReview.remoteDb);
+  const differences=[];
+  for(const key of new Set([...local.keys(),...remote.keys()])) {
+    const left=local.get(key),right=remote.get(key);
+    if(canonical(left)===canonical(right))continue;
+    differences.push({項目:left?.payload?.category||left?.payload?.name||key,
+      この端末:left?.payload??'削除済み',クラウド:right?.payload??'削除済み'});
+  }
+  element('conflict-summary').textContent=JSON.stringify({
+    競合:conflictReview.conflict.records,
+    この端末:{取引:conflictReview.localDb.tx.length,固定費:conflictReview.localDb.bills.length},
+    クラウド:{取引:conflictReview.remoteDb.tx.length,固定費:conflictReview.remoteDb.bills.length},
+    異なる内容:differences
+  },null,2);
+  element('backup-confirmed').checked=false;
+  element('conflict-choice').value='';
+  element('conflict').classList.remove('hidden');
 }
 async function mount() {
   const snapshot = connection.engine.snapshot();
@@ -42,7 +70,7 @@ async function mount() {
     status('ログインできました。この端末の同期保存は未作成です。初回受信でクラウドを確認できます。');
     return;
   }
-  const response = await fetch('./index.html', {cache:'no-store'});
+  const response = await fetch('./ledger.html', {cache:'no-store'});
   if (!response.ok) throw new Error('本体画面を取得できませんでした');
   bridge?.close();
   bridge = createSyncAppBridge({engine:connection.engine, onStatus:handleStatus, view:{
@@ -56,6 +84,7 @@ async function mount() {
   frame.onload = ()=>{
     frame.contentWindow.syncAppView?.setBusy(!!snapshot.conflict);
     status(snapshot.conflict?'競合を保持しています。編集を停止しています。':'端末の保存データを開きました。');
+    if(snapshot.conflict)showConflict().catch(error=>status(error.message));
   };
   frame.classList.remove('hidden');
   element('receive').disabled = true;
@@ -66,7 +95,7 @@ element('login-form').addEventListener('submit', async event=>{
   event.preventDefault();element('send').disabled = true;
   try {
     await sendEmailOtp(element('email').value.trim(), {
-      redirectTo:new URL('./sync-app.html',location.href).href
+      redirectTo:new URL('./',location.href).href
     });
     status('認証メールを送りました。新しく届いたメールのリンクを開いてください。');
   } catch(error) { status(error.message); }
@@ -90,10 +119,40 @@ element('recover').addEventListener('click',()=>bridge?.recover().catch(error=>s
 element('logout').addEventListener('click',async()=>{
   stopped = true;clearTimeout(syncTimer);connection.pauseWrites();bridge?.close();
   try {
-    await bridge?.settled();await signOut(accessToken);connection.close();accessToken=null;
+    await bridge?.settled();await signOut(await auth.getAccessToken());connection.close();auth.clear();
     frame.srcdoc='';frame.classList.add('hidden');element('controls').classList.add('hidden');
     element('login').classList.remove('hidden');status('ログアウトしました。端末の保存データは保持しています。');
   } catch(error) {status(error.message);}
+});
+element('remember').addEventListener('change',async()=>{
+  if(!connection)return;
+  try{await auth.remember(element('remember').checked);status(element('remember').checked?'この端末でログインを維持します。':'ログイン情報の端末保存を解除しました。');}
+  catch(error){element('remember').checked=auth.isRemembered();status(error.message);}
+});
+element('trial').addEventListener('click',async()=>{
+  const controls=['trial','receive','sync','writes'];
+  const previous=controls.map(id=>element(id).disabled);
+  controls.forEach(id=>element(id).disabled=true);
+  try {
+    const report=await remoteTrial.run();
+    element('trial-status').textContent='通信試験に成功しました。'+report.passed.join('・')+'。試験用レコードは削除済み状態にしました。';
+  }catch(error){element('trial-status').textContent=error.message;}
+  finally{controls.forEach((id,index)=>element(id).disabled=previous[index]);}
+});
+element('backup-conflict').addEventListener('click',()=>{
+  if(!conflictReview)return;
+  const url=URL.createObjectURL(new Blob([JSON.stringify(conflictReview,null,2)],{type:'application/json'}));
+  const link=document.createElement('a');link.href=url;link.download='takuwae-conflict-backup-'+Date.now()+'.json';link.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+element('resolve-conflict').addEventListener('click',async()=>{
+  if(!conflictReview||!element('backup-confirmed').checked||!element('conflict-choice').value){status('双方の退避と残す内容を確認してください。');return;}
+  if(!confirm('選んだ内容を同期の正本にします。退避ファイルを保存済みで間違いありませんか？'))return;
+  try {
+    await connection.engine.resolveConflict({resolvedDb:element('conflict-choice').value==='local'?conflictReview.localDb:conflictReview.remoteDb,
+      expectedRemoteRows:conflictReview.remoteRows,hasExternalBackup:true,confirmation:'退避後に競合を解決する'});
+    element('conflict').classList.add('hidden');await bridge.recover();status('端末に解決内容を保存しました。「今すぐ同期」で送信できます。');
+  }catch(error){status(error.message);}
 });
 window.addEventListener('online',scheduleSync);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleSync();});
@@ -105,9 +164,12 @@ const fragment = location.hash || '#'+location.search.slice(1);
 if (location.hash || location.search) history.replaceState(null,'',location.pathname);
 try {
   const session = readMagicLinkSession(fragment);
-  if (session) {
-    accessToken=session.access_token;
-    connection=await createSyncSession({accessToken,storage:localStorage,locks:navigator.locks});
+  const user=session?await auth.accept(session):await auth.resume();
+  if (user) {
+    element('remember').checked=auth.isRemembered();
+    connection=await createSyncSession({getAccessToken:auth.getAccessToken,storage:localStorage,locks:navigator.locks});
+    remoteTrial=createRemoteTrial({getAccessToken:auth.getAccessToken,ownerId:connection.ownerId,storage:localStorage,
+      withLock:(key,action)=>navigator.locks.request(key,action)});
     element('login').classList.add('hidden');element('controls').classList.remove('hidden');
     await mount();
   }

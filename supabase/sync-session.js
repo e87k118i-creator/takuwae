@@ -6,19 +6,21 @@ import {fetchRecords,applyBatch,getAuthUser} from './sync-api.js';
  * separate, explicit call with the currently authenticated owner and phrase.
  * No app, lab or production page imports this adapter yet.
  */
-export async function createSyncSession({accessToken,storage,locks,api={fetchRecords,applyBatch,getAuthUser}}={}) {
+export async function createSyncSession({accessToken,getAccessToken,storage,locks,api={fetchRecords,applyBatch,getAuthUser}}={}) {
   if(!locks?.request)throw Error('安全な複数タブ排他制御が使えません');
-  const user=await api.getAuthUser(accessToken);
+  const token=async()=>getAccessToken?getAccessToken():accessToken;
+  const user=await api.getAuthUser(await token());
   let writable=false,closed=false;
   const requireSession=()=>{if(closed)throw Error('ログアウト済みです');};
   const engine=makeSyncEngine({storage,ownerId:user.id,withLock:(key,fn)=>locks.request(key,{mode:'exclusive'},fn),transport:{
-    fetchRows:async()=>{requireSession();return api.fetchRecords(accessToken);},
+    fetchRows:async()=>{requireSession();const currentToken=await token();requireSession();return api.fetchRecords(currentToken);},
     applyBatch:async batch=>{
       requireSession();if(!writable)throw Error('家計データの送信はまだ許可されていません');
-      const current=await api.getAuthUser(accessToken);
+      const currentToken=await token();
+      const current=await api.getAuthUser(currentToken);
       requireSession();if(!writable)throw Error('書き込みは一時停止されています');
       if(current.id!==user.id)throw Error('認証ユーザーが変わりました。送信を停止します');
-      return api.applyBatch(accessToken,batch);
+      return api.applyBatch(currentToken,batch);
     }
   }});
   return {

@@ -6,8 +6,11 @@
 <style>body{margin:0;background:#edf3f5;color:#17374c;font:16px/1.6 system-ui}main{max-width:700px;margin:auto;padding:16px}h1{font-size:1.4rem}label{display:block;margin:12px 0}input,button{font:inherit;min-height:44px;padding:8px 12px;border-radius:8px}input[type=email]{width:90%}button{border:0;background:#255f7b;color:white;margin:4px}button:disabled{opacity:.5}#status{padding:12px;background:white;border-radius:8px;white-space:pre-wrap}iframe{width:100%;height:85vh;border:0}.hidden{display:none}</style></head>
 <body><main><h1>たくわえ｜同期版候補</h1>
 <section id="login"><form id="login-form"><label>メールアドレス <input id="email" type="email" autocomplete="email" required></label><button id="send">認証メールを送る</button></form></section>
+<label><input id="remember" type="checkbox">この端末でログインを維持する</label>
 <p id="status" role="status">メールでログインすると、このアカウントの同期状態を確認できます。</p>
 <section id="controls" class="hidden"><label><input id="writes" type="checkbox">この端末の変更をクラウドへ同期する</label>
-<button id="receive">この端末へ初回受信</button><button id="sync" disabled>今すぐ同期</button><button id="recover" disabled>保存済みの状態を再表示</button><button id="logout">ログアウト</button></section>
+<button id="receive">この端末へ初回受信</button><button id="sync" disabled>今すぐ同期</button><button id="recover" disabled>保存済みの状態を再表示</button><button id="logout">ログアウト</button>
+<button id="trial">架空データで通信を試験</button><p id="trial-status" role="status"></p></section>
+<section id="conflict" class="hidden"><h2>変更が重なっています</h2><pre id="conflict-summary"></pre><button id="backup-conflict">双方のデータを退避</button><label>残す内容 <select id="conflict-choice"><option value="">選択してください</option><option value="local">この端末の内容</option><option value="remote">クラウドの内容</option></select></label><label><input id="backup-confirmed" type="checkbox">退避したファイルを保存し、残す内容を確認しました</label><button id="resolve-conflict">選んだ内容で解決</button></section>
 <iframe id="app" title="たくわえ同期版の本体" class="hidden"></iframe>
 </main><script type="module" src="./supabase/sync-app.js"></script></body></html>
