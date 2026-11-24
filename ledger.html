@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#e9eef3"><title>たくわえ｜資金管理</title><meta name="takuwae-version" content="2.3.0"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" sizes="512x512" href="./icon-wallet-b.png?v=20261120b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="たくわえ"><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#e9eef3"><title>たくわえ｜資金管理</title><meta name="takuwae-version" content="2.3.1"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" sizes="512x512" href="./icon-wallet-b.png?v=20261120b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="たくわえ"><style>
 :root{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',sans-serif;color:#263a50;background:#e9eef3}*{box-sizing:border-box}body{margin:0}main{max-width:620px;margin:auto;padding:18px 14px 95px}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}h1{font-size:26px;margin:0}h2{font-size:20px;margin:4px 0 14px}h3{font-size:17px;margin:0 0 10px}small,.muted{color:#69788a;font-size:14px}.card{background:white;border-radius:17px;padding:17px;margin-bottom:12px;box-shadow:0 1px 4px #2030400b}.hero{background:#fff;padding:22px;border-radius:20px;margin-bottom:12px}.hero .big{font-size:36px;font-weight:750;letter-spacing:-1px;margin:9px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{padding:13px;background:#f2f5f8;border-radius:12px}.stat strong{display:block;font-size:22px;margin-top:5px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:grid;gap:10px}.field{display:grid;gap:5px;min-width:0}label{font-size:14px;color:#607085;font-weight:650}input,select,textarea{width:100%;min-width:0;padding:12px;border:1px solid #cbd5df;border-radius:10px;background:#fff;color:#263a50;font:inherit;font-size:18px}input[type=checkbox]{width:27px;height:27px;accent-color:#32815c;cursor:pointer}button{border:0;background:#3f627e;color:white;padding:12px 15px;border-radius:11px;font-weight:650;font-size:16px;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.secondary{background:#e9eef3;color:#34516a}.danger{background:#bb3f4b}.outline{background:white;border:1px solid #cbd5df;color:#34516a}.seg{display:flex;gap:5px}.seg button{flex:1;padding:11px 5px;background:#eef2f6;color:#52657a}.seg .active{color:white;background:#3f627e}.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #d5dde5;display:flex;justify-content:center;padding:8px 3px max(10px,env(safe-area-inset-bottom));z-index:2}.nav-inner{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:min(620px,100%);gap:2px}.nav button{background:transparent;color:#66788b;padding:11px 1px;font-size:18px;font-weight:650;letter-spacing:-.35px;min-height:48px;white-space:nowrap}.nav button.active{background:#e9eef3;color:#243f65;font-weight:800;border-radius:10px}.bill{padding:13px 0;border-bottom:1px solid #e4e9ee}.bill:last-child{border:0}.bill-fields{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:7px;align-items:center;margin-top:8px}.tick{display:grid;place-items:center;height:44px;width:48px;cursor:pointer}.tick input{width:30px;height:30px}.green{color:#32815c}.navy{color:#243f65}.blue{color:#3478d4}.amber{color:#9b681e}.progress{height:9px;background:#e4e9ef;border-radius:10px;overflow:hidden}.progress div{height:100%;background:#6d9c8c}.notice{font-size:15px;background:#fff6e7;padding:11px;border-radius:10px;color:#785521;margin-bottom:12px}.pill{font-size:13px;border-radius:20px;padding:4px 8px;background:#edf1f5;color:#536579}.entry{padding:10px 0;border-bottom:1px solid #e7ebef}.entry:last-child{border:0}.entry strong{font-size:18px}.foot{font-size:13px;color:#758498;margin-top:14px;line-height:1.6}.bar{height:12px;border-radius:8px;background:#e8edf3;overflow:hidden;display:flex}.bar span{background:#3478d4}canvas{width:100%;height:220px;display:block;touch-action:pan-y;cursor:crosshair}.chart-detail{min-height:54px;margin-top:8px;padding:10px 12px;border-radius:10px;background:#f2f5f8;font-size:15px;line-height:1.65}.chart-detail strong{font-size:18px}.chart-tip{color:#64748b;font-size:14px;margin-top:5px}.hidden{display:none}.checkselect{width:20px;height:20px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}.caption{font-size:14px;color:#66778a;line-height:1.5}hr{border:0;border-top:1px solid #e5eaf0;margin:15px 0}
 .bill-hint{font-size:14px;color:#9b5b20;margin-top:7px;line-height:1.5}
 /* v0.9 入出金：手描きレイアウトをもとにした2カラム */
@@ -1166,13 +1166,13 @@ header.v79-header img{object-fit:contain}
 #view .saving-handline.heading-line{padding:0 3px;background:linear-gradient(transparent 39%,var(--saving-marker,rgba(238,199,98,.38)) 39%,var(--saving-marker,rgba(238,199,98,.38)) 94%,transparent 94%)}
 /* Amounts alone get a restrained hand-drawn wavy line. */
 #view .saving-amount-wave{text-decoration-line:underline!important;text-decoration-style:wavy!important;text-decoration-thickness:2px!important;text-underline-offset:5px;text-decoration-color:#315b9c!important}
-#view .saving-color-0{--saving-line-color:#469e74;--saving-marker:rgba(70,158,116,.23)}
-#view .saving-color-1{--saving-line-color:#e39a48;--saving-marker:rgba(227,154,72,.25)}
-#view .saving-color-2{--saving-line-color:#dc78a9;--saving-marker:rgba(220,120,169,.25)}
-#view .saving-color-3{--saving-line-color:#8c6ecc;--saving-marker:rgba(140,110,204,.25)}
-#view .saving-color-4{--saving-line-color:#42a7c0;--saving-marker:rgba(66,167,192,.25)}
-#view .saving-feature-title{--saving-line-color:#6c90db;--saving-marker:rgba(230,181,74,.35)}
-#view .saving-month-title{--saving-line-color:#9c68dc;--saving-marker:rgba(156,104,220,.22)}
+#view .saving-color-0{--saving-line-color:#469e74;--saving-marker:rgba(70,158,116,.52)}
+#view .saving-color-1{--saving-line-color:#e39a48;--saving-marker:rgba(227,154,72,.58)}
+#view .saving-color-2{--saving-line-color:#dc78a9;--saving-marker:rgba(220,120,169,.54)}
+#view .saving-color-3{--saving-line-color:#8c6ecc;--saving-marker:rgba(140,110,204,.50)}
+#view .saving-color-4{--saving-line-color:#42a7c0;--saving-marker:rgba(66,167,192,.52)}
+#view .saving-feature-title{--saving-line-color:#6c90db;--saving-marker:rgba(230,181,74,.64)}
+#view .saving-month-title{--saving-line-color:#9c68dc;--saving-marker:rgba(156,104,220,.48)}
 /* All tabs: marker background for headings, hand-drawn wave for standalone money figures. */
 #view .global-marker-heading{
   display:inline;
@@ -1181,11 +1181,11 @@ header.v79-header img{object-fit:contain}
   padding:0 2px;
   text-decoration:none!important;
 }
-#view .global-marker-0{--global-marker:rgba(248,211,93,.48)}
-#view .global-marker-1{--global-marker:rgba(247,153,185,.40)}
-#view .global-marker-2{--global-marker:rgba(111,215,187,.38)}
-#view .global-marker-3{--global-marker:rgba(152,189,246,.40)}
-#view .global-marker-4{--global-marker:rgba(197,167,239,.40)}
+#view .global-marker-0{--global-marker:rgba(248,211,93,.74)}
+#view .global-marker-1{--global-marker:rgba(247,153,185,.69)}
+#view .global-marker-2{--global-marker:rgba(111,215,187,.65)}
+#view .global-marker-3{--global-marker:rgba(152,189,246,.70)}
+#view .global-marker-4{--global-marker:rgba(197,167,239,.68)}
 #view .global-money-wave{
   text-decoration-line:underline!important;
   text-decoration-style:wavy!important;
@@ -1487,7 +1487,7 @@ home=function(){
 };
 
 /* v36: safe in-app PWA update check. Does not modify financial storage. */
-const TAKUWAE_APP_VERSION='2.3.0';
+const TAKUWAE_APP_VERSION='2.3.1';
 let takuwaeUpdateBusy=false;
 const settingsViewBeforeUpdate=settingsView;
 settingsView=function(){
