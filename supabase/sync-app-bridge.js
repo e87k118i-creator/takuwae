@@ -26,7 +26,9 @@ export function createSyncAppBridge({engine, view, onStatus=()=>{}}) {
       }
       const next = structuredClone(nextDb);
       queued++;
-      busy(true);
+      // Do not make the ledger inert for routine field saves: doing so blurs
+      // the active input on every keystroke (and can jump the page to top).
+      // The serialized journal still guards durability and conflicts.
       tail = tail.then(async()=>{
         if (failed || closed) return {status:'blocked'};
         try {
