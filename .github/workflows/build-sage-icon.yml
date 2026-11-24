@@ -1,0 +1,70 @@
+name: Build sage-green Hosuke icon
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-sage-icon.yml'
+permissions:
+  contents: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install Pillow==11.2.1
+      - name: Replace only the white exterior of the existing icon
+        run: |
+          python - <<'PY'
+          from PIL import Image
+          from collections import deque
+          im = Image.open('icon-hosuke-512.png').convert('RGB')
+          w,h = im.size
+          px = im.load()
+          seen = bytearray(w*h)
+          q = deque()
+          def enqueue(x,y):
+              idx=y*w+x
+              if seen[idx]: return
+              r,g,b=px[x,y]
+              if min(r,g,b)<205: return
+              seen[idx]=1
+              q.append((x,y))
+          for x in range(w):
+              enqueue(x,0)
+              enqueue(x,h-1)
+          for y in range(h):
+              enqueue(0,y)
+              enqueue(w-1,y)
+          while q:
+              x,y=q.popleft()
+              if x>0: enqueue(x-1,y)
+              if x+1<w: enqueue(x+1,y)
+              if y>0: enqueue(x,y-1)
+              if y+1<h: enqueue(x,y+1)
+          sage=(164,191,151)
+          out=im.copy()
+          dst=out.load()
+          for y in range(h):
+              for x in range(w):
+                  if not seen[y*w+x]: continue
+                  r,g,b=px[x,y]
+                  # Preserve original artwork and its non-white contours.
+                  strength=max(0.0,min(1.0,(min(r,g,b)-205)/38))
+                  dst[x,y]=tuple(round(v*(1-strength)+sage[i]*strength) for i,v in enumerate((r,g,b)))
+          out.save('icon-hosuke-sage-512.png',format='PNG',optimize=True)
+          print('Created icon-hosuke-sage-512.png',w,h)
+          PY
+      - name: Commit generated icon
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add icon-hosuke-sage-512.png
+          if ! git diff --staged --quiet; then
+            git commit -m 'Generate sage-green Hosuke home screen icon'
+            git push
+          fi
