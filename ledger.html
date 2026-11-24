@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#e9eef3"><title>たくわえ｜資金管理</title><meta name="takuwae-version" content="2.2.2"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" sizes="512x512" href="./icon-wallet-b.png?v=20261120b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="たくわえ"><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#e9eef3"><title>たくわえ｜資金管理</title><meta name="takuwae-version" content="2.2.3"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" sizes="512x512" href="./icon-wallet-b.png?v=20261120b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="たくわえ"><style>
 :root{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',sans-serif;color:#263a50;background:#e9eef3}*{box-sizing:border-box}body{margin:0}main{max-width:620px;margin:auto;padding:18px 14px 95px}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}h1{font-size:26px;margin:0}h2{font-size:20px;margin:4px 0 14px}h3{font-size:17px;margin:0 0 10px}small,.muted{color:#69788a;font-size:14px}.card{background:white;border-radius:17px;padding:17px;margin-bottom:12px;box-shadow:0 1px 4px #2030400b}.hero{background:#fff;padding:22px;border-radius:20px;margin-bottom:12px}.hero .big{font-size:36px;font-weight:750;letter-spacing:-1px;margin:9px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{padding:13px;background:#f2f5f8;border-radius:12px}.stat strong{display:block;font-size:22px;margin-top:5px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:grid;gap:10px}.field{display:grid;gap:5px;min-width:0}label{font-size:14px;color:#607085;font-weight:650}input,select,textarea{width:100%;min-width:0;padding:12px;border:1px solid #cbd5df;border-radius:10px;background:#fff;color:#263a50;font:inherit;font-size:18px}input[type=checkbox]{width:27px;height:27px;accent-color:#32815c;cursor:pointer}button{border:0;background:#3f627e;color:white;padding:12px 15px;border-radius:11px;font-weight:650;font-size:16px;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.secondary{background:#e9eef3;color:#34516a}.danger{background:#bb3f4b}.outline{background:white;border:1px solid #cbd5df;color:#34516a}.seg{display:flex;gap:5px}.seg button{flex:1;padding:11px 5px;background:#eef2f6;color:#52657a}.seg .active{color:white;background:#3f627e}.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #d5dde5;display:flex;justify-content:center;padding:8px 3px max(10px,env(safe-area-inset-bottom));z-index:2}.nav-inner{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:min(620px,100%);gap:2px}.nav button{background:transparent;color:#66788b;padding:11px 1px;font-size:18px;font-weight:650;letter-spacing:-.35px;min-height:48px;white-space:nowrap}.nav button.active{background:#e9eef3;color:#243f65;font-weight:800;border-radius:10px}.bill{padding:13px 0;border-bottom:1px solid #e4e9ee}.bill:last-child{border:0}.bill-fields{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:7px;align-items:center;margin-top:8px}.tick{display:grid;place-items:center;height:44px;width:48px;cursor:pointer}.tick input{width:30px;height:30px}.green{color:#32815c}.navy{color:#243f65}.blue{color:#3478d4}.amber{color:#9b681e}.progress{height:9px;background:#e4e9ef;border-radius:10px;overflow:hidden}.progress div{height:100%;background:#6d9c8c}.notice{font-size:15px;background:#fff6e7;padding:11px;border-radius:10px;color:#785521;margin-bottom:12px}.pill{font-size:13px;border-radius:20px;padding:4px 8px;background:#edf1f5;color:#536579}.entry{padding:10px 0;border-bottom:1px solid #e7ebef}.entry:last-child{border:0}.entry strong{font-size:18px}.foot{font-size:13px;color:#758498;margin-top:14px;line-height:1.6}.bar{height:12px;border-radius:8px;background:#e8edf3;overflow:hidden;display:flex}.bar span{background:#3478d4}canvas{width:100%;height:220px;display:block;touch-action:pan-y;cursor:crosshair}.chart-detail{min-height:54px;margin-top:8px;padding:10px 12px;border-radius:10px;background:#f2f5f8;font-size:15px;line-height:1.65}.chart-detail strong{font-size:18px}.chart-tip{color:#64748b;font-size:14px;margin-top:5px}.hidden{display:none}.checkselect{width:20px;height:20px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}.caption{font-size:14px;color:#66778a;line-height:1.5}hr{border:0;border-top:1px solid #e5eaf0;margin:15px 0}
 .bill-hint{font-size:14px;color:#9b5b20;margin-top:7px;line-height:1.5}
 /* v0.9 入出金：手描きレイアウトをもとにした2カラム */
@@ -1048,7 +1048,7 @@ header.v79-header .pill{position:absolute;right:3px;bottom:0;font-size:12px;z-in
 @media(prefers-reduced-motion:reduce){#view .settings-subtabs button{transition:none}}
 
 
-/* v2.2.2: approved relief on home savings and item-management controls. */
+/* v2.2.3: approved relief on home savings and item-management controls. */
 #view button.matching-relief {
   box-shadow:0 5px 11px rgba(49,72,87,.17),0 10px 19px rgba(49,72,87,.085),inset 0 1px 0 rgba(255,255,255,.55);
   transition:transform .13s ease,box-shadow .13s ease;
@@ -1061,7 +1061,7 @@ header.v79-header .pill{position:absolute;right:3px;bottom:0;font-size:12px;z-in
 @media(prefers-reduced-motion:reduce){#view button.matching-relief{transition:none}}
 
 
-/* v2.2.2: gentle optical correction for navy Add buttons, without a hard shadow edge. */
+/* v2.2.3: gentle optical correction for navy Add buttons, without a hard shadow edge. */
 #view button.matching-relief.add-soft-shadow{
   box-shadow:0 5px 12px rgba(35,60,78,.23),0 10px 22px rgba(35,60,78,.12),inset 0 1px 0 rgba(255,255,255,.55);
 }
@@ -1137,6 +1137,13 @@ body > main{position:relative;z-index:1}
     rgba(247,252,255,var(--takuwae-panel-opacity,.80)) 55%,
     rgba(246,250,253,var(--takuwae-panel-opacity,.80)) 100%);
 }
+</style><style id="adaptive-panel-text-style">
+#view :is(.card,.hero).adaptive-text-light{color:#fffdf7}
+#view :is(.card,.hero).adaptive-text-light :is(h2,h3,h4,p,small,label,b,strong,span,.muted,.caption):not(.pill):not(.badge):not(.switch-icon){color:#fffdf7!important;text-shadow:0 1px 3px rgba(5,20,34,.72),0 0 8px rgba(5,20,34,.35)}
+#view :is(.card,.hero).adaptive-text-dark{color:#172a3a}
+#view :is(.card,.hero).adaptive-text-dark :is(h2,h3,h4,p,small,label,b,strong,span,.muted,.caption):not(.pill):not(.badge):not(.switch-icon){color:#172a3a!important;text-shadow:0 1px 3px rgba(255,255,255,.45)}
+#view :is(.card,.hero).adaptive-text-light button *,
+#view :is(.card,.hero).adaptive-text-dark button *{color:inherit!important;text-shadow:none!important}
 </style></head><body><main><header class="v79-header" aria-label="たくわえ パーソナルファイナンス"><img src="./assets/header-current.svg" alt="たくわえ パーソナルファイナンス。ホースケとピンクの貯金箱、赤いリボンの車のイラスト"><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
 const KEY='takuwae-v1';const names={s1:'三井住友①',r:'りそな',s2:'三井住友②',cash:'現金財布',em:'電子マネー'};const seedBills=[['rent','家賃','r'],['parking','駐車場','s1'],['insurance','傷害保険','s1'],['phone','携帯電話','s1'],['chat','ChatGPT','s1'],['adobe','Adobe','s1'],['youtube','YouTube',''],['weather','ウェザーニュース',''],['prime','Amazonプライム','']].map(([id,name,bank])=>({id,name,bank,active:true}));
 const today=()=>new Date().toLocaleDateString('sv-SE');const ym=()=>new Date().toLocaleDateString('sv-SE').slice(0,7);const fresh=()=>({initial:{s1:0,r:0,s2:0,cash:0,em:0},fundInitial:{repair:0,car:0},fundCategories:[{id:'repair',name:'修理予備費',goal:300000},{id:'car',name:'車両購入資金',goal:0}],bills:seedBills,months:{},tx:[],monthly:30000,bonus:150000,payday:25,weeklyBuffer:0});let db;try{db=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){db=fresh()}if(!Array.isArray(db.fundCategories))db.fundCategories=fresh().fundCategories;const ui={tab:'home',type:'expense',edit:false,selected:[],add:false,withdrawStep:0,wd:{fund:'repair',amount:'',reason:'フレアの修理',to:'s1'},filter:'all',month:ym(),addFund:false,deleteFund:null,editTx:null,billNotice:null};const fmt=n=>'¥'+Math.round(Number(n)||0).toLocaleString('ja-JP');const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);let save=()=>localStorage.setItem(KEY,JSON.stringify(db));const month=()=>db.months[ui.month]??(db.months[ui.month]={});const billState=b=>month()[b.id]??(month()[b.id]={amount:'',paid:false,bank:b.bank});const activeBills=()=>db.bills.filter(b=>b.active!==false&&(!b.end||ui.month<b.end)&&(!b.start||ui.month>=b.start));const balances=()=>{const a={...db.initial};for(const t of db.tx){if(t.kind==='income')a[t.to]=(a[t.to]||0)+t.amount;else if(t.kind==='expense') {if(t.settled)a[t.from]=(a[t.from]||0)-t.amount;}else {a[t.from]=(a[t.from]||0)-t.amount;a[t.to]=(a[t.to]||0)+t.amount;}}return a};const fundName=k=>db.fundCategories.find(f=>f.id===k)?.name||k;const funds=()=>{const a={...db.fundInitial};for(const t of db.tx){if(t.kind==='saving')a[t.purpose]=(a[t.purpose]||0)+t.amount;if(t.kind==='withdraw')a[t.purpose]=(a[t.purpose]||0)-t.amount;}return a};const options=(selected,includeEmpty=false,subset=Object.keys(names))=>(includeEmpty?'<option value="">支払元</option>':'')+accountDisplayOrder().filter(k=>subset.includes(k)).map(k=>`<option value="${k}" ${selected===k?'selected':''}>${esc(names[k])}</option>`).join('');const totalBill=()=>activeBills().reduce((s,b)=>s+(billState(b).paid?Number(billState(b).amount)||0:0),0);const pending=()=>activeBills().filter(b=>!billState(b).paid).reduce((s,b)=>s+(Number(billState(b).amount)||0),0);const unknown=()=>activeBills().filter(b=>!billState(b).amount).length;const moneyColor=k=>({expense:'navy',income:'green',saving:'blue',withdraw:'amber',transfer:'muted'}[k]||'muted');const titleKind=k=>({expense:'出金',income:'入金',saving:'積立',withdraw:'取り崩し',transfer:'振替'}[k]);function record(t){db.tx.unshift({id:id(),date:today(),...t});save();render()};function setTab(t){ui.tab=t;ui.withdrawStep=0;render()};function navIcon(k){return '<span class="nav-illustration sprite-icon sprite-'+k+'" aria-hidden="true"></span>';
@@ -1428,7 +1435,7 @@ home=function(){
 };
 
 /* v36: safe in-app PWA update check. Does not modify financial storage. */
-const TAKUWAE_APP_VERSION='2.2.2';
+const TAKUWAE_APP_VERSION='2.2.3';
 let takuwaeUpdateBusy=false;
 const settingsViewBeforeUpdate=settingsView;
 settingsView=function(){
@@ -1827,10 +1834,12 @@ async function applyBackgroundBlob(blob){
   photoBackdrop.style.backgroundImage='url("'+dataURL+'")';
   document.body.style.backgroundImage='none';
   customBackgroundPresent=true;
+  await preparePhotoContrast(blob);
  }else{
   if(photoBackdrop){photoBackdrop.remove();photoBackdrop=null}
   document.body.style.removeProperty('background-image');
   customBackgroundPresent=false;
+  await preparePhotoContrast(null);
  }
  backgroundReady=true;
  setBackgroundStatus(blob?'写真の背景を使用中（この端末のみ）':'標準のフェルト背景を使用中');
@@ -2025,7 +2034,73 @@ function savePanelOpacity(value){
  try{localStorage.setItem(PANEL_OPACITY_KEY,String(panelOpacity))}
  catch(error){/* Visual preference still works for this session. */}
 }
+
 setPanelOpacity(panelOpacity);
+
+/* Sample the local photo without modifying finance data or sync records. */
+let backdropContrastPixels=null,backdropContrastWidth=0,backdropContrastHeight=0,contrastFramePending=false;
+function linearChannel(value){const v=value/255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)}
+function contrastRatio(bg,fg){
+ const luminance=a=>.2126*linearChannel(a[0])+.7152*linearChannel(a[1])+.0722*linearChannel(a[2]);
+ const x=luminance(bg),y=luminance(fg);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);
+}
+async function preparePhotoContrast(blob){
+ backdropContrastPixels=null;
+ if(!blob){requestPanelContrastUpdate();return}
+ let image=null;
+ try{
+  image=await readPhotoImage(blob);
+  const canvas=document.createElement('canvas');
+  canvas.width=60;canvas.height=Math.max(12,Math.round(60*image.naturalHeight/image.naturalWidth));
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  if(!ctx)throw Error('canvas unavailable');
+  ctx.drawImage(image,0,0,canvas.width,canvas.height);
+  backdropContrastPixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  backdropContrastWidth=canvas.width;backdropContrastHeight=canvas.height;
+ }catch(error){backdropContrastPixels=null}
+ finally{if(image?._takuwaeObjectURL)URL.revokeObjectURL(image._takuwaeObjectURL)}
+ requestPanelContrastUpdate();
+}
+function photoColorAt(x,y){
+ const data=backdropContrastPixels;
+ if(!data||!backdropContrastWidth||!backdropContrastHeight)return null;
+ const vw=Math.max(1,window.innerWidth),vh=Math.max(1,window.innerHeight);
+ const scale=Math.max(vw/backdropContrastWidth,vh/backdropContrastHeight);
+ const dw=backdropContrastWidth*scale,dh=backdropContrastHeight*scale;
+ const px=Math.max(0,Math.min(backdropContrastWidth-1,Math.floor((x-(vw-dw)/2)/scale)));
+ const py=Math.max(0,Math.min(backdropContrastHeight-1,Math.floor((y-(vh-dh)/2)/scale)));
+ const p=(py*backdropContrastWidth+px)*4;
+ return [data[p],data[p+1],data[p+2]];
+}
+function updatePanelContrast(){
+ contrastFramePending=false;
+ const alpha=panelOpacity/100;
+ for(const panel of document.querySelectorAll('#view .card,#view .hero')){
+  panel.classList.remove('adaptive-text-light','adaptive-text-dark');
+  if(alpha>=.60||!backdropContrastPixels)continue;
+  const rect=panel.getBoundingClientRect();
+  if(rect.bottom<0||rect.top>window.innerHeight)continue;
+  let dark=Infinity,light=Infinity;
+  for(const a of [.18,.50,.82])for(const b of [.20,.50,.80]){
+   const photo=photoColorAt(rect.left+rect.width*a,rect.top+rect.height*b);
+   if(!photo)continue;
+   const bg=photo.map((v,i)=>v*(1-alpha)+[248,252,255][i]*alpha);
+   dark=Math.min(dark,contrastRatio(bg,[23,42,58]));
+   light=Math.min(light,contrastRatio(bg,[255,253,247]));
+  }
+  if(dark!==Infinity)panel.classList.add(light>dark?'adaptive-text-light':'adaptive-text-dark');
+ }
+}
+function requestPanelContrastUpdate(){
+ if(contrastFramePending)return;
+ contrastFramePending=true;requestAnimationFrame(updatePanelContrast);
+}
+window.addEventListener('scroll',requestPanelContrastUpdate,{passive:true,capture:true});
+window.addEventListener('resize',requestPanelContrastUpdate,{passive:true});
+const oldPanelOpacitySetter=setPanelOpacity;
+setPanelOpacity=function(value){oldPanelOpacitySetter(value);requestPanelContrastUpdate()};
+const renderBeforeAdaptiveContrast=render;
+render=function(){const result=renderBeforeAdaptiveContrast();requestPanelContrastUpdate();return result};
 
 const renderBeforeCustomLabels=render;
 render=function(){
