@@ -26,6 +26,8 @@ window.syncAppView = {
   setBusy(value){ document.body.inert=value; },
   snapshot(){ return structuredClone(db); }
 };
+// Export via the top-level host, not a download from this srcdoc iframe.
+exportData=()=>parent.syncAppHost.exportBackup(structuredClone(db));
 importData=async()=>alert('同期中のバックアップ復元は、退避と照合が必要です。同期画面から操作してください');
 resetAll=()=>alert('同期中は全データ初期化を実行できません');
 checkTakuwaeUpdate=async()=>{
