@@ -23,7 +23,7 @@ const files = [
   "./supabase/sync-remote-trial.js",
   "./supabase/sync-session.js"
 ];
-const cacheKey = 'takuwae-v2.1.8-shared-relief-20261124';
+const cacheKey = 'takuwae-v2.1.9-soft-add-shadow-20261124';
 const cachedUrls = new Set(files.map(file=>new URL(file,self.registration.scope).href));
 self.addEventListener('install',event=>{
   event.waitUntil((async()=>{
