@@ -1846,6 +1846,22 @@ async function readPhotoImage(file){
    return image;
   }catch(secondError){
    URL.revokeObjectURL(objectURL);
+   // Last decode path for browsers whose bitmap decoder supports formats
+   // not handled by HTMLImageElement (including some iPhone photo exports).
+   if(typeof createImageBitmap==='function'){
+    try{
+     const bitmap=await createImageBitmap(file);
+     const canvas=document.createElement('canvas');
+     const scale=Math.min(1,2048/Math.max(bitmap.width,bitmap.height));
+     canvas.width=Math.max(1,Math.round(bitmap.width*scale));
+     canvas.height=Math.max(1,Math.round(bitmap.height*scale));
+     const ctx=canvas.getContext('2d');
+     if(!ctx)throw Error('画像変換ができへん');
+     ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);
+     if(typeof bitmap.close==='function')bitmap.close();
+     return await loadImageSource(canvas.toDataURL('image/jpeg',.86));
+    }catch(bitmapError){/* Report a useful format-specific error below. */}
+   }
    const extension=String(file.name||'').split('.').pop().toLowerCase();
    if(['heic','heif'].includes(extension)||/hei[cf]/i.test(file.type))
     throw new Error('HEIC/HEIF形式が読み込めへんかった。写真アプリからJPEGとして保存して試してな');
