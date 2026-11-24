@@ -165,7 +165,44 @@ async function mount(successMessage) {
     replace:db=>frame.contentWindow.syncAppView?.replace(db),
     setBusy:value=>frame.contentWindow.syncAppView?.setBusy(value)
   }});
-  window.syncAppHost = {save:db=>bridge.save(db),openSettings:showSyncSettings, async pullSync() {
+// A srcdoc iframe is not a reliable download origin on iOS/iPadOS.
+// Export only an in-memory copy of the currently displayed ledger; never mutate the source.
+async function exportLedgerBackup(data) {
+  try {
+    if(!data || typeof data!=='object' || !Array.isArray(data.tx) || !Array.isArray(data.bills))
+      throw Error('バックアップ対象のデータを確認できませんでした。');
+    const stamp=new Date().toLocaleDateString('sv-SE');
+    const filename='takuwae-backup-'+stamp+'.json';
+    const file=new File([JSON.stringify(data,null,2)],filename,{type:'application/json'});
+    if(typeof navigator.share==='function' && typeof navigator.canShare==='function' && navigator.canShare({files:[file]})){
+      try {
+        await navigator.share({files:[file],title:'たくわえのバックアップ'});
+        alert('共有画面を閉じました。保存先にJSONファイルがあるか確認してな。');
+      }catch(error){
+        if(error?.name==='AbortError')return;
+        alert('共有に失敗しました：'+(error?.message||'保存先を確認して再試行してな。'));
+      }
+      return;
+    }
+    const url=URL.createObjectURL(file);
+    try {
+      const link=document.createElement('a');
+      link.href=url;
+      link.download=filename;
+      link.style.display='none';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      alert('JSONのダウンロードを開始したで。ファイルアプリで保存を確認してな。');
+    }finally{
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    }
+  }catch(error){
+    alert('バックアップを開始できませんでした：'+(error?.message||'再度試してな。'));
+  }
+}
+
+  window.syncAppHost = {save:db=>bridge.save(db),openSettings:showSyncSettings,exportBackup:exportLedgerBackup, async pullSync() {
     if (!navigator.onLine) return 'オフラインです。通信が戻ったら同期できます。';
     if (!connection?.isWritable()) return 'クラウド同期はオフです。';
     const result = await bridge.sync();
