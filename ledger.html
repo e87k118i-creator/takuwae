@@ -1440,6 +1440,14 @@ function renameAccount(k){
  if(!v||v.length>40)return alert('口座名は1〜40文字で入力してな');
  db.accountLabels={...(db.accountLabels||{}),[k]:v};save();render();
 }
+function moveExpenseCategory(key,step){
+ ensureExpenseCategories();
+ const i=db.expenseCategoryItems.findIndex(x=>x.id===key);
+ const next=i+step;
+ if(i<0||next<0||next>=db.expenseCategoryItems.length)return;
+ [db.expenseCategoryItems[i],db.expenseCategoryItems[next]]=[db.expenseCategoryItems[next],db.expenseCategoryItems[i]];
+ save();render();
+}
 function changeExpenseCategory(action,key){
  ensureExpenseCategories();
  const item=db.expenseCategoryItems.find(x=>x.id===key);
@@ -1464,7 +1472,7 @@ function changeExpenseCategory(action,key){
 const settingsBeforeCustomLabels=settingsView;
 settingsView=function(){
  const accounts=Object.keys(defaultAccountNames).map(k=>'<div class="field"><label>現在：'+esc(names[k])+'</label><div class="row"><input id="account-label-'+k+'" maxlength="40" value="'+esc(names[k])+'"><button type="button" class="secondary" onclick="renameAccount(\''+k+'\')">変更</button></div></div>').join('');
- const categories=(db.expenseCategoryItems||defaultExpenseCategoryNames.map((name,i)=>({id:'default_'+i,name,active:true}))).map(c=>'<div class="field"><label>'+(c.active===false?'使用停止中':'使用中')+'</label><div class="row"><input id="category-label-'+esc(c.id)+'" maxlength="40" value="'+esc(c.name)+'"><button type="button" class="secondary" onclick="changeExpenseCategory(\'rename\',\''+c.id+'\')">変更</button><button type="button" class="secondary" onclick="changeExpenseCategory(\'toggle\',\''+c.id+'\')">'+(c.active===false?'再開':'停止')+'</button></div></div>').join('');
+ const categories=(db.expenseCategoryItems||defaultExpenseCategoryNames.map((name,i)=>({id:'default_'+i,name,active:true}))).map((c,i,list)=>'<div class="field"><label>'+(c.active===false?'使用停止中':'使用中')+' · '+(i+1)+'番目</label><div class="row"><input id="category-label-'+esc(c.id)+'" maxlength="40" value="'+esc(c.name)+'"><button type="button" class="secondary" onclick="changeExpenseCategory(\'rename\',\''+c.id+'\')">変更</button><button type="button" class="secondary" onclick="changeExpenseCategory(\'toggle\',\''+c.id+'\')">'+(c.active===false?'再開':'停止')+'</button></div><div class="row" style="justify-content:flex-end"><button type="button" class="secondary" aria-label="'+esc(c.name)+'を上に移動" '+(i===0?'disabled':'')+' onclick="moveExpenseCategory(\''+c.id+'\',-1)">↑ 上へ</button><button type="button" class="secondary" aria-label="'+esc(c.name)+'を下に移動" '+(i===list.length-1?'disabled':'')+' onclick="moveExpenseCategory(\''+c.id+'\',1)">↓ 下へ</button></div></div>').join('');
  return settingsBeforeCustomLabels()+'<div class="card stack"><h3>口座・支払い元の表示名</h3><p class="caption">5つの内部口座はそのまま。名称だけ変更するで。口座の追加と削除はまだできへん。</p>'+accounts+'</div><div class="card stack"><h3>支出区分の管理</h3><p class="caption">変更した名前は今後の記録に使うで。過去の履歴は変わらへん。</p>'+categories+'<div class="field"><label>区分を追加</label><div class="row"><input id="expense-category-new" maxlength="40" placeholder="新しい支出区分"><button type="button" onclick="changeExpenseCategory(\'add\',\'\')">追加</button></div></div></div>';
 };
 const renderBeforeCustomLabels=render;
