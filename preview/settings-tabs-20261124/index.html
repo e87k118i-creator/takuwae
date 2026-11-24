@@ -1731,10 +1731,120 @@ settingsView=function(){
   }
   grouped[section].push(item.outerHTML);
  }
+ grouped.app.push('<div class="card stack"><h3>背景のカスタマイズ（この端末のみ）</h3><p class="caption">標準はクリーム色のフェルト背景。写真を選ぶと背景だけを変更するで。家計データやクラウドには保存せえへん。</p><div class="field"><label for="custom-background-file">写真から背景を選ぶ</label><input id="custom-background-file" type="file" accept="image/*" onchange="chooseBackgroundPhoto(this.files[0])"></div><button type="button" class="secondary" onclick="restoreDefaultBackground()">標準のフェルト背景に戻す</button><p id="custom-background-status" class="caption" role="status" aria-live="polite">端末内の背景設定を読み込み中</p></div>');
  const tabs=[['finance','資金設定'],['labels','項目管理'],['app','アプリ管理']];
  const toolbar='<div class="settings-subtabs" role="tablist" aria-label="設定の種類">'+tabs.map(([key,label])=>'<button type="button" role="tab" aria-selected="'+(settingsSection===key)+'" class="'+(settingsSection===key?'active':'')+'" onclick="selectSettingsSection(\''+key+'\')">'+label+'</button>').join('')+'</div>';
  return '<h2>設定・口座管理</h2>'+toolbar+'<section aria-label="'+tabs.find(t=>t[0]===settingsSection)[1]+'">'+grouped[settingsSection].join('')+'</section>';
 };
+/* Preview-only device-local photo background; never part of ledger db or sync. */
+const BACKGROUND_DB_NAME='takuwae-preview-background-20261124';
+const BACKGROUND_STORE='preferences';
+let selectedBackgroundUrl=null;
+let backgroundReady=false;
+let customBackgroundPresent=false;
+function openBackgroundDb(){
+ return new Promise((resolve,reject)=>{
+  if(!('indexedDB' in window))return reject(new Error('このブラウザでは写真の保存に対応してへん'));
+  const req=indexedDB.open(BACKGROUND_DB_NAME,1);
+  req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(BACKGROUND_STORE))req.result.createObjectStore(BACKGROUND_STORE)};
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error||new Error('写真保存領域を開けへん'));
+ });
+}
+async function backgroundStore(action,value){
+ const database=await openBackgroundDb();
+ try{
+  return await new Promise((resolve,reject)=>{
+   const tx=database.transaction(BACKGROUND_STORE,action==='read'?'readonly':'readwrite');
+   const store=tx.objectStore(BACKGROUND_STORE);
+   let result=null;
+   const request=action==='read'?store.get('selected'):action==='clear'?store.delete('selected'):store.put(value,'selected');
+   request.onsuccess=()=>{result=request.result};
+   request.onerror=()=>reject(request.error||new Error('背景の保存に失敗したで'));
+   tx.oncomplete=()=>resolve(result);
+   tx.onerror=()=>reject(tx.error||new Error('背景の保存に失敗したで'));
+   tx.onabort=()=>reject(tx.error||new Error('背景の保存が中断されたで'));
+  });
+ }finally{database.close()}
+}
+function setBackgroundStatus(message){
+ const element=document.getElementById('custom-background-status');
+ if(element)element.textContent=message;
+}
+function applyBackgroundBlob(blob){
+ if(selectedBackgroundUrl){URL.revokeObjectURL(selectedBackgroundUrl);selectedBackgroundUrl=null}
+ if(blob){
+  selectedBackgroundUrl=URL.createObjectURL(blob);
+  document.body.style.backgroundImage='linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),url("'+selectedBackgroundUrl+'")';
+  document.body.style.backgroundSize='cover';
+  document.body.style.backgroundPosition='center center';
+  document.body.style.backgroundRepeat='no-repeat';
+  document.body.style.backgroundAttachment='fixed';
+  customBackgroundPresent=true;
+ }else{
+  for(const property of ['background-image','background-size','background-position','background-repeat','background-attachment'])document.body.style.removeProperty(property);
+  customBackgroundPresent=false;
+ }
+ backgroundReady=true;
+ setBackgroundStatus(blob?'写真の背景を使用中（この端末のみ）':'標準のフェルト背景を使用中');
+}
+function readPhotoImage(file){
+ return new Promise((resolve,reject)=>{
+  const url=URL.createObjectURL(file),img=new Image();
+  img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};
+  img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('写真を読み込めへんかった'))};
+  img.src=url;
+ });
+}
+async function convertBackgroundPhoto(file){
+ const image=await readPhotoImage(file);
+ const maximum=1600;
+ const scale=Math.min(1,maximum/Math.max(image.naturalWidth,image.naturalHeight));
+ const canvas=document.createElement('canvas');
+ canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));
+ canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
+ const ctx=canvas.getContext('2d');
+ if(!ctx)throw new Error('写真の加工に対応してへん');
+ ctx.drawImage(image,0,0,canvas.width,canvas.height);
+ const output=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.82));
+ if(!output)throw new Error('背景画像を作れへんかった');
+ return output;
+}
+async function chooseBackgroundPhoto(file){
+ if(!file)return;
+ if(!file.type.startsWith('image/')){setBackgroundStatus('画像ファイルを選んでな');return}
+ if(file.size>20*1024*1024){setBackgroundStatus('写真は20MB以下のものを選んでな');return}
+ setBackgroundStatus('写真を読み込み中…');
+ try{
+  const blob=await convertBackgroundPhoto(file);
+  await backgroundStore('save',blob);
+  applyBackgroundBlob(blob);
+ }catch(error){setBackgroundStatus('変更できへんかった：'+error.message)}
+ const picker=document.getElementById('custom-background-file');
+ if(picker)picker.value='';
+}
+async function restoreDefaultBackground(){
+ try{
+  await backgroundStore('clear');
+  applyBackgroundBlob(null);
+ }catch(error){setBackgroundStatus('標準に戻せへんかった：'+error.message)}
+}
+async function initializePhotoBackground(){
+ try{
+  const stored=await backgroundStore('read');
+  applyBackgroundBlob(stored instanceof Blob?stored:null);
+ }catch(error){
+  backgroundReady=true;
+  setBackgroundStatus('標準背景で表示中。写真の保存は使えへん：'+error.message);
+ }
+}
+const renderBeforePhotoBackground=render;
+render=function(){
+ const result=renderBeforePhotoBackground();
+ if(ui.tab==='settings'&&settingsSection==='app'&&backgroundReady)setBackgroundStatus(customBackgroundPresent?'写真の背景を使用中（この端末のみ）':'標準のフェルト背景を使用中');
+ return result;
+};
+initializePhotoBackground();
 const renderBeforeCustomLabels=render;
 render=function(){
  for(const k of accountKeys()){const extra=Array.isArray(db.extraAccounts)?db.extraAccounts.find(x=>x.id===k):null;const fallback=defaultAccountNames[k]||extra?.name||k;names[k]=typeof db.accountLabels?.[k]==='string'&&db.accountLabels[k].trim()?db.accountLabels[k]:fallback;}
