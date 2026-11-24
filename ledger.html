@@ -1290,7 +1290,7 @@ function quickEntryView(){
  return '<div class="card quick-panel"><div class="row quick-heading"><b>使った金額</b><button id="quick-clear" type="button" class="secondary quick-clear" onclick="quickClear()" '+(!quickAmount?'disabled':'')+'>× クリア</button></div>'+
  '<div class="quick-amount-row"><div class="quick-amount"><b>¥</b><input aria-label="使った金額" type="number" min="1" step="1" inputmode="numeric" placeholder="0" value="'+esc(quickAmount)+'" oninput="quickSetAmount(this.value)"></div><button id="quick-record" type="button" class="quick-record" onclick="quickRecord()" '+(!(Number.isSafeInteger(Number(quickAmount))&&Number(quickAmount)>0)?'disabled':'')+'>✓ 記録</button></div>'+
  '<h3>支出の種類</h3><div class="quick-grid">'+quickCategories.map(v=>quickButton(v,quickCategory===v,"quickSetCategory('"+v+"')")).join('')+'</div>'+
- '<h3>支払元</h3><div class="quick-grid">'+quickSources.map(([v,label])=>quickButton(label,quickSource===v,"quickSetSource('"+v+"')")).join('')+'</div>'+
+ '<h3>支払元</h3><div class="quick-grid">'+quickSources.map(([v,label])=>quickButton(names[v]||label,quickSource===v,"quickSetSource('"+v+"')")).join('')+'</div>'+
  (quickNotice?'<p class="caption" role="status">'+esc(quickNotice)+'</p>':'')+'</div>';
 }
 home=function(){
