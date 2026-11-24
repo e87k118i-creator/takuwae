@@ -1027,18 +1027,23 @@ html { overscroll-behavior-y: contain; }
 </style><style id="settings-subtabs-style">
 .settings-subtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:8px 0 18px}
 #view .settings-subtabs button{
-  min-width:0;min-height:42px;padding:7px 5px;
+  display:flex;align-items:center;justify-content:center;
+  min-width:0;min-height:46px;padding:8px 5px;
   font-size:14px;font-weight:650;line-height:1.25;white-space:nowrap;
-  color:#213f57;background:linear-gradient(160deg,#f1f5f6 0%,#e4ecef 54%,#d4e2e8 100%);
+  color:#213f57;
+  background:linear-gradient(160deg,#f1f5f6 0%,#e4ecef 54%,#d4e2e8 100%);
   border:1px solid #a9bec9;border-radius:18px;
   text-shadow:none;
   box-shadow:0 5px 11px rgba(49,72,87,.17),0 10px 19px rgba(49,72,87,.085),inset 0 1px 0 rgba(255,255,255,.55);
   transition:transform .13s ease,box-shadow .13s ease;
 }
-#view .settings-subtabs button.active{
-  color:#17435c;background:linear-gradient(160deg,#dceaf0 0%,#c8dfe9 56%,#bad5e2 100%);
-  border-color:#6d9bb3;font-weight:750;
-  box-shadow:inset 0 2px 5px rgba(44,80,101,.13),0 2px 5px rgba(49,72,87,.08);
+#view .settings-subtabs button.active,
+#view .settings-subtabs button[aria-selected="true"]{
+  color:#fff;
+  background:linear-gradient(160deg,#426f89 0%,#28516f 55%,#173a55 100%);
+  border:1px solid #173b52;
+  font-weight:750;
+  box-shadow:0 4px 10px rgba(23,58,85,.25),inset 0 1px 0 rgba(255,255,255,.18);
 }
 #view .settings-subtabs button:active{transform:translateY(2px)}
 #view .settings-subtabs button:focus-visible{outline:2px solid #4b839e;outline-offset:3px}
