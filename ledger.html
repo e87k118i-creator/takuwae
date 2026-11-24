@@ -1315,7 +1315,7 @@ savingView=function(){
  const m=savingSelectedMonth,v=savedFor(m),zero=db.savingMonths[m]==='zero';
  const monthSelector='<div class="field saving-month-field"><label>確認する月（2026年11月から）</label><div class="bill-month-nav saving-month-nav"><button type="button" class="secondary" aria-label="前の月" onclick="shiftSavingMonth(-1)" '+(m<='2026-11'?'disabled':'')+'>‹</button><span class="bill-month-value" aria-live="polite">'+savingMonthLabel(m)+'</span><button type="button" class="secondary" aria-label="次の月" onclick="shiftSavingMonth(1)" '+(m>=latest?'disabled':'')+'>›</button></div></div>';
  const row='<div class="row entry"><div><b>'+m+'</b><div class="muted">'+(v>0?'積立実績あり':zero?'0円で確定':'未確認')+'</div></div><div style="text-align:right"><b>'+fmt(v)+'</b><div>'+(v===0?'<button type="button" class="secondary fund-add-button fund-zero-button" onclick="'+(zero?'undoZero':'confirmZero')+'(\''+m+'\')">'+(zero?'確定解除':'0円で確定')+'</button>':'')+'</div></div></div>';
- return original.replace('<div class="card"><h3><span class="saving-handline heading-line saving-feature-title">資金推移グラフ</span></h3>','<div class="card"><h3><span class="saving-handline heading-line saving-month-title">'+esc(fundName('car'))+'・月別積立実績</span></h3><p class="caption">未確認と0円確定を区別する。過去の不足分は翌月へ繰り越さへん。</p>'+monthSelector+row+'</div><div class="card"><h3>資金推移グラフ</h3>');
+ return original.replace('<div class="card"><h3>資金推移グラフ</h3>','<div class="card"><h3><span class="saving-handline heading-line saving-month-title">'+esc(fundName('car'))+'・月別積立実績</span></h3><p class="caption">未確認と0円確定を区別する。過去の不足分は翌月へ繰り越さへん。</p>'+monthSelector+row+'</div><div class="card"><h3><span class="saving-handline heading-line saving-feature-title">資金推移グラフ</span></h3>');
 };
 record=function(t){if(t.kind==='saving'&&t.purpose==='car')delete db.savingMonths[String(t.date||today()).slice(0,7)];originalRecord(t)};
 settingsView=function(){return originalSettingsView()};
@@ -1886,7 +1886,7 @@ async function initializeHeaderArt(){
 async function chooseHeaderArtMode(mode){
  if(mode==='custom'&&!headerArtObjectUrl){
   const file=document.getElementById('header-art-file');
-  if(file){file.click();setHeaderArtStatus('画像を選んでな');return}
+  if(file){const dropdown=document.getElementById('header-art-mode');if(dropdown)dropdown.value=headerArtMode;file.click();setHeaderArtStatus('画像を選んでな');return}
   setHeaderArtStatus('先に画像を選んでな');return;
  }
  setHeaderArtMode(mode);
