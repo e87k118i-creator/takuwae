@@ -1640,7 +1640,7 @@ settingsView=function(){
  for(const item of Array.from(container.children)){
   if(item.matches('h2'))continue;
   const title=item.querySelector('h3')?.textContent||'';
-  let section=/口座・支払い元の表示名|支出区分の管理/.test(title)?'labels':/データのバックアップ|アプリの更新/.test(title)?'app':'finance';
+  let section=/口座・支払い元の表示名|支出区分の管理/.test(title)?'labels':/同期の設定|データのバックアップ|アプリの更新/.test(title)?'app':'finance';
   if(/口座・支払い元の表示名/.test(title)){
    item.insertAdjacentHTML('beforeend','<div class="field"><label for="account-new-name">新しい口座・支払元を追加</label><div class="row"><input id="account-new-name" maxlength="40" placeholder="例：PayPay"><button type="button" onclick="addAccount()">追加</button></div><p class="caption">追加時の残高は0円。初期残高は「資金設定」で確認・設定できるで。</p></div>');
   }
