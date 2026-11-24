@@ -1114,6 +1114,16 @@ html { overscroll-behavior-y: contain; }
 #view .settings-subtabs button:focus-visible{outline:2px solid #4b839e;outline-offset:3px}
 @media(max-width:390px){#view .settings-subtabs button{font-size:12px;padding:7px 2px}}
 @media(prefers-reduced-motion:reduce){#view .settings-subtabs button{transition:none}}
+</style><style id="background-crop-style">
+#background-crop-overlay{position:fixed;inset:0;z-index:30000;background:rgba(15,30,43,.77);display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto}
+.background-crop-panel{width:min(430px,100%);max-height:96dvh;overflow:auto;background:#fffaf1;border-radius:17px;padding:14px;box-shadow:0 12px 35px #10233877;color:#263a50}
+.background-crop-panel h3{margin:0 0 6px}
+.background-crop-panel p{font-size:13px;margin:5px 0 10px}
+#background-crop-canvas{display:block;width:auto;height:auto;max-width:100%;max-height:57dvh;aspect-ratio:auto;margin:8px auto;border:2px solid #9cb6c6;border-radius:9px;touch-action:none;user-select:none;cursor:grab}
+#background-crop-zoom{width:100%;margin:10px 0}
+.background-crop-actions{display:flex;gap:8px}
+.background-crop-actions button{flex:1;font-size:14px}
+#background-crop-message{min-height:1em}
 </style></head><body><main><header class="v79-header" aria-label="たくわえ パーソナルファイナンス"><img src="../../assets/header-current.svg" alt="たくわえ パーソナルファイナンス。ホースケとピンクの貯金箱、赤いリボンの車のイラスト"><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
 const KEY='takuwae-preview-settings-tabs-20261124';const names={s1:'三井住友①',r:'りそな',s2:'三井住友②',cash:'現金財布',em:'電子マネー'};const seedBills=[['rent','家賃','r'],['parking','駐車場','s1'],['insurance','傷害保険','s1'],['phone','携帯電話','s1'],['chat','ChatGPT','s1'],['adobe','Adobe','s1'],['youtube','YouTube',''],['weather','ウェザーニュース',''],['prime','Amazonプライム','']].map(([id,name,bank])=>({id,name,bank,active:true}));
 const today=()=>new Date().toLocaleDateString('sv-SE');const ym=()=>new Date().toLocaleDateString('sv-SE').slice(0,7);const fresh=()=>({initial:{s1:0,r:0,s2:0,cash:0,em:0},fundInitial:{repair:0,car:0},fundCategories:[{id:'repair',name:'修理予備費',goal:300000},{id:'car',name:'車両購入資金',goal:0}],bills:seedBills,months:{},tx:[],monthly:30000,bonus:150000,payday:25,weeklyBuffer:0});let db;try{db=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){db=fresh()}if(!Array.isArray(db.fundCategories))db.fundCategories=fresh().fundCategories;const ui={tab:'home',type:'expense',edit:false,selected:[],add:false,withdrawStep:0,wd:{fund:'repair',amount:'',reason:'フレアの修理',to:'s1'},filter:'all',month:ym(),addFund:false,deleteFund:null,editTx:null,billNotice:null};const fmt=n=>'¥'+Math.round(Number(n)||0).toLocaleString('ja-JP');const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);let save=()=>localStorage.setItem(KEY,JSON.stringify(db));const month=()=>db.months[ui.month]??(db.months[ui.month]={});const billState=b=>month()[b.id]??(month()[b.id]={amount:'',paid:false,bank:b.bank});const activeBills=()=>db.bills.filter(b=>b.active!==false&&(!b.end||ui.month<b.end)&&(!b.start||ui.month>=b.start));const balances=()=>{const a={...db.initial};for(const t of db.tx){if(t.kind==='income')a[t.to]=(a[t.to]||0)+t.amount;else if(t.kind==='expense') {if(t.settled)a[t.from]=(a[t.from]||0)-t.amount;}else {a[t.from]=(a[t.from]||0)-t.amount;a[t.to]=(a[t.to]||0)+t.amount;}}return a};const fundName=k=>db.fundCategories.find(f=>f.id===k)?.name||k;const funds=()=>{const a={...db.fundInitial};for(const t of db.tx){if(t.kind==='saving')a[t.purpose]=(a[t.purpose]||0)+t.amount;if(t.kind==='withdraw')a[t.purpose]=(a[t.purpose]||0)-t.amount;}return a};const options=(selected,includeEmpty=false,subset=Object.keys(names))=>(includeEmpty?'<option value="">支払元</option>':'')+accountDisplayOrder().filter(k=>subset.includes(k)).map(k=>`<option value="${k}" ${selected===k?'selected':''}>${esc(names[k])}</option>`).join('');const totalBill=()=>activeBills().reduce((s,b)=>s+(billState(b).paid?Number(billState(b).amount)||0:0),0);const pending=()=>activeBills().filter(b=>!billState(b).paid).reduce((s,b)=>s+(Number(billState(b).amount)||0),0);const unknown=()=>activeBills().filter(b=>!billState(b).amount).length;const moneyColor=k=>({expense:'navy',income:'green',saving:'blue',withdraw:'amber',transfer:'muted'}[k]||'muted');const titleKind=k=>({expense:'出金',income:'入金',saving:'積立',withdraw:'取り崩し',transfer:'振替'}[k]);function record(t){db.tx.unshift({id:id(),date:today(),...t});save();render()};function setTab(t){ui.tab=t;ui.withdrawStep=0;render()};function navIcon(k){return '<span class="nav-illustration sprite-icon sprite-'+k+'" aria-hidden="true"></span>';
@@ -1796,19 +1806,54 @@ function readPhotoImage(file){
   img.src=url;
  });
 }
-async function convertBackgroundPhoto(file){
- const image=await readPhotoImage(file);
- const maximum=1600;
- const scale=Math.min(1,maximum/Math.max(image.naturalWidth,image.naturalHeight));
- const canvas=document.createElement('canvas');
- canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));
- canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
- const ctx=canvas.getContext('2d');
- if(!ctx)throw new Error('写真の加工に対応してへん');
- ctx.drawImage(image,0,0,canvas.width,canvas.height);
- const output=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.82));
- if(!output)throw new Error('背景画像を作れへんかった');
- return output;
+/* Choose the visible part of a photo before saving it as this device's background. */
+let photoCrop=null;
+function closeBackgroundCrop(){
+ const state=photoCrop;
+ photoCrop=null;
+ if(state?.previewUrl)URL.revokeObjectURL(state.previewUrl);
+ document.getElementById('background-crop-overlay')?.remove();
+ const picker=document.getElementById('custom-background-file');
+ if(picker)picker.value='';
+}
+function paintBackgroundCrop(){
+ const state=photoCrop;
+ if(!state)return;
+ const canvas=state.canvas,ctx=canvas.getContext('2d');
+ if(!ctx)return;
+ const img=state.image,w=canvas.width,h=canvas.height;
+ const base=Math.max(w/img.naturalWidth,h/img.naturalHeight);
+ const drawnW=img.naturalWidth*base*state.zoom,drawnH=img.naturalHeight*base*state.zoom;
+ state.x=Math.max(w-drawnW,Math.min(0,state.x));
+ state.y=Math.max(h-drawnH,Math.min(0,state.y));
+ ctx.clearRect(0,0,w,h);
+ ctx.drawImage(img,state.x,state.y,drawnW,drawnH);
+}
+function zoomBackgroundCrop(value){
+ const state=photoCrop;if(!state)return;
+ const next=Math.max(1,Math.min(3,Number(value)||1));
+ const cx=state.canvas.width/2,cy=state.canvas.height/2;
+ state.x=cx-(cx-state.x)*(next/state.zoom);
+ state.y=cy-(cy-state.y)*(next/state.zoom);
+ state.zoom=next;
+ paintBackgroundCrop();
+}
+function startBackgroundCropDrag(event){
+ const state=photoCrop;if(!state)return;
+ if(event.type==='pointerdown'){
+  if(state.pointerId!==null)return;
+  state.pointerId=event.pointerId;
+  state.lastX=event.clientX;state.lastY=event.clientY;
+  state.canvas.setPointerCapture(event.pointerId);
+ }else if(event.type==='pointermove'&&state.pointerId===event.pointerId){
+  const rect=state.canvas.getBoundingClientRect();
+  state.x+=(event.clientX-state.lastX)*state.canvas.width/rect.width;
+  state.y+=(event.clientY-state.lastY)*state.canvas.height/rect.height;
+  state.lastX=event.clientX;state.lastY=event.clientY;
+  paintBackgroundCrop();
+ }else if(event.pointerId===state.pointerId){
+  state.pointerId=null;
+ }
 }
 async function chooseBackgroundPhoto(file){
  if(!file)return;
@@ -1816,12 +1861,46 @@ async function chooseBackgroundPhoto(file){
  if(file.size>20*1024*1024){setBackgroundStatus('写真は20MB以下のものを選んでな');return}
  setBackgroundStatus('写真を読み込み中…');
  try{
-  const blob=await convertBackgroundPhoto(file);
+  const image=await readPhotoImage(file);
+  closeBackgroundCrop();
+  const overlay=document.createElement('div');
+  overlay.id='background-crop-overlay';
+  overlay.innerHTML='<section class="background-crop-panel" role="dialog" aria-modal="true" aria-label="背景写真の表示範囲"><h3>背景に使う範囲を選ぶ</h3><p>写真を指で動かして位置を調整してな。スライダーで拡大・縮小できるで。</p><canvas id="background-crop-canvas" aria-label="背景の切り取り範囲。ドラッグで調整"></canvas><label for="background-crop-zoom">拡大・縮小</label><input id="background-crop-zoom" type="range" min="1" max="3" step="0.01" value="1" oninput="zoomBackgroundCrop(this.value)"><div class="background-crop-actions"><button type="button" class="secondary" onclick="closeBackgroundCrop()">キャンセル</button><button type="button" onclick="saveBackgroundCrop()">この範囲で決定</button></div><p id="background-crop-message" role="status"></p></section>';
+  document.body.appendChild(overlay);
+  const canvas=document.getElementById('background-crop-canvas');
+  const width=320;
+  const aspect=Math.max(.35,Math.min(1.5,window.innerWidth/Math.max(window.innerHeight,1)));
+  canvas.width=width;canvas.height=Math.round(width/aspect);
+  const base=Math.max(canvas.width/image.naturalWidth,canvas.height/image.naturalHeight);
+  photoCrop={image,canvas,zoom:1,x:(canvas.width-image.naturalWidth*base)/2,y:(canvas.height-image.naturalHeight*base)/2,pointerId:null,lastX:0,lastY:0};
+  for(const type of ['pointerdown','pointermove','pointerup','pointercancel'])canvas.addEventListener(type,startBackgroundCropDrag);
+  paintBackgroundCrop();
+ }catch(error){
+  setBackgroundStatus('写真を開けへんかった：'+error.message);
+  closeBackgroundCrop();
+ }
+}
+async function saveBackgroundCrop(){
+ const state=photoCrop;
+ if(!state)return;
+ const message=document.getElementById('background-crop-message');
+ try{
+  if(message)message.textContent='背景を保存中…';
+  const output=document.createElement('canvas');
+  output.width=900;output.height=Math.round(900*state.canvas.height/state.canvas.width);
+  const ctx=output.getContext('2d');
+  if(!ctx)throw Error('写真の加工に対応してへん');
+  const scale=output.width/state.canvas.width;
+  const base=Math.max(state.canvas.width/state.image.naturalWidth,state.canvas.height/state.image.naturalHeight);
+  ctx.drawImage(state.image,state.x*scale,state.y*scale,state.image.naturalWidth*base*state.zoom*scale,state.image.naturalHeight*base*state.zoom*scale);
+  const blob=await new Promise(resolve=>output.toBlob(resolve,'image/jpeg',.82));
+  if(!blob)throw Error('背景画像を作れへんかった');
   await backgroundStore('save',blob);
   applyBackgroundBlob(blob);
- }catch(error){setBackgroundStatus('変更できへんかった：'+error.message)}
- const picker=document.getElementById('custom-background-file');
- if(picker)picker.value='';
+  closeBackgroundCrop();
+ }catch(error){
+  if(message)message.textContent='保存できへんかった：'+error.message;
+ }
 }
 async function restoreDefaultBackground(){
  try{
