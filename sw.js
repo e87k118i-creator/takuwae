@@ -1,11 +1,11 @@
 const files = [
   "./",
   "./index.html",
-  "./icon-hosuke-512.png?v=20261124-icon240",
+  "./icon-hosuke-sage-512.png?v=20261124-sage242",
   "./ledger.html",
   "./manifest.webmanifest",
   "./apple-touch-icon.png",
-  "./icon-hosuke-512.png",
+  "./icon-hosuke-sage-512.png",
   "./icon-wallet-b.png",
   "./assets/header-current.svg",
   "./assets/takuwae-tabs-3d-hq.webp?v=34",
@@ -24,7 +24,7 @@ const files = [
   "./supabase/sync-remote-trial.js",
   "./supabase/sync-session.js"
 ];
-const cacheKey = 'takuwae-v2.4.1-ipad-backdrop-resume-20261124';
+const cacheKey = 'takuwae-v2.4.2-sage-icon-20261124';
 const cachedUrls = new Set(files.map(file=>new URL(file,self.registration.scope).href));
 self.addEventListener('install',event=>{
   event.waitUntil((async()=>{
