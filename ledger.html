@@ -1024,6 +1024,10 @@ html { overscroll-behavior-y: contain; }
 .custom-sort-active{opacity:.3;border-style:dashed}
 .custom-sort-over{outline:2px solid #32815c;background:#edf7f1}
 .custom-sort-ghost{position:fixed;z-index:10000;pointer-events:none;opacity:.76;box-shadow:0 12px 28px #263a5060;transform:scale(1.015);margin:0;box-sizing:border-box}
+</style><style id="settings-subtabs-style">
+.settings-subtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0 18px}
+.settings-subtabs button{min-width:0;padding:12px 3px;font-size:13px;white-space:nowrap;background:#e4eaf0;color:#334a60;border-radius:12px}
+.settings-subtabs button.active{background:#21485b;color:white;font-weight:750}
 </style></head><body><main><header class="v79-header" aria-label="たくわえ パーソナルファイナンス"><img src="./assets/header-current.svg" alt="たくわえ パーソナルファイナンス。ホースケとピンクの貯金箱、赤いリボンの車のイラスト"><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
 const KEY='takuwae-v1';const names={s1:'三井住友①',r:'りそな',s2:'三井住友②',cash:'現金財布',em:'電子マネー'};const seedBills=[['rent','家賃','r'],['parking','駐車場','s1'],['insurance','傷害保険','s1'],['phone','携帯電話','s1'],['chat','ChatGPT','s1'],['adobe','Adobe','s1'],['youtube','YouTube',''],['weather','ウェザーニュース',''],['prime','Amazonプライム','']].map(([id,name,bank])=>({id,name,bank,active:true}));
 const today=()=>new Date().toLocaleDateString('sv-SE');const ym=()=>new Date().toLocaleDateString('sv-SE').slice(0,7);const fresh=()=>({initial:{s1:0,r:0,s2:0,cash:0,em:0},fundInitial:{repair:0,car:0},fundCategories:[{id:'repair',name:'修理予備費',goal:300000},{id:'car',name:'車両購入資金',goal:0}],bills:seedBills,months:{},tx:[],monthly:30000,bonus:150000,payday:25,weeklyBuffer:0});let db;try{db=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){db=fresh()}if(!Array.isArray(db.fundCategories))db.fundCategories=fresh().fundCategories;const ui={tab:'home',type:'expense',edit:false,selected:[],add:false,withdrawStep:0,wd:{fund:'repair',amount:'',reason:'フレアの修理',to:'s1'},filter:'all',month:ym(),addFund:false,deleteFund:null,editTx:null,billNotice:null};const fmt=n=>'¥'+Math.round(Number(n)||0).toLocaleString('ja-JP');const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);let save=()=>localStorage.setItem(KEY,JSON.stringify(db));const month=()=>db.months[ui.month]??(db.months[ui.month]={});const billState=b=>month()[b.id]??(month()[b.id]={amount:'',paid:false,bank:b.bank});const activeBills=()=>db.bills.filter(b=>b.active!==false&&(!b.end||ui.month<b.end)&&(!b.start||ui.month>=b.start));const balances=()=>{const a={...db.initial};for(const t of db.tx){if(t.kind==='income')a[t.to]=(a[t.to]||0)+t.amount;else if(t.kind==='expense') {if(t.settled)a[t.from]=(a[t.from]||0)-t.amount;}else {a[t.from]=(a[t.from]||0)-t.amount;a[t.to]=(a[t.to]||0)+t.amount;}}return a};const fundName=k=>db.fundCategories.find(f=>f.id===k)?.name||k;const funds=()=>{const a={...db.fundInitial};for(const t of db.tx){if(t.kind==='saving')a[t.purpose]=(a[t.purpose]||0)+t.amount;if(t.kind==='withdraw')a[t.purpose]=(a[t.purpose]||0)-t.amount;}return a};const options=(selected,includeEmpty=false,subset=Object.keys(names))=>(includeEmpty?'<option value="">支払元</option>':'')+accountDisplayOrder().filter(k=>subset.includes(k)).map(k=>`<option value="${k}" ${selected===k?'selected':''}>${esc(names[k])}</option>`).join('');const totalBill=()=>activeBills().reduce((s,b)=>s+(billState(b).paid?Number(billState(b).amount)||0:0),0);const pending=()=>activeBills().filter(b=>!billState(b).paid).reduce((s,b)=>s+(Number(billState(b).amount)||0),0);const unknown=()=>activeBills().filter(b=>!billState(b).amount).length;const moneyColor=k=>({expense:'navy',income:'green',saving:'blue',withdraw:'amber',transfer:'muted'}[k]||'muted');const titleKind=k=>({expense:'出金',income:'入金',saving:'積立',withdraw:'取り崩し',transfer:'振替'}[k]);function record(t){db.tx.unshift({id:id(),date:today(),...t});save();render()};function setTab(t){ui.tab=t;ui.withdrawStep=0;render()};function navIcon(k){return '<span class="nav-illustration sprite-icon sprite-'+k+'" aria-hidden="true"></span>';
@@ -1069,7 +1073,7 @@ return '<div class="card"><h2>入出金を記録</h2><form id="txform" onsubmit=
 function submitTx(e){e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const n=Number(d.amount);if(!(n>0))return;let t={kind:ui.type,amount:n,date:d.date,note:d.note||'',category:d.category||titleKind(ui.type)};if(ui.type==='income'){t.to=d.from}else if(ui.type==='expense'){t.from=d.from;t.settled=d.method!=='credit';t.method=d.method}else{if(d.from===d.to)return alert('振替元と振替先は別にしてな');if(ui.type==='saving'&&d.to!=='s2')return alert('積立先は三井住友②にしてな');if(ui.type==='saving'&&d.from==='s2')return alert('同じ貯蓄口座内の用途変更は設定から行ってな');t.from=d.from;t.to=d.to;t.purpose=d.purpose}if(['saving','transfer'].includes(ui.type)&&balances()[t.from]<n)return alert('振替元の帳簿残高が不足してるで。先に残高を確認してな');record(t);ui.tab='history';render()}
 function billMonthLabel(){const [y,m]=ui.month.split('-').map(Number);const d=new Date(y,m-1,1);return new Intl.DateTimeFormat('ja-JP-u-ca-japanese',{era:'short',year:'numeric',month:'long'}).format(d)}
 function shiftBillMonth(step){const [y,m]=ui.month.split('-').map(Number);const d=new Date(y,m-1+step,1);ui.month=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');ui.edit=false;ui.selected=[];render()}
-function billsView(){const bs=activeBills();return `<div class="row" style="margin-bottom:10px"><h2>固定費管理</h2><button class="secondary" onclick="ui.edit=!ui.edit;ui.selected=[];render()">${ui.edit?'完了':'編集'}</button></div><div class="hero"><small>今月の引き落とし確認済み合計</small><div class="big navy">−${fmt(totalBill())}</div><small>${bs.filter(b=>billState(b).paid).length}/${bs.length}件確認済み · ${ui.month}</small></div><div class="card"><div class="field bill-month-field" style="margin-bottom:12px"><label>表示月</label><div class="bill-month-nav"><button type="button" class="secondary" aria-label="前の月" onclick="shiftBillMonth(-1)">‹</button><span class="bill-month-value" aria-live="polite">${billMonthLabel()}</span><button type="button" class="secondary" aria-label="次の月" onclick="shiftBillMonth(1)">›</button></div></div>${bs.map(b=>{const s=billState(b);return `<div class="bill"><div class="row">${ui.edit?`<input class="checkselect" type="checkbox" onchange="toggleSelect('${b.id}',this.checked)">`:''}<b style="flex:1">${esc(b.name)}</b><small>${s.paid?'確認済み':'未確認'}</small></div>${!ui.edit?`<div class="bill-fields"><select aria-label="支払元" onchange="changeBill('${b.id}','bank',this.value)">${options(s.bank,true,['s1','r','s2','cash'])}</select><label class="tick"><input type="checkbox" data-bill-id="${b.id}" aria-label="${esc(b.name)}の引落確認" ${s.paid?'checked':''} onchange="confirmBill('${b.id}',this.checked)"></label><input aria-label="金額" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="金額" value="${esc(s.amount)}" oninput="changeBillAmount('${b.id}',this.value)"></div>${ui.billNotice===b.id?`<div class="bill-hint" role="alert">支払元口座と金額を入力してから確認してな。</div>`:''}`:''}</div>`}).join('')}${ui.edit?`<button class="danger" style="width:100%;margin-top:12px" onclick="scheduleDelete()">選択項目を翌月から削除</button>`:''}</div><div class="card"><button type="button" class="secondary fund-add-button" style="width:100%" onclick="ui.add=!ui.add;render()"><span class="fund-add-plus" aria-hidden="true">＋</span><span>固定費を追加</span></button>${ui.add?`<form class="stack" style="margin-top:14px" onsubmit="addBill(event)"><div class="field"><label>名称</label><input name="name" required></div><div class="field"><label>支払元</label><select name="bank">${options('s1',false,['s1','r','s2','cash'])}</select></div><div class="actions"><button class="secondary" type="button" onclick="ui.add=false;render()">キャンセル</button><button>当月から追加</button></div></form>`:''}</div><p class="caption">追加は当月から、削除は翌月から反映。月ごとの金額は空欄で始まるで。固定費の確認取消や金額訂正は帳簿の記録と連動する。</p>`}
+function billsView(){const bs=activeBills();return `<div class="row" style="margin-bottom:10px"><h2>固定費管理</h2><button class="secondary" onclick="ui.edit=!ui.edit;ui.selected=[];render()">${ui.edit?'完了':'編集'}</button></div><div class="hero"><small>今月の引き落とし確認済み合計</small><div class="big navy">−${fmt(totalBill())}</div><small>${bs.filter(b=>billState(b).paid).length}/${bs.length}件確認済み · ${ui.month}</small></div><div class="card"><div class="field bill-month-field" style="margin-bottom:12px"><label>表示月</label><div class="bill-month-nav"><button type="button" class="secondary" aria-label="前の月" onclick="shiftBillMonth(-1)">‹</button><span class="bill-month-value" aria-live="polite">${billMonthLabel()}</span><button type="button" class="secondary" aria-label="次の月" onclick="shiftBillMonth(1)">›</button></div></div>${bs.map(b=>{const s=billState(b);return `<div class="bill"><div class="row">${ui.edit?`<input class="checkselect" type="checkbox" onchange="toggleSelect('${b.id}',this.checked)">`:''}<b style="flex:1">${esc(b.name)}</b><small>${s.paid?'確認済み':'未確認'}</small></div>${!ui.edit?`<div class="bill-fields"><select aria-label="支払元" onchange="changeBill('${b.id}','bank',this.value)">${options(s.bank,true,accountKeys())}</select><label class="tick"><input type="checkbox" data-bill-id="${b.id}" aria-label="${esc(b.name)}の引落確認" ${s.paid?'checked':''} onchange="confirmBill('${b.id}',this.checked)"></label><input aria-label="金額" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="金額" value="${esc(s.amount)}" oninput="changeBillAmount('${b.id}',this.value)"></div>${ui.billNotice===b.id?`<div class="bill-hint" role="alert">支払元口座と金額を入力してから確認してな。</div>`:''}`:''}</div>`}).join('')}${ui.edit?`<button class="danger" style="width:100%;margin-top:12px" onclick="scheduleDelete()">選択項目を翌月から削除</button>`:''}</div><div class="card"><button type="button" class="secondary fund-add-button" style="width:100%" onclick="ui.add=!ui.add;render()"><span class="fund-add-plus" aria-hidden="true">＋</span><span>固定費を追加</span></button>${ui.add?`<form class="stack" style="margin-top:14px" onsubmit="addBill(event)"><div class="field"><label>名称</label><input name="name" required></div><div class="field"><label>支払元</label><select name="bank">${options('s1',false,accountKeys())}</select></div><div class="actions"><button class="secondary" type="button" onclick="ui.add=false;render()">キャンセル</button><button>当月から追加</button></div></form>`:''}</div><p class="caption">追加は当月から、削除は翌月から反映。月ごとの金額は空欄で始まるで。固定費の確認取消や金額訂正は帳簿の記録と連動する。</p>`}
 function changeBillAmount(bid,val){const b=db.bills.find(x=>x.id===bid),st=billState(b);if(st.paid)return;st.amount=val;save();const tick=document.querySelector('input[data-bill-id="'+bid+'"]');if(tick)tick.disabled=false};function changeBill(bid,field,val){const b=db.bills.find(x=>x.id===bid),s=billState(b);if(s.paid){if(!confirm('確認済みの記録を取り消して編集する？'))return;unconfirm(bid)}s[field]=val;ui.billNotice=null;save();render()};function unconfirm(bid){const s=month()[bid];if(s)s.paid=false;db.tx=db.tx.filter(t=>t.billKey!==ui.month+':'+bid)};function confirmBill(bid,checked){const b=db.bills.find(x=>x.id===bid),s=billState(b);if(checked){if(!(Number(s.amount)>0)||!s.bank){ui.billNotice=bid;render();return;}ui.billNotice=null;db.tx=db.tx.filter(t=>t.billKey!==ui.month+':'+bid);db.tx.unshift({id:id(),kind:'expense',from:s.bank,amount:Number(s.amount),date:today(),category:b.name,settled:true,billKey:ui.month+':'+bid});s.paid=true}else{unconfirm(bid)}ui.billNotice=null;save();render()};function toggleSelect(id,on){ui.selected=on?[...ui.selected,id]:ui.selected.filter(x=>x!==id)};function scheduleDelete(){if(!ui.selected.length)return alert('削除する項目を選んでな');if(!confirm('選択した固定費を翌月から一覧から外す？ 過去の履歴は残るで。'))return;const [y,m]=ui.month.split('-').map(Number),next=`${m===12?y+1:y}-${String(m===12?1:m+1).padStart(2,'0')}`;for(const b of db.bills)if(ui.selected.includes(b.id))b.end=next;ui.edit=false;ui.selected=[];save();render()};function addBill(e){e.preventDefault();const d=Object.fromEntries(new FormData(e.target));db.bills.push({id:id(),name:d.name.trim(),bank:d.bank,start:ui.month,active:true});ui.add=false;save();render()}
 function savingView(){const f=funds();return `<h2>積立・将来の見通し</h2><div class="grid">${db.fundCategories.map(x=>`<div class="card"><small>${esc(x.name)}</small><strong class="blue" style="display:block;font-size:22px">${fmt(f[x.id]||0)}</strong><small>${x.goal?'目標 '+fmt(x.goal):'用途別積立'}</small></div>`).join('')}</div><div class="card"><div class="row"><h3>積立項目の管理</h3><button type="button" class="secondary fund-add-button" onclick="ui.addFund=!ui.addFund;render()"><span class="fund-add-plus" aria-hidden="true">＋</span><span>項目を追加</span></button></div>${ui.addFund?`<form class="stack" onsubmit="addFund(event)" style="padding:12px 0"><div class="field"><label>積立項目名</label><input name="fundName" placeholder="例：旅行資金" maxlength="40" required></div><div class="field"><label>目標金額（円・任意）</label><input name="fundGoal" type="number" inputmode="numeric" min="0" step="1" placeholder="未設定なら0"></div><div class="actions"><button type="button" class="secondary" onclick="ui.addFund=false;render()">キャンセル</button><button type="submit">追加する</button></div></form>`:''}${db.fundCategories.map(x=>`<div class="row entry"><span>${esc(x.name)}</span><span>${!['repair','car'].includes(x.id)?`<button class="outline" style="padding:6px 9px" onclick="ui.deleteFund='${x.id}';render()">削除</button>`:''}</span></div>`).join('')}${ui.deleteFund?`<div class="notice"><b>${esc(fundName(ui.deleteFund))}を削除する？</b><p>残高0円の項目だけ削除できるで。取引履歴は残す。</p><div class="actions"><button class="secondary" onclick="ui.deleteFund=null;render()">キャンセル</button><button class="danger" onclick="removeFund(ui.deleteFund)">削除を確定</button></div></div>`:""}<p class="caption">追加した項目は「入出金 → 積立」から選べるで。残高が0円なら削除できるで。過去の履歴は保持する。</p></div><div class="card"><h3>資金推移グラフ</h3><canvas id="chart" width="700" height="320" aria-label="積立資金の推移グラフ。点をタップすると日付と金額を表示"></canvas><div id="chart-detail" class="chart-detail" aria-live="polite">グラフの点をタップすると、年月日と金額が表示されるで。</div><p class="chart-tip">青：${esc(fundName('car'))} ／ 緑：${esc(fundName('repair'))} ／ その他：追加項目</p><p class="caption">追加項目は将来の積立額が未設定のため、現状維持で表示するで。</p></div><div class="card stack"><div class="field"><label>毎月の${esc(fundName('car'))}積立目標</label><input type="number" inputmode="numeric" value="${db.monthly}" onchange="db.monthly=Number(this.value)||0;save();render()"></div><div class="field"><label>${esc(fundName('car'))}向けボーナス積立（1回分）</label><input type="number" inputmode="numeric" value="${db.bonus}" onchange="db.bonus=Number(this.value)||0;save();render()"></div><p class="caption">2027年夏は${esc(fundName('repair'))}へ20万円を補填する計画。</p><div class="actions"><button class="saving-action-button" onclick="ui.type='saving';setTab('entry')">積立を記録</button><button class="secondary saving-action-button" onclick="setTab('withdraw')">資金を取り崩す</button></div></div>`}
 function addFund(event){event.preventDefault();const form=event.currentTarget;const n=form.elements.fundName.value.trim();const raw=form.elements.fundGoal.value;const goal=raw===''?0:Number(raw);if(!n||n.length>40)return alert('1〜40文字で入力してな');if(db.fundCategories.some(x=>x.name===n))return alert('同じ名前があるで');if(!Number.isSafeInteger(goal)||goal<0)return alert('0以上の整数で入力してな');db.fundCategories.push({id:'fund_'+id(),name:n,goal});ui.addFund=false;save();render()}
@@ -1281,17 +1285,18 @@ home=function(){return rolloverForm()+historyRolloverView()+homeBeforeRollover()
 /* v1.0 quick entry: existing storage key and ledger are preserved. */
 let quickMode='quick',quickCategory='買い物',quickSource='cash',quickAmount='',quickNotice='';
 const quickSources=[['cash','現金'],['em','電子マネー'],['s1','三井住友'],['r','りそな']];
+function quickSourceChoices(){return accountDisplayOrder().map(k=>[k,names[k]||k]);}
 const quickCategories=['買い物','食事','支払い','雑費'];
 const homeV09=home;
 function quickSetCategory(v){if(!quickCategories.includes(v))return;quickCategory=v;render()}
-function quickSetSource(v){if(!quickSources.some(x=>x[0]===v))return;quickSource=v;render()}
+function quickSetSource(v){if(!quickSourceChoices().some(x=>x[0]===v))return;quickSource=v;render()}
 function quickSetAmount(v){quickAmount=String(v).replace(/[^0-9]/g,'');quickNotice='';const b=document.getElementById('quick-record');if(b)b.disabled=!(Number.isSafeInteger(Number(quickAmount))&&Number(quickAmount)>0);const c=document.getElementById('quick-clear');if(c)c.disabled=!quickAmount}
 function quickClear(){quickAmount='';quickNotice='';render()}
 let quickBusy=false;
 function quickRecord(){
  const n=Number(quickAmount);
  if(quickBusy||!quickAmount||!Number.isSafeInteger(n)||n<=0)return;
- if(!quickCategories.includes(quickCategory)||!quickSources.some(x=>x[0]===quickSource))return;
+ if(!quickCategories.includes(quickCategory)||!quickSourceChoices().some(x=>x[0]===quickSource))return;
  quickBusy=true;
  try{
    record({kind:'expense',amount:n,from:quickSource,category:quickCategory,method:'instant',settled:true,note:'',recordedAt:new Date().toISOString()});
@@ -1306,7 +1311,7 @@ function quickEntryView(){
  return '<div class="card quick-panel"><div class="row quick-heading"><b>使った金額</b><button id="quick-clear" type="button" class="secondary quick-clear" onclick="quickClear()" '+(!quickAmount?'disabled':'')+'>× クリア</button></div>'+
  '<div class="quick-amount-row"><div class="quick-amount"><b>¥</b><input aria-label="使った金額" type="number" min="1" step="1" inputmode="numeric" placeholder="0" value="'+esc(quickAmount)+'" oninput="quickSetAmount(this.value)"></div><button id="quick-record" type="button" class="quick-record" onclick="quickRecord()" '+(!(Number.isSafeInteger(Number(quickAmount))&&Number(quickAmount)>0)?'disabled':'')+'>✓ 記録</button></div>'+
  '<h3>支出の種類</h3><div class="quick-grid">'+quickCategories.map(v=>quickButton(v,quickCategory===v,"quickSetCategory('"+v+"')")).join('')+'</div>'+
- '<h3>支払元</h3><div class="quick-grid">'+quickSources.map(([v,label])=>quickButton(label,quickSource===v,"quickSetSource('"+v+"')")).join('')+'</div>'+
+ '<h3>支払元</h3><div class="quick-grid">'+quickSourceChoices().map(([v,label])=>quickButton(label,quickSource===v,"quickSetSource('"+v+"')")).join('')+'</div>'+
  (quickNotice?'<p class="caption" role="status">'+esc(quickNotice)+'</p>':'')+'</div>';
 }
 home=function(){
@@ -1449,11 +1454,30 @@ function activeExpenseCategories(){
 function ensureExpenseCategories(){
  if(!Array.isArray(db.expenseCategoryItems))db.expenseCategoryItems=defaultExpenseCategoryNames.map((name,i)=>({id:'default_'+i,name,active:true}));
 }
+function accountKeys(){
+ const extras=Array.isArray(db.extraAccounts)?db.extraAccounts:[];
+ return [...Object.keys(defaultAccountNames),...extras.map(x=>x.id).filter(k=>typeof k==='string'&&k&&!Object.prototype.hasOwnProperty.call(defaultAccountNames,k))];
+}
 function accountDisplayOrder(){
- const base=Object.keys(defaultAccountNames);
+ const base=accountKeys();
  const saved=db.accountOrder;
- if(!Array.isArray(saved)||saved.length!==base.length||new Set(saved).size!==base.length||saved.some(x=>!base.includes(x)))return base;
- return saved;
+ if(!Array.isArray(saved))return base;
+ const valid=saved.filter(k=>base.includes(k));
+ if(new Set(valid).size!==valid.length)return base;
+ return [...valid,...base.filter(k=>!valid.includes(k))];
+}
+function addAccount(){
+ const field=document.getElementById('account-new-name');
+ const name=String(field?.value||'').trim();
+ if(!name||name.length>40)return alert('口座・支払元の名前は1〜40文字で入力してな');
+ if(accountKeys().some(k=>names[k]===name))return alert('同じ名前の支払元があるで');
+ const key='account_'+id();
+ if(!Array.isArray(db.extraAccounts))db.extraAccounts=[];
+ db.extraAccounts.push({id:key,name});
+ db.initial[key]=0;
+ db.accountOrder=[...accountDisplayOrder().filter(k=>k!==key),key];
+ names[key]=name;
+ save();render();
 }
 function moveAccount(key,step){
  const list=accountDisplayOrder().slice(),i=list.indexOf(key),j=i+step;
@@ -1462,9 +1486,10 @@ function moveAccount(key,step){
  db.accountOrder=list;save();render();
 }
 function renameAccount(k){
- if(!Object.prototype.hasOwnProperty.call(defaultAccountNames,k))return;
+ if(!accountKeys().includes(k))return;
  const field=document.getElementById('account-label-'+k),v=field?.value.trim();
  if(!v||v.length>40)return alert('口座名は1〜40文字で入力してな');
+ if(accountKeys().some(x=>x!==k&&names[x]===v))return alert('同じ名前の支払元があるで');
  db.accountLabels={...(db.accountLabels||{}),[k]:v};save();render();
 }
 function moveExpenseCategory(key,step){
@@ -1597,13 +1622,37 @@ settingsView=function(){
  const grip=(group,key,label)=>'<button type="button" class="custom-sort-grip" aria-label="'+esc(label)+'をつまんで並び替え" title="長押しして移動">☰</button>';
  const accounts=accountDisplayOrder().map((k,i)=>'<div class="field custom-sort-item" data-group="account" data-key="'+esc(k)+'"><div class="row">'+grip('account',k,names[k])+'<div class="field" style="flex:1"><label>現在：'+esc(names[k])+'</label><input id="account-label-'+k+'" maxlength="40" value="'+esc(names[k])+'"></div><button type="button" class="secondary" onclick="renameAccount(\''+k+'\')">変更</button></div></div>').join('');
  const categories=(db.expenseCategoryItems||defaultExpenseCategoryNames.map((name,i)=>({id:'default_'+i,name,active:true}))).map(c=>'<div class="field custom-sort-item" data-group="category" data-key="'+esc(c.id)+'"><div class="row">'+grip('category',c.id,c.name)+'<div class="field" style="flex:1"><label>'+(c.active===false?'使用停止中':'使用中')+'</label><input id="category-label-'+esc(c.id)+'" maxlength="40" value="'+esc(c.name)+'"></div><button type="button" class="secondary" onclick="changeExpenseCategory(\'rename\',\''+c.id+'\')">変更</button><button type="button" class="secondary" onclick="changeExpenseCategory(\'toggle\',\''+c.id+'\')">'+(c.active===false?'再開':'停止')+'</button></div></div>').join('');
- return settingsBeforeCustomLabels()+'<div class="card stack"><h3>口座・支払い元の表示名</h3><p class="caption">左端の☰をつまんで上下に動かすと、表示順を変更できるで。5つの内部口座と残高は変わらへん。</p>'+accounts+'</div><div class="card stack"><h3>支出区分の管理</h3><p class="caption">左端の☰をつまんで並び替え。変更した名前は今後の記録に使い、過去の履歴は変わらへん。</p>'+categories+'<div class="field"><label>区分を追加</label><div class="row"><input id="expense-category-new" maxlength="40" placeholder="新しい支出区分"><button type="button" onclick="changeExpenseCategory(\'add\',\'\')">追加</button></div></div></div>';
+ return settingsBeforeCustomLabels()+'<div class="card stack"><h3>口座・支払い元の表示名</h3><p class="caption">左端の☰をつまんで並べ替えできるで。新しい支払元は初期残高0円で作成し、入出金や固定費でも選べるようになる。</p>'+accounts+'</div><div class="card stack"><h3>支出区分の管理</h3><p class="caption">左端の☰をつまんで並び替え。変更した名前は今後の記録に使い、過去の履歴は変わらへん。</p>'+categories+'<div class="field"><label>区分を追加</label><div class="row"><input id="expense-category-new" maxlength="40" placeholder="新しい支出区分"><button type="button" onclick="changeExpenseCategory(\'add\',\'\')">追加</button></div></div></div>';
 };
 const recordBeforeLabelSnapshot=record;
 record=function(t){const accountLabelsAtRecord={};if(t.from)accountLabelsAtRecord[t.from]=names[t.from];if(t.to)accountLabelsAtRecord[t.to]=names[t.to];return recordBeforeLabelSnapshot({...t,accountLabelsAtRecord})};
+// Settings sub-tabs keep balances and stored data untouched until a user edits a field.
+let settingsSection='finance';
+function selectSettingsSection(section){
+ if(!['finance','labels','app'].includes(section))return;
+ settingsSection=section;render();
+}
+const settingsBeforeSubtabs=settingsView;
+settingsView=function(){
+ const raw=settingsBeforeSubtabs();
+ const container=document.createElement('div');container.innerHTML=raw;
+ const grouped={finance:[],labels:[],app:[]};
+ for(const item of Array.from(container.children)){
+  if(item.matches('h2'))continue;
+  const title=item.querySelector('h3')?.textContent||'';
+  let section=/口座・支払い元の表示名|支出区分の管理/.test(title)?'labels':/データのバックアップ|アプリの更新/.test(title)?'app':'finance';
+  if(/口座・支払い元の表示名/.test(title)){
+   item.insertAdjacentHTML('beforeend','<div class="field"><label for="account-new-name">新しい口座・支払元を追加</label><div class="row"><input id="account-new-name" maxlength="40" placeholder="例：PayPay"><button type="button" onclick="addAccount()">追加</button></div><p class="caption">追加時の残高は0円。初期残高は「資金設定」で確認・設定できるで。</p></div>');
+  }
+  grouped[section].push(item.outerHTML);
+ }
+ const tabs=[['finance','資金設定'],['labels','項目管理'],['app','アプリ管理']];
+ const toolbar='<div class="settings-subtabs" role="tablist" aria-label="設定の種類">'+tabs.map(([key,label])=>'<button type="button" role="tab" aria-selected="'+(settingsSection===key)+'" class="'+(settingsSection===key?'active':'')+'" onclick="selectSettingsSection(\''+key+'\')">'+label+'</button>').join('')+'</div>';
+ return '<h2>設定・口座管理</h2>'+toolbar+'<section aria-label="'+tabs.find(t=>t[0]===settingsSection)[1]+'">'+grouped[settingsSection].join('')+'</section>';
+};
 const renderBeforeCustomLabels=render;
 render=function(){
- for(const k of Object.keys(defaultAccountNames))names[k]=typeof db.accountLabels?.[k]==='string'&&db.accountLabels[k].trim()?db.accountLabels[k]:defaultAccountNames[k];
+ for(const k of accountKeys()){const extra=Array.isArray(db.extraAccounts)?db.extraAccounts.find(x=>x.id===k):null;const fallback=defaultAccountNames[k]||extra?.name||k;names[k]=typeof db.accountLabels?.[k]==='string'&&db.accountLabels[k].trim()?db.accountLabels[k]:fallback;}
  return renderBeforeCustomLabels();
 };
 
