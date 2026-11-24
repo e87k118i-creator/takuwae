@@ -1016,13 +1016,14 @@ html { overscroll-behavior-y: contain; }
 .gesture-notice { position: fixed; z-index: 9999; top: max(12px,env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); padding: 8px 16px; border-radius: 18px; background: #21485b; color: white; text-align: center; pointer-events: none; }
 .gesture-notice:empty { display: none; }
 </style><style id="custom-sort-style">
-.custom-sort-item{padding:9px 5px;border:1px solid #d5dce4;border-radius:11px;min-width:0}
+.custom-sort-item{padding:9px 5px;border:1px solid #d5dce4;border-radius:11px;min-width:0;background:#fff}
 .custom-sort-item>.row{align-items:center;gap:7px}
 .custom-sort-item input{min-width:0}
 .custom-sort-grip{touch-action:none;user-select:none;-webkit-user-select:none;flex:0 0 42px;width:42px;min-width:42px;min-height:54px;padding:8px 0;background:#eef2f5;color:#526173;cursor:grab;border-radius:9px;font-size:22px}
 .custom-sort-grip:active{cursor:grabbing}
-.custom-sort-active{opacity:.6}
+.custom-sort-active{opacity:.3;border-style:dashed}
 .custom-sort-over{outline:2px solid #32815c;background:#edf7f1}
+.custom-sort-ghost{position:fixed;z-index:10000;pointer-events:none;opacity:.76;box-shadow:0 12px 28px #263a5060;transform:scale(1.015);margin:0;box-sizing:border-box}
 </style></head><body><main><header class="v79-header" aria-label="たくわえ パーソナルファイナンス"><img src="./assets/header-current.svg" alt="たくわえ パーソナルファイナンス。ホースケとピンクの貯金箱、赤いリボンの車のイラスト"><span class="pill">ローカル保存</span></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
 const KEY='takuwae-v1';const names={s1:'三井住友①',r:'りそな',s2:'三井住友②',cash:'現金財布',em:'電子マネー'};const seedBills=[['rent','家賃','r'],['parking','駐車場','s1'],['insurance','傷害保険','s1'],['phone','携帯電話','s1'],['chat','ChatGPT','s1'],['adobe','Adobe','s1'],['youtube','YouTube',''],['weather','ウェザーニュース',''],['prime','Amazonプライム','']].map(([id,name,bank])=>({id,name,bank,active:true}));
 const today=()=>new Date().toLocaleDateString('sv-SE');const ym=()=>new Date().toLocaleDateString('sv-SE').slice(0,7);const fresh=()=>({initial:{s1:0,r:0,s2:0,cash:0,em:0},fundInitial:{repair:0,car:0},fundCategories:[{id:'repair',name:'修理予備費',goal:300000},{id:'car',name:'車両購入資金',goal:0}],bills:seedBills,months:{},tx:[],monthly:30000,bonus:150000,payday:25,weeklyBuffer:0});let db;try{db=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){db=fresh()}if(!Array.isArray(db.fundCategories))db.fundCategories=fresh().fundCategories;const ui={tab:'home',type:'expense',edit:false,selected:[],add:false,withdrawStep:0,wd:{fund:'repair',amount:'',reason:'フレアの修理',to:'s1'},filter:'all',month:ym(),addFund:false,deleteFund:null,editTx:null,billNotice:null};const fmt=n=>'¥'+Math.round(Number(n)||0).toLocaleString('ja-JP');const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);let save=()=>localStorage.setItem(KEY,JSON.stringify(db));const month=()=>db.months[ui.month]??(db.months[ui.month]={});const billState=b=>month()[b.id]??(month()[b.id]={amount:'',paid:false,bank:b.bank});const activeBills=()=>db.bills.filter(b=>b.active!==false&&(!b.end||ui.month<b.end)&&(!b.start||ui.month>=b.start));const balances=()=>{const a={...db.initial};for(const t of db.tx){if(t.kind==='income')a[t.to]=(a[t.to]||0)+t.amount;else if(t.kind==='expense') {if(t.settled)a[t.from]=(a[t.from]||0)-t.amount;}else {a[t.from]=(a[t.from]||0)-t.amount;a[t.to]=(a[t.to]||0)+t.amount;}}return a};const fundName=k=>db.fundCategories.find(f=>f.id===k)?.name||k;const funds=()=>{const a={...db.fundInitial};for(const t of db.tx){if(t.kind==='saving')a[t.purpose]=(a[t.purpose]||0)+t.amount;if(t.kind==='withdraw')a[t.purpose]=(a[t.purpose]||0)-t.amount;}return a};const options=(selected,includeEmpty=false,subset=Object.keys(names))=>(includeEmpty?'<option value="">支払元</option>':'')+accountDisplayOrder().filter(k=>subset.includes(k)).map(k=>`<option value="${k}" ${selected===k?'selected':''}>${names[k]}</option>`).join('');const totalBill=()=>activeBills().reduce((s,b)=>s+(billState(b).paid?Number(billState(b).amount)||0:0),0);const pending=()=>activeBills().filter(b=>!billState(b).paid).reduce((s,b)=>s+(Number(billState(b).amount)||0),0);const unknown=()=>activeBills().filter(b=>!billState(b).amount).length;const moneyColor=k=>({expense:'navy',income:'green',saving:'blue',withdraw:'amber',transfer:'muted'}[k]||'muted');const titleKind=k=>({expense:'出金',income:'入金',saving:'積立',withdraw:'取り崩し',transfer:'振替'}[k]);function record(t){db.tx.unshift({id:id(),date:today(),...t});save();render()};function setTab(t){ui.tab=t;ui.withdrawStep=0;render()};function navIcon(k){return '<span class="nav-illustration sprite-icon sprite-'+k+'" aria-hidden="true"></span>';
@@ -1506,36 +1507,53 @@ function reorderCustomItem(group,fromKey,toKey){
   items.splice(to,0,items.splice(from,1)[0]);
  }else return;
  const scrollY=window.scrollY;
- save();render();
- window.scrollTo(0,scrollY);
+ save();render();window.scrollTo(0,scrollY);
 }
 let customDrag=null;
 document.addEventListener('pointerdown',event=>{
  const grip=event.target.closest('.custom-sort-grip');
- if(!grip||event.button!==0)return;
+ if(!grip||event.button!==0||customDrag)return;
  const item=grip.closest('.custom-sort-item');
  if(!item)return;
  event.preventDefault();
- customDrag={pointerId:event.pointerId,group:item.dataset.group,key:item.dataset.key,target:null,grip};
+ const box=item.getBoundingClientRect();
+ const ghost=item.cloneNode(true);
+ ghost.classList.add('custom-sort-ghost');
+ ghost.classList.remove('custom-sort-active','custom-sort-over');
+ ghost.querySelectorAll('input,button').forEach(x=>{x.tabIndex=-1;x.disabled=true});
+ ghost.style.width=box.width+'px';
+ ghost.style.left=box.left+'px';
+ ghost.style.top=box.top+'px';
+ document.body.appendChild(ghost);
  item.classList.add('custom-sort-active');
- grip.setPointerCapture(event.pointerId);
+ const offsetY=event.clientY-box.top;
+ customDrag={pointerId:event.pointerId,group:item.dataset.group,key:item.dataset.key,
+  target:null,item,grip,ghost,offsetY,initialY:event.clientY};
+ try{grip.setPointerCapture(event.pointerId)}catch{}
 });
 document.addEventListener('pointermove',event=>{
- if(!customDrag||event.pointerId!==customDrag.pointerId)return;
+ const d=customDrag;
+ if(!d||event.pointerId!==d.pointerId)return;
  event.preventDefault();
+ d.ghost.style.top=(event.clientY-d.offsetY)+'px';
+ // Ignore the floating clone during hit testing and highlight the drop row.
  const under=document.elementFromPoint(event.clientX,event.clientY)?.closest('.custom-sort-item');
- const target=under?.dataset.group===customDrag.group?under:null;
+ const target=under&&under!==d.item&&under.dataset.group===d.group?under:null;
  document.querySelectorAll('.custom-sort-over').forEach(x=>x.classList.remove('custom-sort-over'));
- customDrag.target=target?.dataset.key||null;
- if(target&&target.dataset.key!==customDrag.key)target.classList.add('custom-sort-over');
+ d.target=target?.dataset.key||null;
+ if(target)target.classList.add('custom-sort-over');
+ // Nudge the viewport near edges, making long lists sortable on touchscreens.
+ if(event.clientY<65)window.scrollBy(0,-14);
+ else if(event.clientY>window.innerHeight-65)window.scrollBy(0,14);
 });
 function finishCustomDrag(event){
- if(!customDrag||event.pointerId!==customDrag.pointerId)return;
- const {group,key,target,grip}=customDrag;
+ const d=customDrag;
+ if(!d||event.pointerId!==d.pointerId)return;
  customDrag=null;
- if(grip.hasPointerCapture(event.pointerId))grip.releasePointerCapture(event.pointerId);
+ try{if(d.grip.hasPointerCapture(event.pointerId))d.grip.releasePointerCapture(event.pointerId)}catch{}
+ d.ghost.remove();
  document.querySelectorAll('.custom-sort-active,.custom-sort-over').forEach(x=>x.classList.remove('custom-sort-active','custom-sort-over'));
- if(event.type==='pointerup'&&target&&target!==key)reorderCustomItem(group,key,target);
+ if(event.type==='pointerup'&&d.target)reorderCustomItem(d.group,d.key,d.target);
 }
 document.addEventListener('pointerup',finishCustomDrag);
 document.addEventListener('pointercancel',finishCustomDrag);
