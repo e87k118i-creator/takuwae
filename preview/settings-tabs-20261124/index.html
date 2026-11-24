@@ -1024,6 +1024,38 @@ html { overscroll-behavior-y: contain; }
 .custom-sort-active{opacity:.3;border-style:dashed}
 .custom-sort-over{outline:2px solid #32815c;background:#edf7f1}
 .custom-sort-ghost{position:fixed;z-index:10000;pointer-events:none;opacity:.76;box-shadow:0 12px 28px #263a5060;transform:scale(1.015);margin:0;box-sizing:border-box}
+
+/* Item-management actions: same light blue-gray finish as the history-period button;
+   retain each control's existing width, height, padding, and corner shape. */
+#view .custom-sort-item .custom-sort-grip,
+#view .custom-sort-item button.secondary,
+#view #expense-category-new + button,
+#view #account-new-name + button{
+  color:#213f57;
+  background:linear-gradient(160deg,#f1f5f6 0%,#e4ecef 54%,#d4e2e8 100%);
+  border:1px solid #a9bec9;
+  text-shadow:none;
+  box-shadow:0 5px 11px rgba(49,72,87,.17),0 10px 19px rgba(49,72,87,.085),inset 0 1px 0 rgba(255,255,255,.55);
+  transition:box-shadow .13s ease,background .13s ease;
+}
+#view .custom-sort-item .custom-sort-grip:active,
+#view .custom-sort-item button.secondary:active,
+#view #expense-category-new + button:active,
+#view #account-new-name + button:active{
+  box-shadow:0 2px 6px rgba(49,72,87,.14),inset 0 2px 4px rgba(35,65,80,.09);
+}
+#view .custom-sort-item .custom-sort-grip:focus-visible,
+#view .custom-sort-item button.secondary:focus-visible,
+#view #expense-category-new + button:focus-visible,
+#view #account-new-name + button:focus-visible{
+  outline:2px solid #4b839e;outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+  #view .custom-sort-item .custom-sort-grip,
+  #view .custom-sort-item button.secondary,
+  #view #expense-category-new + button,
+  #view #account-new-name + button{transition:none}
+}
 </style><style id="settings-subtabs-style">
 .settings-subtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:8px 0 18px}
 #view .settings-subtabs button{
