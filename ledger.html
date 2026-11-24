@@ -1840,13 +1840,17 @@ async function readPhotoImage(file){
  catch(firstError){
   // Some browsers support object URLs for image decoding but not data URLs.
   const objectURL=URL.createObjectURL(file);
-  try{return await loadImageSource(objectURL)}
-  catch(secondError){
+  try{
+   const image=await loadImageSource(objectURL);
+   image._takuwaeObjectURL=objectURL;
+   return image;
+  }catch(secondError){
+   URL.revokeObjectURL(objectURL);
    const extension=String(file.name||'').split('.').pop().toLowerCase();
    if(['heic','heif'].includes(extension)||/hei[cf]/i.test(file.type))
     throw new Error('HEIC/HEIF形式が読み込めへんかった。写真アプリからJPEGとして保存して試してな');
    throw new Error('この写真を読み込めへんかった。JPEGかPNGで再度試してな');
-  }finally{URL.revokeObjectURL(objectURL)}
+  }
  }
 }
 /* Choose the visible part of a photo before saving it as this device's background. */
@@ -1854,7 +1858,7 @@ let photoCrop=null;
 function closeBackgroundCrop(){
  const state=photoCrop;
  photoCrop=null;
-
+ if(state?.image?._takuwaeObjectURL)URL.revokeObjectURL(state.image._takuwaeObjectURL);
  document.getElementById('background-crop-overlay')?.remove();
  const picker=document.getElementById('custom-background-file');
  if(picker)picker.value='';
@@ -1951,16 +1955,6 @@ async function restoreDefaultBackground(){
   await applyBackgroundBlob(null);
  }catch(error){setBackgroundStatus('標準に戻せへんかった：'+error.message)}
 }
-async function initializePhotoBackground(){
- try{
-  const stored=await backgroundStore('read');
-  applyBackgroundBlob(stored instanceof Blob?stored:null);
- }catch(error){
-  backgroundReady=true;
-  setBackgroundStatus('標準背景で表示中。写真の保存は使えへん：'+error.message);
- }
-}
-
 async function initializePhotoBackground(){
  try{
   const stored=await backgroundStore('read');
