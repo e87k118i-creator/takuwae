@@ -1,0 +1,27 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>たくわえ｜入力テスト</title><style>body{font:16px/1.5 system-ui;margin:0;background:#edf3f5;color:#17374c}header{padding:10px 14px;background:#17374c;color:white}header small{display:block}#status{font-size:12px;background:#f4f0d9;color:#312c1c;padding:5px 14px}iframe{display:block;width:100%;height:calc(100dvh - 95px);border:0}</style></head><body><header><b>たくわえ｜固定費入力テスト</b><small>架空データのみ・本番データと同期しません</small></header><div id="status">テスト画面を準備中…</div><iframe id="app" title="たくわえ固定費入力テスト"></iframe><script type="module">
+import {createSyncAppBridge} from './sync-app-bridge.js';
+const frame=document.getElementById('app'),status=document.getElementById('status');
+let bridge;
+window.demoHost={save(db){if(!bridge)throw Error('テスト画面の準備ができていません');return bridge.save(db)}};
+async function start(){
+ try{
+  let src=await (await fetch('./ledger.html',{cache:'no-store'})).text();
+  const load="let db;try{db=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){db=fresh()}";
+  const save='let save=()=>localStorage.setItem(KEY,JSON.stringify(db));';
+  if(!src.includes(load)||!src.includes(save))throw Error('画面の構造が変更されています');
+  src=src.replace(load,'let db=fresh();').replace(save,'let save=()=>parent.demoHost.save(structuredClone(db));');
+  src=src.replace('\nrender();\nfunction syncBottomNavHeight','\nwindow.testDb=()=>structuredClone(db);window.testReplace=value=>{db=structuredClone(value);render()};\nrender();\nfunction syncBottomNavHeight');
+  src=src.replace('\nsnapshotOn24();\n','\n');
+  src=src.replace('<head>','<head><base href="'+new URL('../../',location.href).href+'">');
+  frame.onload=()=>{
+   let stored=frame.contentWindow.testDb();
+   const engine={snapshot:()=>({localDb:structuredClone(stored),conflict:null}),async saveLocal(next){stored=structuredClone(next);await Promise.resolve()},async sync(){return {status:'synced'}}};
+   bridge=createSyncAppBridge({engine,view:{replace:db=>frame.contentWindow.testReplace(db),setBusy:v=>{frame.contentDocument.body.inert=v}}});
+   frame.contentWindow.setTab('bills');
+   status.textContent='テスト可能：固定費の金額欄を連続入力して、位置・キーボードを確認してな。テスト内容は保存・同期されません。';
+  };
+  frame.srcdoc=src;
+ }catch(e){status.textContent='テスト画面を開けませんでした：'+e.message}
+}
+start();
+</script></body></html>
