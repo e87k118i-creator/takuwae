@@ -23,7 +23,7 @@ const files = [
   "./supabase/sync-remote-trial.js",
   "./supabase/sync-session.js"
 ];
-const cacheKey = 'takuwae-v2.3.3-money-wave-fix-20261124';
+const cacheKey = 'takuwae-v2.3.4-zero-button-gap-20261124';
 const cachedUrls = new Set(files.map(file=>new URL(file,self.registration.scope).href));
 self.addEventListener('install',event=>{
   event.waitUntil((async()=>{
