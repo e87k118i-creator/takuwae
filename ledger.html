@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#e9eef3"><title>たくわえ｜資金管理</title><meta name="takuwae-version" content="2.2.8"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" sizes="512x512" href="./icon-wallet-b.png?v=20261120b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="たくわえ"><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#e9eef3"><title>たくわえ｜資金管理</title><meta name="takuwae-version" content="2.2.9"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" sizes="512x512" href="./icon-wallet-b.png?v=20261120b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="たくわえ"><style>
 :root{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',sans-serif;color:#263a50;background:#e9eef3}*{box-sizing:border-box}body{margin:0}main{max-width:620px;margin:auto;padding:18px 14px 95px}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}h1{font-size:26px;margin:0}h2{font-size:20px;margin:4px 0 14px}h3{font-size:17px;margin:0 0 10px}small,.muted{color:#69788a;font-size:14px}.card{background:white;border-radius:17px;padding:17px;margin-bottom:12px;box-shadow:0 1px 4px #2030400b}.hero{background:#fff;padding:22px;border-radius:20px;margin-bottom:12px}.hero .big{font-size:36px;font-weight:750;letter-spacing:-1px;margin:9px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{padding:13px;background:#f2f5f8;border-radius:12px}.stat strong{display:block;font-size:22px;margin-top:5px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:grid;gap:10px}.field{display:grid;gap:5px;min-width:0}label{font-size:14px;color:#607085;font-weight:650}input,select,textarea{width:100%;min-width:0;padding:12px;border:1px solid #cbd5df;border-radius:10px;background:#fff;color:#263a50;font:inherit;font-size:18px}input[type=checkbox]{width:27px;height:27px;accent-color:#32815c;cursor:pointer}button{border:0;background:#3f627e;color:white;padding:12px 15px;border-radius:11px;font-weight:650;font-size:16px;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.secondary{background:#e9eef3;color:#34516a}.danger{background:#bb3f4b}.outline{background:white;border:1px solid #cbd5df;color:#34516a}.seg{display:flex;gap:5px}.seg button{flex:1;padding:11px 5px;background:#eef2f6;color:#52657a}.seg .active{color:white;background:#3f627e}.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #d5dde5;display:flex;justify-content:center;padding:8px 3px max(10px,env(safe-area-inset-bottom));z-index:2}.nav-inner{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:min(620px,100%);gap:2px}.nav button{background:transparent;color:#66788b;padding:11px 1px;font-size:18px;font-weight:650;letter-spacing:-.35px;min-height:48px;white-space:nowrap}.nav button.active{background:#e9eef3;color:#243f65;font-weight:800;border-radius:10px}.bill{padding:13px 0;border-bottom:1px solid #e4e9ee}.bill:last-child{border:0}.bill-fields{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:7px;align-items:center;margin-top:8px}.tick{display:grid;place-items:center;height:44px;width:48px;cursor:pointer}.tick input{width:30px;height:30px}.green{color:#32815c}.navy{color:#243f65}.blue{color:#3478d4}.amber{color:#9b681e}.progress{height:9px;background:#e4e9ef;border-radius:10px;overflow:hidden}.progress div{height:100%;background:#6d9c8c}.notice{font-size:15px;background:#fff6e7;padding:11px;border-radius:10px;color:#785521;margin-bottom:12px}.pill{font-size:13px;border-radius:20px;padding:4px 8px;background:#edf1f5;color:#536579}.entry{padding:10px 0;border-bottom:1px solid #e7ebef}.entry:last-child{border:0}.entry strong{font-size:18px}.foot{font-size:13px;color:#758498;margin-top:14px;line-height:1.6}.bar{height:12px;border-radius:8px;background:#e8edf3;overflow:hidden;display:flex}.bar span{background:#3478d4}canvas{width:100%;height:220px;display:block;touch-action:pan-y;cursor:crosshair}.chart-detail{min-height:54px;margin-top:8px;padding:10px 12px;border-radius:10px;background:#f2f5f8;font-size:15px;line-height:1.65}.chart-detail strong{font-size:18px}.chart-tip{color:#64748b;font-size:14px;margin-top:5px}.hidden{display:none}.checkselect{width:20px;height:20px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}.caption{font-size:14px;color:#66778a;line-height:1.5}hr{border:0;border-top:1px solid #e5eaf0;margin:15px 0}
 .bill-hint{font-size:14px;color:#9b5b20;margin-top:7px;line-height:1.5}
 /* v0.9 入出金：手描きレイアウトをもとにした2カラム */
@@ -1089,6 +1089,8 @@ html { overscroll-behavior-y: contain; }
 }
 body > main{position:relative;z-index:1}
 #background-crop-overlay{z-index:30000}
+#header-crop-overlay{position:fixed;inset:0;z-index:30001;background:rgba(15,30,43,.77);display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto}
+#header-crop-canvas{display:block;width:100%;height:auto;max-height:40dvh;aspect-ratio:22/7;margin:8px auto;border:2px solid #9cb6c6;border-radius:9px;touch-action:none;user-select:none;cursor:grab}
 #background-crop-overlay{position:fixed;inset:0;z-index:30000;background:rgba(15,30,43,.77);display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto}
 .background-crop-panel{width:min(430px,100%);max-height:96dvh;overflow:auto;background:#fffaf1;border-radius:17px;padding:14px;box-shadow:0 12px 35px #10233877;color:#263a50}
 .background-crop-panel h3{margin:0 0 6px}
@@ -1462,7 +1464,7 @@ home=function(){
 };
 
 /* v36: safe in-app PWA update check. Does not modify financial storage. */
-const TAKUWAE_APP_VERSION='2.2.8';
+const TAKUWAE_APP_VERSION='2.2.9';
 let takuwaeUpdateBusy=false;
 const settingsViewBeforeUpdate=settingsView;
 settingsView=function(){
@@ -1789,7 +1791,7 @@ settingsView=function(){
   }
   grouped[section].push(item.outerHTML);
  }
- grouped.app.push('<div class="card stack"><h3>タイトルイラスト</h3><p class="caption">上部のイラストを標準表示・非表示・好きな画像から選べるで。画像と表示設定はこの端末だけに保存し、家計データやクラウド同期には含めへん。</p><div class="field"><label for="header-art-mode">表示方法</label><select id="header-art-mode" onchange="chooseHeaderArtMode(this.value)"><option value="standard" '+(headerArtMode==='standard'?'selected':'')+'>標準イラスト</option><option value="hidden" '+(headerArtMode==='hidden'?'selected':'')+'>表示しない</option><option value="custom" '+(headerArtMode==='custom'?'selected':'')+'>好きな画像</option></select></div><div class="field"><label for="header-art-file">画像を選んで差し替え（JPEG・PNG・WebP）</label><input id="header-art-file" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" onchange="selectHeaderArtFile(this.files[0])"></div><p id="header-art-status" class="caption" role="status">'+(headerArtMode==='hidden'?'タイトル画像を非表示にしているで':headerArtMode==='custom'?'選んだ画像を表示中':'標準イラストを表示中')+'</p></div>');
+ grouped.app.push('<div class="card stack"><h3>タイトルイラスト</h3><p class="caption">上部のイラストを標準表示・非表示・好きな画像から選べるで。画像と表示設定はこの端末だけに保存し、家計データやクラウド同期には含めへん。</p><div class="field"><label for="header-art-mode">表示方法</label><select id="header-art-mode" onchange="chooseHeaderArtMode(this.value)"><option value="standard" '+(headerArtMode==='standard'?'selected':'')+'>標準イラスト</option><option value="hidden" '+(headerArtMode==='hidden'?'selected':'')+'>表示しない</option><option value="custom" '+(headerArtMode==='custom'?'selected':'')+'>好きな画像</option></select></div><div class="field"><label for="header-art-file">画像を選んで表示範囲を調整（写真対応）</label><input id="header-art-file" type="file" accept="image/*,.heic,.heif" onchange="selectHeaderArtFile(this.files[0])"></div><p id="header-art-status" class="caption" role="status">'+(headerArtMode==='hidden'?'タイトル画像を非表示にしているで':headerArtMode==='custom'?'選んだ画像を表示中':'標準イラストを表示中')+'</p></div>');
  grouped.app.push('<div class="card stack"><h3>背景のカスタマイズ（この端末のみ）</h3><p class="caption">標準はクリーム色のフェルト背景。写真を選んだら、使う範囲と拡大率を決められるで。画面を切り替えても背景位置は固定。家計データやクラウドには送信せえへん。</p><div class="field"><label for="custom-background-file">写真から背景を選ぶ</label><input id="custom-background-file" type="file" accept="image/*" onchange="chooseBackgroundPhoto(this.files[0])"></div><button type="button" class="secondary" onclick="restoreDefaultBackground()">標準のフェルト背景に戻す</button><p id="custom-background-status" class="caption" role="status" aria-live="polite">背景を読み込み中…</p></div>');
  grouped.app.push('<div class="card stack"><h3>白パネルの透明度</h3><p class="caption">各画面の白いパネルの透け具合を調整できるで。背景写真も見えるように、パネルの中の文字やボタンは透明にせえへん。</p><div class="field"><label for="panel-opacity-slider">白パネルの不透明度：<output id="panel-opacity-value" for="panel-opacity-slider">'+panelOpacity+'％</output></label><input id="panel-opacity-slider" type="range" min="0" max="100" step="5" value="'+panelOpacity+'" oninput="setPanelOpacity(this.value)" onchange="savePanelOpacity(this.value)"></div><p class="caption">0％はパネルの白い背景が完全に透明になる設定、100％は白いパネルが最も濃い設定やで。この端末だけに保存する。</p><button type="button" class="secondary" onclick="setPanelOpacity(80);savePanelOpacity(80)">標準の80％に戻す</button></div>');
  grouped.app.push('<div class="card stack"><h3>白パネルのぼかし強度</h3><p class="caption">背景写真のぼかしだけを調整するで。白パネルの不透明度は別の設定のまま。0％はぼかしなし、100％は従来の強さ、200％は2倍の強さ。</p><div class="field"><label for="panel-blur-slider">ぼかしの強さ：<output id="panel-blur-value" for="panel-blur-slider">'+panelBlurStrength+'％</output></label><input id="panel-blur-slider" type="range" min="0" max="200" step="10" value="'+panelBlurStrength+'" oninput="setPanelBlurStrength(this.value)" onchange="savePanelBlurStrength(this.value)"></div><button type="button" class="secondary" onclick="savePanelBlurStrength(100)">標準の100％に戻す</button></div>');
@@ -1835,6 +1837,7 @@ const HEADER_ART_KEY='takuwae-header-art-mode-v1';
 const HEADER_ART_STORE_KEY='header-custom';
 let headerArtMode='standard';
 let headerArtObjectUrl=null;
+let headerCrop=null;
 let headerArtReady=false;
 try{
  const mode=localStorage.getItem(HEADER_ART_KEY);
@@ -1875,40 +1878,109 @@ async function initializeHeaderArt(){
  try{
   const blob=await headerArtStore('read');
   if(blob instanceof Blob && blob.size>0){
-   headerArtObjectUrl=URL.createObjectURL(blob);
+   // iPhone standalone PWA can reject some blob: URLs; use the same device-local data URL path as backgrounds.
+   headerArtObjectUrl=await backgroundDataURL(blob);
    if(headerArtMode==='custom')setHeaderArtMode('custom');
-  }else if(headerArtMode==='custom'){
-   setHeaderArtMode('standard');
-  }
+  }else if(headerArtMode==='custom')setHeaderArtMode('standard');
  }catch(error){if(headerArtMode==='custom')setHeaderArtMode('standard')}
  headerArtReady=true;
 }
 async function chooseHeaderArtMode(mode){
  if(mode==='custom'&&!headerArtObjectUrl){
   const file=document.getElementById('header-art-file');
-  if(file){const dropdown=document.getElementById('header-art-mode');if(dropdown)dropdown.value=headerArtMode;file.click();setHeaderArtStatus('画像を選んでな');return}
+  if(file){
+   const dropdown=document.getElementById('header-art-mode');
+   if(dropdown)dropdown.value=headerArtMode;
+   file.click();setHeaderArtStatus('画像を選んでな');return;
+  }
   setHeaderArtStatus('先に画像を選んでな');return;
  }
  setHeaderArtMode(mode);
 }
+function closeHeaderCrop(){
+ const state=headerCrop;headerCrop=null;
+ if(state?.image?._takuwaeObjectURL)URL.revokeObjectURL(state.image._takuwaeObjectURL);
+ document.getElementById('header-crop-overlay')?.remove();
+ const picker=document.getElementById('header-art-file');
+ if(picker)picker.value='';
+ const dropdown=document.getElementById('header-art-mode');
+ if(dropdown)dropdown.value=headerArtMode;
+}
+function paintHeaderCrop(){
+ const c=headerCrop;if(!c)return;
+ const ctx=c.canvas.getContext('2d');if(!ctx)return;
+ const w=c.canvas.width,h=c.canvas.height;
+ const scale=Math.max(w/c.image.naturalWidth,h/c.image.naturalHeight)*c.zoom;
+ const dw=c.image.naturalWidth*scale,dh=c.image.naturalHeight*scale;
+ c.x=Math.max(w-dw,Math.min(0,c.x));
+ c.y=Math.max(h-dh,Math.min(0,c.y));
+ ctx.clearRect(0,0,w,h);
+ ctx.drawImage(c.image,c.x,c.y,dw,dh);
+}
+function zoomHeaderCrop(raw){
+ const c=headerCrop;if(!c)return;
+ const next=Math.max(1,Math.min(4,Number(raw)||1));
+ const cx=c.canvas.width/2,cy=c.canvas.height/2;
+ c.x=cx-(cx-c.x)*next/c.zoom;c.y=cy-(cy-c.y)*next/c.zoom;
+ c.zoom=next;paintHeaderCrop();
+}
+function dragHeaderCrop(event){
+ const c=headerCrop;if(!c)return;
+ if(event.type==='pointerdown'){
+  if(c.pointerId!==null)return;
+  c.pointerId=event.pointerId;c.lastX=event.clientX;c.lastY=event.clientY;
+  c.canvas.setPointerCapture(event.pointerId);
+ }else if(event.type==='pointermove'&&c.pointerId===event.pointerId){
+  const rect=c.canvas.getBoundingClientRect();
+  c.x+=(event.clientX-c.lastX)*c.canvas.width/rect.width;
+  c.y+=(event.clientY-c.lastY)*c.canvas.height/rect.height;
+  c.lastX=event.clientX;c.lastY=event.clientY;paintHeaderCrop();
+ }else if(c.pointerId===event.pointerId)c.pointerId=null;
+}
 async function selectHeaderArtFile(file){
  if(!file)return;
- if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>8*1024*1024){
-  setHeaderArtStatus('JPEG・PNG・WebP形式で8MB以下の画像を選んでな');return;
+ const type=String(file.type||'').toLowerCase(),name=String(file.name||'');
+ if((!type.startsWith('image/')&&!/\.(jpe?g|png|webp|heic|heif)$/i.test(name))||file.size>20*1024*1024){
+  setHeaderArtStatus('画像ファイル（20MB以下）を選んでな');
+  const picker=document.getElementById('header-art-file');if(picker)picker.value='';
+  return;
  }
+ setHeaderArtStatus('画像を読み込み中…');
  try{
-  // Decode first: malformed images must not replace a working header.
-  const probe=await readPhotoImage(file);
-  if(probe._takuwaeObjectURL)URL.revokeObjectURL(probe._takuwaeObjectURL);
-  await headerArtStore('write',file);
-  const next=URL.createObjectURL(file),previous=headerArtObjectUrl;
-  headerArtObjectUrl=next;
+  const image=await readPhotoImage(file);
+  closeHeaderCrop();
+  const overlay=document.createElement('div');overlay.id='header-crop-overlay';
+  overlay.innerHTML='<section class="background-crop-panel" role="dialog" aria-modal="true" aria-label="タイトル画像の表示範囲"><h3>タイトル画像の表示範囲</h3><p>横長のタイトル領域に合わせて、写真を指で動かしてな。拡大率も変えられるで。</p><canvas id="header-crop-canvas" aria-label="タイトル画像の切り取り範囲"></canvas><label for="header-crop-zoom">拡大・縮小</label><input id="header-crop-zoom" type="range" min="1" max="4" step="0.01" value="1" oninput="zoomHeaderCrop(this.value)"><div class="background-crop-actions"><button type="button" class="secondary" onclick="closeHeaderCrop()">キャンセル</button><button type="button" onclick="saveHeaderCrop()">この範囲で決定</button></div><p id="header-crop-message" role="status" aria-live="polite"></p></section>';
+  document.body.appendChild(overlay);
+  const canvas=document.getElementById('header-crop-canvas');
+  canvas.width=440;canvas.height=140;
+  const base=Math.max(canvas.width/image.naturalWidth,canvas.height/image.naturalHeight);
+  headerCrop={image,canvas,zoom:1,x:(canvas.width-image.naturalWidth*base)/2,y:(canvas.height-image.naturalHeight*base)/2,pointerId:null,lastX:0,lastY:0};
+  for(const kind of ['pointerdown','pointermove','pointerup','pointercancel'])canvas.addEventListener(kind,dragHeaderCrop);
+  paintHeaderCrop();
+ }catch(error){
+  closeHeaderCrop();
+  setHeaderArtStatus('画像を開けへんかった：'+(error.message||String(error)));
+ }
+}
+async function saveHeaderCrop(){
+ const c=headerCrop;if(!c)return;
+ const message=document.getElementById('header-crop-message');
+ try{
+  if(message)message.textContent='タイトル画像を保存中…';
+  const output=document.createElement('canvas');output.width=1100;output.height=350;
+  const ctx=output.getContext('2d');if(!ctx)throw Error('写真の加工に対応してへん');
+  const factor=output.width/c.canvas.width;
+  const scale=Math.max(c.canvas.width/c.image.naturalWidth,c.canvas.height/c.image.naturalHeight)*c.zoom*factor;
+  ctx.drawImage(c.image,c.x*factor,c.y*factor,c.image.naturalWidth*scale,c.image.naturalHeight*scale);
+  const blob=await new Promise(resolve=>output.toBlob(resolve,'image/png'));
+  if(!blob)throw Error('画像を加工できへんかった');
+  await headerArtStore('write',blob);
+  headerArtObjectUrl=await backgroundDataURL(blob);
   setHeaderArtMode('custom');
-  if(previous)URL.revokeObjectURL(previous);
-  const select=document.getElementById('header-art-mode');
-  if(select)select.value='custom';
-  setHeaderArtStatus('選んだ画像に差し替えたで');
- }catch(error){setHeaderArtStatus('画像を差し替えられへんかった：'+(error.message||String(error)))}
+  closeHeaderCrop();
+  setHeaderArtStatus('表示範囲を保存してタイトル画像を変更したで');
+ }catch(error){if(message)message.textContent='保存できへんかった：'+(error.message||String(error))}
 }
 initializeHeaderArt();
 
