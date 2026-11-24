@@ -1510,53 +1510,82 @@ function reorderCustomItem(group,fromKey,toKey){
  save();render();window.scrollTo(0,scrollY);
 }
 let customDrag=null;
-document.addEventListener('pointerdown',event=>{
- const grip=event.target.closest('.custom-sort-grip');
- if(!grip||event.button!==0||customDrag)return;
- const item=grip.closest('.custom-sort-item');
- if(!item)return;
- event.preventDefault();
+function beginSortDrag(grip,x,y,identity){
+ if(customDrag)return;
+ const item=grip.closest('.custom-sort-item');if(!item)return;
  const box=item.getBoundingClientRect();
  const ghost=item.cloneNode(true);
  ghost.classList.add('custom-sort-ghost');
  ghost.classList.remove('custom-sort-active','custom-sort-over');
  ghost.querySelectorAll('input,button').forEach(x=>{x.tabIndex=-1;x.disabled=true});
- ghost.style.width=box.width+'px';
- ghost.style.left=box.left+'px';
- ghost.style.top=box.top+'px';
+ ghost.style.width=box.width+'px';ghost.style.left=box.left+'px';ghost.style.top=box.top+'px';
  document.body.appendChild(ghost);
  item.classList.add('custom-sort-active');
- const offsetY=event.clientY-box.top;
- customDrag={pointerId:event.pointerId,group:item.dataset.group,key:item.dataset.key,
-  target:null,item,grip,ghost,offsetY,initialY:event.clientY};
- try{grip.setPointerCapture(event.pointerId)}catch{}
-});
-document.addEventListener('pointermove',event=>{
- const d=customDrag;
- if(!d||event.pointerId!==d.pointerId)return;
- event.preventDefault();
- d.ghost.style.top=(event.clientY-d.offsetY)+'px';
- // Ignore the floating clone during hit testing and highlight the drop row.
- const under=document.elementFromPoint(event.clientX,event.clientY)?.closest('.custom-sort-item');
+ customDrag={identity,group:item.dataset.group,key:item.dataset.key,target:null,
+  item,grip,ghost,offsetY:y-box.top};
+}
+function moveSortDrag(x,y,identity){
+ const d=customDrag;if(!d||d.identity!==identity)return;
+ d.ghost.style.top=(y-d.offsetY)+'px';
+ const under=document.elementFromPoint(x,y)?.closest('.custom-sort-item');
  const target=under&&under!==d.item&&under.dataset.group===d.group?under:null;
  document.querySelectorAll('.custom-sort-over').forEach(x=>x.classList.remove('custom-sort-over'));
  d.target=target?.dataset.key||null;
  if(target)target.classList.add('custom-sort-over');
- // Nudge the viewport near edges, making long lists sortable on touchscreens.
- if(event.clientY<65)window.scrollBy(0,-14);
- else if(event.clientY>window.innerHeight-65)window.scrollBy(0,14);
-});
-function finishCustomDrag(event){
- const d=customDrag;
- if(!d||event.pointerId!==d.pointerId)return;
- customDrag=null;
- try{if(d.grip.hasPointerCapture(event.pointerId))d.grip.releasePointerCapture(event.pointerId)}catch{}
- d.ghost.remove();
- document.querySelectorAll('.custom-sort-active,.custom-sort-over').forEach(x=>x.classList.remove('custom-sort-active','custom-sort-over'));
- if(event.type==='pointerup'&&d.target)reorderCustomItem(d.group,d.key,d.target);
+ if(y<65)window.scrollBy(0,-12);
+ else if(y>window.innerHeight-65)window.scrollBy(0,12);
 }
-document.addEventListener('pointerup',finishCustomDrag);
-document.addEventListener('pointercancel',finishCustomDrag);
+function endSortDrag(identity,commit){
+ const d=customDrag;if(!d||d.identity!==identity)return;
+ customDrag=null;d.ghost.remove();
+ document.querySelectorAll('.custom-sort-active,.custom-sort-over').forEach(x=>x.classList.remove('custom-sort-active','custom-sort-over'));
+ if(commit&&d.target)reorderCustomItem(d.group,d.key,d.target);
+}
+// Explicit touch events: iOS Chrome/WebKit may not deliver captured pointermove
+// reliably from a button. Use non-passive touchmove to block page scrolling.
+document.addEventListener('touchstart',event=>{
+ const grip=event.target.closest('.custom-sort-grip');
+ if(!grip||event.touches.length!==1)return;
+ const t=event.changedTouches[0];
+ beginSortDrag(grip,t.clientX,t.clientY,'touch:'+t.identifier);
+ event.preventDefault();
+},{passive:false});
+document.addEventListener('touchmove',event=>{
+ const d=customDrag;if(!d||!d.identity.startsWith('touch:'))return;
+ const id=Number(d.identity.slice(6));
+ const t=Array.from(event.touches).find(x=>x.identifier===id);
+ if(!t)return;
+ event.preventDefault();moveSortDrag(t.clientX,t.clientY,d.identity);
+},{passive:false});
+document.addEventListener('touchend',event=>{
+ const d=customDrag;if(!d||!d.identity.startsWith('touch:'))return;
+ const id=Number(d.identity.slice(6));
+ const t=Array.from(event.changedTouches).find(x=>x.identifier===id);
+ if(!t)return;
+ moveSortDrag(t.clientX,t.clientY,d.identity);
+ endSortDrag(d.identity,true);
+},{passive:false});
+document.addEventListener('touchcancel',()=>{
+ if(customDrag?.identity.startsWith('touch:'))endSortDrag(customDrag.identity,false);
+});
+document.addEventListener('pointerdown',event=>{
+ if(event.pointerType==='touch'||event.button!==0)return;
+ const grip=event.target.closest('.custom-sort-grip');if(!grip)return;
+ event.preventDefault();
+ beginSortDrag(grip,event.clientX,event.clientY,'pointer:'+event.pointerId);
+ try{grip.setPointerCapture(event.pointerId)}catch{}
+});
+document.addEventListener('pointermove',event=>{
+ if(event.pointerType==='touch')return;
+ if(customDrag?.identity!=='pointer:'+event.pointerId)return;
+ event.preventDefault();moveSortDrag(event.clientX,event.clientY,customDrag.identity);
+});
+document.addEventListener('pointerup',event=>{
+ if(customDrag?.identity==='pointer:'+event.pointerId)endSortDrag(customDrag.identity,true);
+});
+document.addEventListener('pointercancel',event=>{
+ if(customDrag?.identity==='pointer:'+event.pointerId)endSortDrag(customDrag.identity,false);
+});
 const settingsBeforeCustomLabels=settingsView;
 settingsView=function(){
  const grip=(group,key,label)=>'<button type="button" class="custom-sort-grip" aria-label="'+esc(label)+'をつまんで並び替え" title="長押しして移動">☰</button>';
