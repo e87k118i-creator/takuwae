@@ -1173,6 +1173,26 @@ header.v79-header img{object-fit:contain}
 #view .saving-color-4{--saving-line-color:#42a7c0;--saving-marker:rgba(66,167,192,.25)}
 #view .saving-feature-title{--saving-line-color:#6c90db;--saving-marker:rgba(230,181,74,.35)}
 #view .saving-month-title{--saving-line-color:#9c68dc;--saving-marker:rgba(156,104,220,.22)}
+/* All tabs: marker background for headings, hand-drawn wave for standalone money figures. */
+#view .global-marker-heading{
+  display:inline;
+  background:linear-gradient(transparent 41%,var(--global-marker,rgba(255,220,98,.50)) 41%,var(--global-marker,rgba(255,220,98,.50)) 91%,transparent 91%)!important;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;
+  padding:0 2px;
+  text-decoration:none!important;
+}
+#view .global-marker-0{--global-marker:rgba(248,211,93,.48)}
+#view .global-marker-1{--global-marker:rgba(247,153,185,.40)}
+#view .global-marker-2{--global-marker:rgba(111,215,187,.38)}
+#view .global-marker-3{--global-marker:rgba(152,189,246,.40)}
+#view .global-marker-4{--global-marker:rgba(197,167,239,.40)}
+#view .global-money-wave{
+  text-decoration-line:underline!important;
+  text-decoration-style:wavy!important;
+  text-decoration-thickness:2px!important;
+  text-underline-offset:5px!important;
+  text-decoration-color:#315b9c!important;
+}
 /* Bare titles sit directly over the photo, unlike headings inside translucent panels. */
 #view .adaptive-title-light{color:#fffdf7!important;text-shadow:0 1px 3px rgba(5,20,34,.8),0 0 8px rgba(5,20,34,.4)}
 #view .adaptive-title-dark{color:#172a3a!important;text-shadow:0 1px 3px rgba(255,255,255,.6)}
@@ -2339,6 +2359,40 @@ const renderBeforeCustomLabels=render;
 render=function(){
  for(const k of accountKeys()){const extra=Array.isArray(db.extraAccounts)?db.extraAccounts.find(x=>x.id===k):null;const fallback=defaultAccountNames[k]||extra?.name||k;names[k]=typeof db.accountLabels?.[k]==='string'&&db.accountLabels[k].trim()?db.accountLabels[k]:fallback;}
  return renderBeforeCustomLabels();
+};
+
+/* Add readable emphasis after each tab render, without changing financial values or controls. */
+function applyGlobalLedgerHighlights(){
+ const root=document.getElementById('view');if(!root)return;
+ let headingIndex=0;
+ for(const heading of root.querySelectorAll('h2,h3')){
+  // Existing savings markup already has a marker; avoid double highlighting.
+  const already=heading.querySelector('.saving-handline');
+  if(already){headingIndex++;continue}
+  const marker='global-marker-'+(headingIndex%5);
+  headingIndex++;
+  for(const node of Array.from(heading.childNodes)){
+   if(node.nodeType!==Node.TEXT_NODE||!node.textContent.trim())continue;
+   const span=document.createElement('span');
+   span.className='global-marker-heading '+marker;
+   heading.replaceChild(span,node);
+   span.textContent=node.textContent;
+  }
+ }
+ // Emphasize only individual displayed yen figures, not paragraphs, inputs or controls.
+ for(const el of root.querySelectorAll('strong,b,span,.big')){
+  if(el.closest('button,label,select,textarea,form,.caption,.foot,.notice,.saving-handline'))continue;
+  if(el.children.length>0)continue;
+  const value=(el.textContent||'').trim();
+  if(!/^[+＋−-]?\s*¥\s*[0-9,]+(?:円)?$/.test(value))continue;
+  el.classList.add('global-money-wave');
+ }
+}
+const renderBeforeGlobalHighlights=render;
+render=function(){
+ const result=renderBeforeGlobalHighlights();
+ applyGlobalLedgerHighlights();
+ return result;
 };
 
 render();
