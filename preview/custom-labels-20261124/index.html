@@ -1481,11 +1481,62 @@ function changeExpenseCategory(action,key){
  }else return;
  save();render();
 }
+
+function reorderCustomItem(group,fromKey,toKey){
+ if(fromKey===toKey)return;
+ if(group==='account'){
+  const items=accountDisplayOrder().slice();
+  const from=items.indexOf(fromKey),to=items.indexOf(toKey);
+  if(from<0||to<0)return;
+  items.splice(to,0,items.splice(from,1)[0]);
+  db.accountOrder=items;
+ }else if(group==='category'){
+  ensureExpenseCategories();
+  const items=db.expenseCategoryItems;
+  const from=items.findIndex(x=>x.id===fromKey),to=items.findIndex(x=>x.id===toKey);
+  if(from<0||to<0)return;
+  items.splice(to,0,items.splice(from,1)[0]);
+ }else return;
+ const scrollY=window.scrollY;
+ save();render();
+ window.scrollTo(0,scrollY);
+}
+let customDrag=null;
+document.addEventListener('pointerdown',event=>{
+ const grip=event.target.closest('.custom-sort-grip');
+ if(!grip||event.button!==0)return;
+ const item=grip.closest('.custom-sort-item');
+ if(!item)return;
+ event.preventDefault();
+ customDrag={pointerId:event.pointerId,group:item.dataset.group,key:item.dataset.key,target:null,grip};
+ item.classList.add('custom-sort-active');
+ grip.setPointerCapture(event.pointerId);
+});
+document.addEventListener('pointermove',event=>{
+ if(!customDrag||event.pointerId!==customDrag.pointerId)return;
+ event.preventDefault();
+ const under=document.elementFromPoint(event.clientX,event.clientY)?.closest('.custom-sort-item');
+ const target=under?.dataset.group===customDrag.group?under:null;
+ document.querySelectorAll('.custom-sort-over').forEach(x=>x.classList.remove('custom-sort-over'));
+ customDrag.target=target?.dataset.key||null;
+ if(target&&target.dataset.key!==customDrag.key)target.classList.add('custom-sort-over');
+});
+function finishCustomDrag(event){
+ if(!customDrag||event.pointerId!==customDrag.pointerId)return;
+ const {group,key,target,grip}=customDrag;
+ customDrag=null;
+ if(grip.hasPointerCapture(event.pointerId))grip.releasePointerCapture(event.pointerId);
+ document.querySelectorAll('.custom-sort-active,.custom-sort-over').forEach(x=>x.classList.remove('custom-sort-active','custom-sort-over'));
+ if(event.type==='pointerup'&&target&&target!==key)reorderCustomItem(group,key,target);
+}
+document.addEventListener('pointerup',finishCustomDrag);
+document.addEventListener('pointercancel',finishCustomDrag);
 const settingsBeforeCustomLabels=settingsView;
 settingsView=function(){
- const accounts=accountDisplayOrder().map((k,i,list)=>'<div class="field"><label>現在：'+esc(names[k])+'</label><div class="row"><input id="account-label-'+k+'" maxlength="40" value="'+esc(names[k])+'"><button type="button" class="secondary" onclick="renameAccount(\''+k+'\')">変更</button></div><div class="row" style="justify-content:flex-end"><button type="button" class="secondary" '+(i===0?'disabled':'')+' onclick="moveAccount(\''+k+'\',-1)">↑ 上へ</button><button type="button" class="secondary" '+(i===list.length-1?'disabled':'')+' onclick="moveAccount(\''+k+'\',1)">↓ 下へ</button></div></div>').join('');
- const categories=(db.expenseCategoryItems||defaultExpenseCategoryNames.map((name,i)=>({id:'default_'+i,name,active:true}))).map((c,i,list)=>'<div class="field"><label>'+(c.active===false?'使用停止中':'使用中')+' · '+(i+1)+'番目</label><div class="row"><input id="category-label-'+esc(c.id)+'" maxlength="40" value="'+esc(c.name)+'"><button type="button" class="secondary" onclick="changeExpenseCategory(\'rename\',\''+c.id+'\')">変更</button><button type="button" class="secondary" onclick="changeExpenseCategory(\'toggle\',\''+c.id+'\')">'+(c.active===false?'再開':'停止')+'</button></div><div class="row" style="justify-content:flex-end"><button type="button" class="secondary" aria-label="'+esc(c.name)+'を上に移動" '+(i===0?'disabled':'')+' onclick="moveExpenseCategory(\''+c.id+'\',-1)">↑ 上へ</button><button type="button" class="secondary" aria-label="'+esc(c.name)+'を下に移動" '+(i===list.length-1?'disabled':'')+' onclick="moveExpenseCategory(\''+c.id+'\',1)">↓ 下へ</button></div></div>').join('');
- return settingsBeforeCustomLabels()+'<div class="card stack"><h3>口座・支払い元の表示名</h3><p class="caption">5つの内部口座はそのまま。名称だけ変更するで。口座の追加と削除はまだできへん。</p>'+accounts+'</div><div class="card stack"><h3>支出区分の管理</h3><p class="caption">変更した名前は今後の記録に使うで。過去の履歴は変わらへん。</p>'+categories+'<div class="field"><label>区分を追加</label><div class="row"><input id="expense-category-new" maxlength="40" placeholder="新しい支出区分"><button type="button" onclick="changeExpenseCategory(\'add\',\'\')">追加</button></div></div></div>';
+ const grip=(group,key,label)=>'<button type="button" class="custom-sort-grip" aria-label="'+esc(label)+'をつまんで並び替え" title="長押しして移動">☰</button>';
+ const accounts=accountDisplayOrder().map((k,i)=>'<div class="field custom-sort-item" data-group="account" data-key="'+esc(k)+'"><div class="row">'+grip('account',k,names[k])+'<div class="field" style="flex:1"><label>現在：'+esc(names[k])+'</label><input id="account-label-'+k+'" maxlength="40" value="'+esc(names[k])+'"></div><button type="button" class="secondary" onclick="renameAccount(\''+k+'\')">変更</button></div></div>').join('');
+ const categories=(db.expenseCategoryItems||defaultExpenseCategoryNames.map((name,i)=>({id:'default_'+i,name,active:true}))).map(c=>'<div class="field custom-sort-item" data-group="category" data-key="'+esc(c.id)+'"><div class="row">'+grip('category',c.id,c.name)+'<div class="field" style="flex:1"><label>'+(c.active===false?'使用停止中':'使用中')+'</label><input id="category-label-'+esc(c.id)+'" maxlength="40" value="'+esc(c.name)+'"></div><button type="button" class="secondary" onclick="changeExpenseCategory(\'rename\',\''+c.id+'\')">変更</button><button type="button" class="secondary" onclick="changeExpenseCategory(\'toggle\',\''+c.id+'\')">'+(c.active===false?'再開':'停止')+'</button></div></div>').join('');
+ return settingsBeforeCustomLabels()+'<div class="card stack"><h3>口座・支払い元の表示名</h3><p class="caption">左端の☰をつまんで上下に動かすと、表示順を変更できるで。5つの内部口座と残高は変わらへん。</p>'+accounts+'</div><div class="card stack"><h3>支出区分の管理</h3><p class="caption">左端の☰をつまんで並び替え。変更した名前は今後の記録に使い、過去の履歴は変わらへん。</p>'+categories+'<div class="field"><label>区分を追加</label><div class="row"><input id="expense-category-new" maxlength="40" placeholder="新しい支出区分"><button type="button" onclick="changeExpenseCategory(\'add\',\'\')">追加</button></div></div></div>';
 };
 const renderBeforeCustomLabels=render;
 render=function(){
