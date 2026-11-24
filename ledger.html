@@ -1920,7 +1920,7 @@ function startBackgroundCropDrag(event){
 }
 async function chooseBackgroundPhoto(file){
  if(!file)return;
- if(!file.type.startsWith('image/')){setBackgroundStatus('画像ファイルを選んでな');return}
+ if(!file.type.startsWith('image/')&&!/\.(jpe?g|png|webp|heic|heif)$/i.test(String(file.name||''))){setBackgroundStatus('画像ファイルを選んでな');return}
  if(file.size>20*1024*1024){setBackgroundStatus('写真は20MB以下のものを選んでな');return}
  setBackgroundStatus('写真を読み込み中…');
  try{
