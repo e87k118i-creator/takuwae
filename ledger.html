@@ -1201,7 +1201,18 @@ header.v79-header img{object-fit:contain}
 /* Bare titles sit directly over the photo, unlike headings inside translucent panels. */
 #view .adaptive-title-light{color:#fffdf7!important;text-shadow:0 1px 3px rgba(5,20,34,.8),0 0 8px rgba(5,20,34,.4)}
 #view .adaptive-title-dark{color:#172a3a!important;text-shadow:0 1px 3px rgba(255,255,255,.6)}
-</style><style id="takuwae-status-bar-base">html{background-color:#10263c}</style></head><body><main><header class="v79-header" aria-label="たくわえ パーソナルファイナンス"><img id="takuwae-header-art" src="./assets/header-current.svg" alt="たくわえ。ホースケとピンクの貯金箱、芽と硬貨のイラスト"></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
+</style><style id="takuwae-status-bar-base">html{background-color:#10263c}</style><style>
+#view .quick-wheel-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#view .quick-wheel-col{min-width:0}
+#view .quick-wheel-col h3{margin:0 0 5px}
+#view .quick-wheel{height:108px;box-sizing:border-box;padding:36px 0;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain;position:relative;border-radius:11px;background:rgba(128,128,128,.09)}
+#view .quick-wheel::-webkit-scrollbar{display:none}
+#view .quick-wheel [role=option]{height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;white-space:nowrap;overflow:hidden;font-size:14px;opacity:.55}
+#view .quick-wheel [aria-selected=true]{opacity:1;font-weight:700;background:rgba(50,122,112,.15);border-radius:8px}
+#view .quick-memo-row{display:grid;grid-template-columns:minmax(0,1fr) 90px;gap:8px;margin-top:8px;margin-bottom:12px;align-items:center}
+#view .quick-memo-row input{min-width:0;width:100%;box-sizing:border-box}
+#view .quick-panel .quick-heading{margin-top:8px}
+</style></head><body><main><header class="v79-header" aria-label="たくわえ パーソナルファイナンス"><img id="takuwae-header-art" src="./assets/header-current.svg" alt="たくわえ。ホースケとピンクの貯金箱、芽と硬貨のイラスト"></header><div id="view"></div><div class="foot">銀行との自動連携はありません。金額は入力した記録をもとに計算します。銀行明細との照合とバックアップを定期的に行ってください。</div></main><div class="home-switch seg" id="home-switch" hidden aria-label="ホーム内の表示切り替え"></div><nav class="nav"><div class="nav-inner" id="nav"></div></nav><script>
 const KEY='takuwae-v1';const names={s1:'三井住友①',r:'りそな',s2:'三井住友②',cash:'現金財布',em:'電子マネー'};const seedBills=[['rent','家賃','r'],['parking','駐車場','s1'],['insurance','傷害保険','s1'],['phone','携帯電話','s1'],['chat','ChatGPT','s1'],['adobe','Adobe','s1'],['youtube','YouTube',''],['weather','ウェザーニュース',''],['prime','Amazonプライム','']].map(([id,name,bank])=>({id,name,bank,active:true}));
 const today=()=>new Date().toLocaleDateString('sv-SE');const accountingMonth=(date,payday=25)=>{const match=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(date||''));if(!match)return '';let y=Number(match[1]),m=Number(match[2]),d=Number(match[3]);const pay=Math.max(2,Math.min(28,Number(payday)||25));if(d>=pay){m++;if(m===13){m=1;y++}}return String(y).padStart(4,'0')+'-'+String(m).padStart(2,'0')};const ym=()=>accountingMonth(today(),db.payday);const fresh=()=>({initial:{s1:0,r:0,s2:0,cash:0,em:0},fundInitial:{repair:0,car:0},fundCategories:[{id:'repair',name:'修理予備費',goal:300000},{id:'car',name:'車両購入資金',goal:0}],bills:seedBills,months:{},tx:[],monthly:30000,bonus:150000,payday:25,weeklyBuffer:0});let db;try{db=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){db=fresh()}if(!Array.isArray(db.fundCategories))db.fundCategories=fresh().fundCategories;const ui={tab:'home',type:'expense',edit:false,selected:[],add:false,withdrawStep:0,wd:{fund:'repair',amount:'',reason:'フレアの修理',to:'s1'},filter:'all',month:ym(),addFund:false,deleteFund:null,editTx:null,billNotice:null};const fmt=n=>'¥'+Math.round(Number(n)||0).toLocaleString('ja-JP');const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);let save=()=>localStorage.setItem(KEY,JSON.stringify(db));const month=()=>db.months[ui.month]??(db.months[ui.month]={});const billState=b=>month()[b.id]??(month()[b.id]={amount:'',paid:false,bank:b.bank});const activeBills=()=>db.bills.filter(b=>b.active!==false&&(!b.end||ui.month<b.end)&&(!b.start||ui.month>=b.start));const balances=()=>{const a={...db.initial};for(const t of db.tx){if(t.kind==='income')a[t.to]=(a[t.to]||0)+t.amount;else if(t.kind==='expense') {if(t.settled)a[t.from]=(a[t.from]||0)-t.amount;}else {a[t.from]=(a[t.from]||0)-t.amount;a[t.to]=(a[t.to]||0)+t.amount;}}return a};const fundName=k=>db.fundCategories.find(f=>f.id===k)?.name||k;const funds=()=>{const a={...db.fundInitial};for(const t of db.tx){if(t.kind==='saving')a[t.purpose]=(a[t.purpose]||0)+t.amount;if(t.kind==='withdraw')a[t.purpose]=(a[t.purpose]||0)-t.amount;}return a};const options=(selected,includeEmpty=false,subset=Object.keys(names))=>(includeEmpty?'<option value="">支払元</option>':'')+accountDisplayOrder().filter(k=>subset.includes(k)).map(k=>`<option value="${k}" ${selected===k?'selected':''}>${esc(names[k])}</option>`).join('');const totalBill=()=>activeBills().reduce((s,b)=>s+(billState(b).paid?Number(billState(b).amount)||0:0),0);const pending=()=>activeBills().filter(b=>!billState(b).paid).reduce((s,b)=>s+(Number(billState(b).amount)||0),0);const unknown=()=>activeBills().filter(b=>!billState(b).amount).length;const moneyColor=k=>({expense:'navy',income:'green',saving:'blue',withdraw:'amber',transfer:'muted'}[k]||'muted');const titleKind=k=>({expense:'出金',income:'入金',saving:'積立',withdraw:'取り崩し',transfer:'振替'}[k]);function record(t){db.tx.unshift({id:id(),date:today(),...t});save();render()};function setTab(t){ui.tab=t;ui.withdrawStep=0;render()};function navIcon(k){return '<span class="nav-illustration sprite-icon sprite-'+k+'" aria-hidden="true"></span>';
 const outline='#632607',cream='#fff6df',red='#ff5147',blue='#2baaf7',gold='#ffc92e';
@@ -1235,7 +1246,7 @@ function homeFundCards(){
 let homeExpenseExpanded=false;
 function expenseBreakdown(transactions,period,payday){
  const totals=new Map(),sources=new Map();let total=0;
- for(const t of transactions){if(t.kind!=='expense'||accountingMonth(t.date,payday)!==period)continue;const amount=Number(t.amount||0);if(!Number.isFinite(amount))continue;const name=t.billKey?'固定費':String(t.category||'その他').trim()||'その他';totals.set(name,(totals.get(name)||0)+amount);total+=amount;const key=String(t.from||'');const source=sources.get(key)||{key,total:0,pending:0,label:''};source.total+=amount;if(t.settled===false)source.pending+=amount;if(!source.label)source.label=String(t.accountLabelsAtRecord?.[key]||'');sources.set(key,source);}
+ for(const t of transactions){if(t.kind!=='expense'||accountingMonth(t.date,payday)!==period)continue;const amount=Number(t.amount||0);if(!Number.isFinite(amount))continue;const name=t.billKey?'固定費':({'ジュース':'飲料','食事':'食費'}[t.category]||String(t.category||'その他').trim()||'その他');totals.set(name,(totals.get(name)||0)+amount);total+=amount;const key=String(t.from||'');const source=sources.get(key)||{key,total:0,pending:0,label:''};source.total+=amount;if(t.settled===false)source.pending+=amount;if(!source.label)source.label=String(t.accountLabelsAtRecord?.[key]||'');sources.set(key,source);}
  return {total,rows:[...totals].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ja')),sources:[...sources.values()].sort((a,b)=>b.total-a.total||a.key.localeCompare(b.key))};
 }
 function homeExpenseSources(sources,total){
@@ -1483,10 +1494,10 @@ const homeBeforeRollover=home;
 home=function(){return homeBeforeRollover()+rolloverForm()+historyRolloverView()};
 
 /* v1.0 quick entry: existing storage key and ledger are preserved. */
-let quickMode='quick',quickCategory='ジュース',quickSource='cash',quickAmount='',quickNotice='';
+let quickMode='quick',quickCategory='飲料',quickSource='cash',quickAmount='',quickNotice='',quickMemo='';
 const quickSources=[['cash','現金'],['em','電子マネー'],['s1','三井住友'],['r','りそな']];
 function quickSourceChoices(){return accountDisplayOrder().map(k=>[k,names[k]||k]);}
-const quickCategories=['ジュース','交際費','買い物','食事','支払い','雑費'];
+const quickCategories=['飲料','交際費','買い物','食費','外食費','たばこ','衛生費','衣服費','支払い','雑費'];
 const homeV09=home;
 function quickSetCategory(v){if(!quickCategories.includes(v))return;quickCategory=v;render()}
 function quickSetSource(v){if(!quickSourceChoices().some(x=>x[0]===v))return;quickSource=v;render()}
@@ -1499,21 +1510,34 @@ function quickRecord(){
  if(!quickCategories.includes(quickCategory)||!quickSourceChoices().some(x=>x[0]===quickSource))return;
  quickBusy=true;
  try{
-   record({kind:'expense',amount:n,from:quickSource,category:quickCategory,method:'instant',settled:true,note:'',recordedAt:new Date().toISOString()});
-   quickAmount='';quickNotice=fmt(n)+' を記録したで';
+   record({kind:'expense',amount:n,from:quickSource,category:quickCategory,method:'instant',settled:true,note:quickMemo,recordedAt:new Date().toISOString()});
+   quickAmount='';quickMemo='';quickNotice=fmt(n)+' を記録したで';
  }finally{quickBusy=false}
  render();
 }
 function quickButton(label,selected,fn){
  return '<button type="button" class="quick-choice'+(selected?' chosen':'')+'" onclick="'+fn+'">'+esc(label)+'</button>';
 }
+function quickWheel(label,choices,selected,kind){
+ return '<div class="quick-wheel-col"><h3>'+label+'</h3><div class="quick-wheel" role="listbox" aria-label="'+label+'" tabindex="0" data-kind="'+kind+'" onscroll="quickWheelScroll(this)" onkeydown="quickWheelKey(event,this)">'+choices.map(([v,n])=>'<div role="option" aria-selected="'+(v===selected)+'" data-value="'+esc(v)+'" onclick="this.parentElement.scrollTo({top:this.offsetTop-this.parentElement.firstElementChild.offsetTop,behavior:\'smooth\'})">'+esc(n)+'</div>').join('')+'</div></div>';
+}
+function quickWheelScroll(el){
+ const rows=[...el.children],i=Math.max(0,Math.min(rows.length-1,Math.round(el.scrollTop/36))),v=rows[i]?.dataset.value;
+ if(!v)return;
+ if(el.dataset.kind==='category')quickCategory=v;else quickSource=v;
+ rows.forEach((r,j)=>r.setAttribute('aria-selected',String(i===j)));
+}
+function quickWheelKey(e,el){if(!['ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();el.scrollBy({top:e.key==='ArrowUp'?-36:36,behavior:'smooth'});}
 function quickEntryView(){
- return '<div class="card quick-panel"><div class="row quick-heading"><b>使った金額</b><button id="quick-clear" type="button" class="secondary quick-clear" onclick="quickClear()" '+(!quickAmount?'disabled':'')+'>× クリア</button></div>'+
- '<div class="quick-amount-row"><div class="quick-amount"><b>¥</b><input aria-label="使った金額" type="number" min="1" step="1" inputmode="numeric" placeholder="0" value="'+esc(quickAmount)+'" oninput="quickSetAmount(this.value)"></div><button id="quick-record" type="button" class="quick-record" onclick="quickRecord()" '+(!(Number.isSafeInteger(Number(quickAmount))&&Number(quickAmount)>0)?'disabled':'')+'>✓ 記録</button></div>'+
- '<h3>支出の種類</h3><div class="quick-grid">'+quickCategories.map(v=>quickButton(v,quickCategory===v,"quickSetCategory('"+v+"')")).join('')+'</div>'+
- '<h3>支払元</h3><div class="quick-grid">'+quickSourceChoices().map(([v,label])=>quickButton(label,quickSource===v,"quickSetSource('"+v+"')")).join('')+'</div>'+
+ const sources=quickSourceChoices();if(!sources.some(x=>x[0]===quickSource))quickSource=sources[0]?.[0]||'';
+ requestAnimationFrame(()=>document.querySelectorAll('.quick-wheel').forEach(el=>{const i=[...el.children].findIndex(r=>r.getAttribute('aria-selected')==='true');if(i>=0)el.scrollTop=i*36;}));
+ return '<div class="card quick-panel"><div class="quick-wheel-pair">'+quickWheel('支出の種類',quickCategories.map(v=>[v,v]),quickCategory,'category')+quickWheel('支払元',sources,quickSource,'source')+'</div>'+
+ '<div class="row quick-heading"><b>使った金額</b><button id="quick-clear" type="button" class="secondary quick-clear" onclick="quickClear()" '+(!quickAmount?'disabled':'')+'>× クリア</button></div>'+
+ '<div class="quick-amount"><b>¥</b><input aria-label="使った金額" type="number" min="1" step="1" inputmode="numeric" placeholder="0" value="'+esc(quickAmount)+'" oninput="quickSetAmount(this.value)"></div>'+
+ '<div class="quick-memo-row"><input aria-label="メモ" placeholder="メモ（任意）" value="'+esc(quickMemo)+'" oninput="quickMemo=this.value"><button id="quick-record" type="button" class="quick-record" onclick="quickRecord()" '+(!(Number.isSafeInteger(Number(quickAmount))&&Number(quickAmount)>0)?'disabled':'')+'>✓ 記録</button></div>'+
  (quickNotice?'<p class="caption" role="status">'+esc(quickNotice)+'</p>':'')+'</div>';
 }
+
 home=function(){
  return (quickMode==='quick'?quickEntryView()+homeFundCards():homeV09());
 };
