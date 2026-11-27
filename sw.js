@@ -24,7 +24,7 @@ const files = [
   "./supabase/sync-remote-trial.js",
   "./supabase/sync-session.js"
 ];
-const cacheKey = 'takuwae-v2.5.0-expense-sources-20261125';
+const cacheKey = 'takuwae-v2.6.0-quick-wheel-20261128';
 const cachedUrls = new Set(files.map(file=>new URL(file,self.registration.scope).href));
 self.addEventListener('install',event=>{
   event.waitUntil((async()=>{
