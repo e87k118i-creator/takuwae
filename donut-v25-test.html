@@ -1,0 +1,35 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>たくわえ v25 表示検証</title><style>body{font:16px system-ui;background:#f4f0e7;color:#20394d;margin:16px}section{background:white;border-radius:16px;padding:14px;margin:16px auto;max-width:420px}h2{font-size:17px}p{font-size:13px}</style><h1>立体グラフ v25 検証</h1><p>サンプル専用・家計データ変更なし</p><main id="cases"></main><script>let free=0;const balances=()=>({r:free}),fixedUnpaid=()=>0,unpaidCredit=()=>0,db={},fmt=n=>'¥'+n.toLocaleString('ja-JP'),esc=s=>String(s);function raisedExpensePie(rows,colors){
+ const bal=balances(),free=Math.max(0,['r','cash','em'].reduce((s,k)=>s+(Number(bal[k])||0)-fixedUnpaid(k)-unpaidCredit(k),0)-(Number(db.weeklyBuffer)||0));
+ const valid=[...rows.filter(x=>Number(x[1])>0),...(free>0?[['残り資産',free]]:[])],sum=valid.reduce((s,x)=>s+Number(x[1]),0);if(!sum)return '';
+ const R=83,I=48,H=12,cy=90,cx=150,sy=.72,pt=(r,a,h=0)=>[cx+r*Math.cos(a),cy+sy*r*Math.sin(a)+h].map(v=>v.toFixed(3)).join(' '),arc=(r,a,b,h=0,rev=false)=>'A'+r+' '+r*sy+' 0 '+(Math.abs(b-a)>Math.PI?1:0)+' '+(rev?0:1)+' '+pt(r,b,h);
+ let angle=-Math.PI/2,defs='',walls=[],tops=[],labels=[];
+ valid.forEach(([name,value],i)=>{const span=Number(value)/sum*Math.PI*2,gap=valid.length===1?0:Math.min(.025,span*.10),a=angle+gap,b=angle+span-gap,m=(a+b)/2;angle+=span;const color=name==='残り資産'&&i===valid.length-1&&free>0?'#18c64b':colors.filter(x=>x!=='#25b985')[i% (colors.length-1)],id='satin-pie-'+i;
+ defs+='<linearGradient id="'+id+'" x1="0" y1="0" x2=".65" y2="1"><stop stop-color="'+color+'"/><stop offset=".28" stop-color="'+color+'"/><stop offset="1" stop-color="'+color+'"/></linearGradient>';
+ const face=(d,shade)=>'<path d="'+d+'" fill="'+color+'" style="filter:brightness('+shade+')"/>';
+ const q=Math.min(4,(R-I)/4,I*(b-a)/5),ro=q/R,ri=q/I;
+ const full=valid.length===1;
+ const d=full?'M'+pt(R,a)+' '+arc(R,a,a+Math.PI)+' '+arc(R,a+Math.PI,b)+' L'+pt(I,b)+' '+arc(I,b,b-Math.PI,0,true)+' '+arc(I,b-Math.PI,a,0,true)+' Z':'M'+pt(R,a+ro)+' '+arc(R,a+ro,b-ro)+' Q'+pt(R,b)+' '+pt(R-q,b)+' L'+pt(I+q,b)+' Q'+pt(I,b)+' '+pt(I,b-ri)+' '+arc(I,b-ri,a+ri,0,true)+' Q'+pt(I,a)+' '+pt(I+q,a)+' L'+pt(R-q,a)+' Q'+pt(R,a)+' '+pt(R,a+ro)+' Z';
+ // Extrude the exact rounded top contour, including every corner.
+ const P=(r,t)=>[r*Math.cos(t),r*Math.sin(t)];
+ const contour=[];
+ const add=p=>contour.push(p);
+ const curve=(p0,p1,p2)=>{for(let j=1;j<=8;j++){const t=j/8,u=1-t;add([u*u*p0[0]+2*u*t*p1[0]+t*t*p2[0],u*u*p0[1]+2*u*t*p1[1]+t*t*p2[1]])}};
+ const ring=(r,u,v)=>{const n=Math.max(1,Math.ceil(Math.abs(v-u)/.035));for(let j=0;j<=n;j++)add(P(r,u+(v-u)*j/n))};
+ const loops=[];
+ if(full){ring(R,a,b);loops.push(contour.splice(0));ring(I,b,a);loops.push(contour.splice(0));}
+ else {ring(R,a+ro,b-ro);curve(P(R,b-ro),P(R,b),P(R-q,b));add(P(I+q,b));curve(P(I+q,b),P(I,b),P(I,b-ri));ring(I,b-ri,a+ri);curve(P(I,a+ri),P(I,a),P(I+q,a));add(P(R-q,a));curve(P(R-q,a),P(R,a),P(R,a+ro));loops.push(contour);}
+ const project=(p,h=0)=>[cx+p[0],cy+sy*p[1]+h].map(v=>v.toFixed(3)).join(' ');
+ for(const loop of loops){for(let j=0;j<loop.length;j++){const p=loop[j],n=loop[(j+1)%loop.length],dx=n[0]-p[0],dy=n[1]-p[1],len=Math.hypot(dx,dy);if(len<.001||dx>=0)continue;
+ const shade=.73+.16*Math.max(0,-dy/len)+.08*Math.abs(dx/len);
+ const poly='M'+project(p)+' L'+project(n)+' L'+project(n,H)+' L'+project(p,H)+' Z';
+ walls.push({z:(p[1]+n[1])/2,html:'<path d="'+poly+'" fill="'+color+'" stroke="'+color+'" stroke-width=".35" style="filter:brightness('+shade+')"/>'});
+ }}
+ tops.push('<path d="'+d+'" fill="'+color+'"/><path d="'+d+'" fill="url(#satin-donut-light)" pointer-events="none"/>');
+ const side=Math.cos(m)>=0?1:-1;labels.push({side,y:cy+Math.sin(m)*65,m,name,value});
+ });
+ const maxSide=Math.max(...[-1,1].map(side=>labels.filter(x=>x.side===side).length)),height=Math.max(210, maxSide*36+24),offset=(height-190)/2;
+ let lab='';for(const side of [-1,1]){const list=labels.filter(x=>x.side===side).sort((a,b)=>a.y-b.y);let prev=0;for(const x of list){x.ly=Math.max(x.y+offset,prev+36);prev=x.ly;}const shift=Math.max(0,prev-height+18);for(const x of list){const y=x.ly-shift,tx=side===1?336:4,ex=side===1?270:70;const name=Array.from(x.name);const lines=name.length>7?[name.slice(0,7).join(''),name.slice(7,14).join('')+(name.length>14?'…':'')]:[x.name];lab+='<path d="M'+(170+R*Math.cos(x.m))+' '+(cy+offset+sy*R*Math.sin(x.m))+' L'+ex+' '+y+' H'+(side===1?274:66)+'" fill="none" stroke="currentColor" opacity=".5" stroke-width=".8"/>'+lines.map((line,j)=>'<text x="'+tx+'" y="'+(y-5-(lines.length-1-j)*12)+'" text-anchor="'+(side===1?'end':'start')+'" font-size="11" fill="currentColor">'+esc(line)+'</text>').join('')+'<text x="'+tx+'" y="'+(y+10)+'" text-anchor="'+(side===1?'end':'start')+'" font-size="13" font-weight="700" fill="currentColor">'+(Number(x.value)/sum*100).toFixed(1).replace(/\\.0$/,'')+'%</text>';}}
+ return '<svg viewBox="0 0 340 '+height+'" role="img" aria-label="立体ドーナツ型支出内訳" style="display:block;width:100%;max-width:360px;margin:8px auto 14px;overflow:visible"><defs><radialGradient id="satin-donut-light" gradientUnits="userSpaceOnUse" cx="112" cy="40" r="145"><stop stop-color="white" stop-opacity=".85"/><stop offset=".16" stop-color="white" stop-opacity=".65"/><stop offset=".35" stop-color="white" stop-opacity=".27"/><stop offset=".58" stop-color="white" stop-opacity="0"/><stop offset=".8" stop-color="black" stop-opacity=".04"/><stop offset="1" stop-color="black" stop-opacity=".22"/></radialGradient><linearGradient id="donut-edge-gloss" x1="0" y1="0" x2="0" y2="1"><stop stop-color="white" stop-opacity=".65"/><stop offset=".55" stop-color="white" stop-opacity=".15"/><stop offset="1" stop-color="white" stop-opacity=".32"/></linearGradient>'+defs+'</defs>'+ '<g transform="translate(20 '+offset+')">'+walls.sort((a,b)=>a.z-b.z).map(x=>x.html).join('')+tops.join('')+'</g>'+lab+'<text x="170" y="'+(87+offset)+'" text-anchor="middle" font-size="8.5" fill="currentColor">可処分資産</text><text x="170" y="'+(101+offset)+'" text-anchor="middle" font-size="'+(fmt(free).length>10?9:12)+'" font-weight="700" fill="currentColor">'+fmt(free)+'</text></svg>';
+}
+
+const colors=['#168ce8','#f6a21a','#ef5273','#8956e8','#16baca','#ff7043','#e5bc23','#536bd8','#a64bd0','#25b985'];const cases=[['残り資産100%',10000,[]],['残り資産0%・支出1項目',0,[['食費',10000]]],['残り資産0%・複数項目',0,[['食費',6000],['買い物',4000]]],['支出も資産もゼロ',0,[]],['微小区分0.1%',1000,[['固定費',8990],['手数料',10]]],['16項目',1000,Array.from({length:15},(_,i)=>['項目'+(i+1),(i+1)*100])]];for(const [title,amount,rows] of cases){free=amount;const section=document.createElement('section');section.innerHTML='<h2>'+title+'</h2>'+(raisedExpensePie(rows,colors)||'<p>グラフ非表示（データなし）</p>');document.querySelector('main').append(section)}</script></html>
